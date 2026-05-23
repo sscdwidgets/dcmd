@@ -1,0 +1,3368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Deposit Rates by Region</title>
+<style>
+  /* ---------- Fonts ---------- */
+  @font-face {
+    font-family: 'Cera Pro';
+    src: url('https://sscdwidgets.github.io/fonts/CeraPro-Regular.woff2') format('woff2');
+    font-weight: 400; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: 'Cera Pro';
+    src: url('https://sscdwidgets.github.io/fonts/CeraPro-Medium.woff2') format('woff2');
+    font-weight: 500; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: 'Cera Pro';
+    src: url('https://sscdwidgets.github.io/fonts/CeraPro-Bold.woff2') format('woff2');
+    font-weight: 700; font-style: normal; font-display: swap;
+  }
+
+  /* ---------- Tokens ---------- */
+  :root {
+    --navy: #002D72;
+    --navy-700: #1e4a8a;
+    --navy-50: #eaf0fa;
+    --gold: #FFBF3F;
+    --gold-soft: #FFE7AC;
+    --blue: #0960BB;
+    --blue-soft: #d6e6f7;
+    --gray-900: #1a1a1a;
+    --gray-700: #4C4C4C;
+    --gray-500: #7a7a7a;
+    --gray-300: #d0d4dc;
+    --gray-200: #e4e7ee;
+    --gray-100: #f3f5f9;
+    --gray-50:  #f8f9fc;
+    --white: #ffffff;
+    --up: #1a8a4d;
+    --down: #c0392b;
+    --flat: #7a7a7a;
+
+    --radius: 8px;
+    --radius-sm: 4px;
+    --shadow-sm: 0 1px 2px rgba(0,45,114,0.06);
+    --shadow-md: 0 4px 14px rgba(0,45,114,0.08);
+    --font: 'Cera Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: var(--font);
+    color: var(--gray-900);
+    background: var(--white);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ---------- Layout ---------- */
+  .widget {
+    max-width: 1280px;
+    margin: 0 auto;
+    background: var(--white);
+  }
+
+  .widget-header {
+    padding: 18px 28px 16px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* ---------- Logo ---------- */
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-mark { flex-shrink: 0; }
+  .logo-mark svg { width: 40px; height: 40px; display: block; }
+  .logo-text { line-height: 1.15; }
+  .logo-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.005em;
+  }
+  .logo-name .accent { color: var(--navy); font-weight: 500; }
+  .logo-text .subtitle {
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--gray-500);
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
+  /* ---------- Sidebar toggle button ---------- */
+  .sidebar-toggle {
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    color: var(--navy);
+    padding: 7px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    transition: all .12s ease;
+    flex-shrink: 0;
+    align-self: center;
+    height: 34px;
+    letter-spacing: 0.01em;
+  }
+  .sidebar-toggle:hover {
+    background: var(--navy-50);
+    border-color: var(--navy);
+  }
+  .sidebar-toggle.active {
+    background: var(--navy);
+    color: var(--white);
+    border-color: var(--navy);
+  }
+  .sidebar-toggle svg {
+    width: 14px; height: 14px;
+    fill: none; stroke: currentColor; stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  .main-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    min-height: 720px;
+    transition: grid-template-columns .2s ease;
+  }
+  .container.sidebar-open {
+    grid-template-columns: 300px 1fr;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    display: none;
+    background: var(--gray-50);
+    border-right: 1px solid var(--gray-200);
+    flex-direction: column;
+  }
+  .container.sidebar-open .sidebar {
+    display: flex;
+  }
+
+  .geo-tabs {
+    display: flex;
+    gap: 2px;
+    padding: 14px 14px 0;
+  }
+  .geo-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 8px 4px;
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gray-500);
+    cursor: pointer;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: all .12s ease;
+  }
+  .geo-tab:hover:not(.active):not(:disabled) {
+    color: var(--navy);
+    background: var(--white);
+  }
+  .geo-tab.active {
+    background: var(--white);
+    color: var(--navy);
+    border-bottom: 2px solid var(--gold);
+  }
+  .geo-tab:disabled {
+    color: var(--gray-300);
+    cursor: not-allowed;
+  }
+
+  .sidebar-search {
+    padding: 10px 14px 12px;
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .sidebar-search input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--gray-900);
+    background: var(--white);
+    transition: border-color .12s ease;
+  }
+  .sidebar-search input:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-soft);
+  }
+
+  .state-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 0;
+    max-height: 700px;
+  }
+  .state-list::-webkit-scrollbar { width: 8px; }
+  .state-list::-webkit-scrollbar-track { background: transparent; }
+  .state-list::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: 4px;
+  }
+
+  .state-item { border-bottom: 1px solid var(--gray-200); }
+  .state-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-900);
+    text-align: left;
+    cursor: pointer;
+    transition: background .12s ease;
+  }
+  .state-row:hover { background: var(--navy-50); }
+  .state-row.selected {
+    background: var(--white);
+    color: var(--navy);
+    font-weight: 700;
+    border-left: 3px solid var(--gold);
+    padding-left: 11px;
+  }
+  .state-row .caret {
+    width: 16px; height: 16px;
+    margin-right: 8px;
+    color: var(--gray-500);
+    transition: transform .15s ease;
+    flex-shrink: 0;
+  }
+  .state-row.expanded .caret { transform: rotate(90deg); }
+  .state-row .state-name { flex: 1; }
+  .state-row .state-count {
+    font-size: 11px;
+    color: var(--gray-500);
+    font-weight: 400;
+  }
+
+  .state-sublist {
+    display: none;
+    background: var(--white);
+    padding: 4px 0 8px;
+  }
+  .state-item.expanded .state-sublist { display: block; }
+
+  .sub-group {
+    padding: 6px 14px 2px 38px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gray-500);
+    font-weight: 500;
+  }
+  .sub-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 14px 5px 38px;
+    font-size: 12px;
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: background .1s ease;
+  }
+  .sub-item:hover { background: var(--gray-100); color: var(--navy); }
+  .sub-item.selected {
+    background: var(--gold-soft);
+    color: var(--navy);
+    font-weight: 500;
+  }
+  .sub-item .rate {
+    font-size: 11px;
+    color: var(--gray-500);
+    font-variant-numeric: tabular-nums;
+  }
+  .sub-item.selected .rate { color: var(--navy); }
+
+  /* ---------- Main ---------- */
+  .main {
+    padding: 22px 28px;
+    background: var(--white);
+    min-width: 0;
+  }
+
+  .main-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--gray-200);
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .location-info h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.01em;
+  }
+  .location-info .breadcrumb {
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .location-info .filter-tag {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 3px 8px;
+    background: var(--navy-50);
+    color: var(--navy);
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: var(--radius-sm);
+  }
+  .location-info .filter-tag .clear {
+    margin-left: 6px;
+    cursor: pointer;
+    color: var(--gray-500);
+    font-weight: 700;
+  }
+  .location-info .filter-tag .clear:hover { color: var(--down); }
+
+  .stats {
+    display: flex;
+    gap: 18px;
+  }
+  .stat {
+    text-align: right;
+  }
+  .stat .value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .stat .label {
+    font-size: 11px;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+  }
+
+  /* ---------- Finder & Settings buttons (header) ---------- */
+  .finder-btn {
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: background .12s ease, transform .12s ease;
+    height: 34px;
+    letter-spacing: 0.01em;
+  }
+  .finder-btn:hover {
+    background: var(--navy-700);
+    transform: translateY(-1px);
+  }
+  .finder-btn:active { transform: translateY(0); }
+  .finder-btn svg {
+    width: 14px; height: 14px;
+    fill: var(--gold); stroke: none;
+  }
+
+  .settings-btn {
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    color: var(--navy);
+    width: 34px; height: 34px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .12s ease;
+  }
+  .settings-btn:hover {
+    background: var(--navy-50);
+    border-color: var(--navy);
+  }
+  .settings-btn svg {
+    width: 18px; height: 18px;
+    fill: none; stroke: currentColor; stroke-width: 1.6;
+  }
+
+  /* ---------- Finder Modal ---------- */
+  .finder-modal { max-width: 920px !important; }
+  .finder-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    padding: 14px 22px;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    font-size: 12px;
+  }
+  .finder-control-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .finder-control-group .label {
+    color: var(--gray-500);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 10px;
+  }
+  .finder-chips { display: inline-flex; gap: 4px; }
+  .finder-chip {
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    color: var(--gray-700);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .12s ease;
+  }
+  .finder-chip:hover { border-color: var(--navy); color: var(--navy); }
+  .finder-chip.active {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: var(--white);
+  }
+
+  .finder-summary {
+    padding: 10px 22px;
+    font-size: 11px;
+    color: var(--gray-500);
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .finder-summary strong { color: var(--navy); font-weight: 700; }
+
+  .finder-results-wrap {
+    overflow-y: auto;
+    max-height: calc(100vh - 320px);
+    background: var(--white);
+  }
+  table.finder-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  table.finder-table thead th {
+    position: sticky;
+    top: 0;
+    background: var(--navy);
+    color: var(--white);
+    padding: 9px 12px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    z-index: 2;
+  }
+  table.finder-table thead th.num { text-align: right; }
+  table.finder-table tbody td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: middle;
+  }
+  table.finder-table tbody td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+  }
+  table.finder-table tbody tr.finder-row {
+    cursor: pointer;
+    transition: background .1s ease;
+  }
+  table.finder-table tbody tr.finder-row:hover { background: var(--navy-50); }
+  table.finder-table tbody tr.finder-row:hover .finder-arrow { opacity: 1; transform: translateX(2px); }
+
+  .finder-rank {
+    width: 32px;
+    color: var(--gray-500);
+    font-weight: 700;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .finder-loc strong {
+    display: block;
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .finder-meta {
+    display: block;
+    font-size: 10px;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 1px;
+  }
+  .finder-product-group {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .finder-rate { color: var(--navy); font-weight: 700; }
+  .finder-cof { color: var(--gray-500); }
+  .finder-spread {
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 10px;
+    display: inline-block;
+    min-width: 56px;
+    text-align: center;
+  }
+  .finder-spread.green  { background: #e8f4ed; color: #1a6d3a; }
+  .finder-spread.orange { background: #fff3e0; color: #a85d00; }
+  .finder-spread.red    { background: #fceae8; color: #9c2e23; }
+  .finder-arrow {
+    color: var(--blue);
+    opacity: 0;
+    transition: opacity .12s ease, transform .12s ease;
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .finder-empty {
+    padding: 36px 24px;
+    text-align: center;
+    color: var(--gray-500);
+    font-size: 13px;
+  }
+  .finder-empty button {
+    background: none;
+    border: none;
+    color: var(--blue);
+    cursor: pointer;
+    font-size: 13px;
+    text-decoration: underline;
+    padding: 4px 0;
+    font-family: var(--font);
+  }
+
+  /* Highlight pulse for navigated-to table rows */
+  @keyframes highlightPulse {
+    0% { background: var(--gold-soft); }
+    100% { background: transparent; }
+  }
+  table.rates tbody tr.highlight-pulse td {
+    animation: highlightPulse 2.4s ease-out;
+  }
+
+  /* ---------- Slim lens indicator (under main-header) ---------- */
+  .lens-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    margin-bottom: 14px;
+    background: var(--navy-50);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--navy);
+  }
+  .lens-indicator.disabled {
+    background: var(--gray-50);
+    color: var(--gray-500);
+  }
+  .lens-indicator-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .lens-indicator-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--up);
+    box-shadow: 0 0 0 3px rgba(26,138,77,0.15);
+  }
+  .lens-indicator.disabled .lens-indicator-dot {
+    background: var(--gray-300);
+    box-shadow: none;
+  }
+  .lens-indicator strong {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .lens-indicator-legend { display: flex; gap: 4px; }
+  .lens-adjust {
+    background: transparent;
+    border: none;
+    color: var(--blue);
+    cursor: pointer;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .lens-adjust:hover { color: var(--navy); }
+
+  /* Legend chips (reused inside modal and lens-indicator) */
+  .legend-chip {
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--gray-900);
+    border: 1px solid transparent;
+  }
+  .legend-chip.green   { background: #e8f4ed; border-color: #c5e2d2; }
+  .legend-chip.orange  { background: #fff3e0; border-color: #f8d9a8; }
+  .legend-chip.red     { background: #fceae8; border-color: #f1cac4; }
+
+  /* ---------- Settings Modal ---------- */
+  .settings-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 45, 114, 0.45);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+    z-index: 1000;
+    overflow-y: auto;
+    animation: fadeIn .15s ease;
+  }
+  .settings-overlay.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .settings-modal {
+    background: var(--white);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 70px rgba(0,45,114,0.35);
+    overflow: hidden;
+    font-family: var(--font);
+  }
+  .settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .settings-header h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: -0.005em;
+  }
+  .settings-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--gray-500);
+    width: 28px; height: 28px;
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .12s ease, color .12s ease;
+    font-size: 20px;
+    line-height: 1;
+  }
+  .settings-close:hover {
+    background: var(--gray-100);
+    color: var(--navy);
+  }
+
+  .settings-body {
+    padding: 18px 22px;
+    overflow-y: auto;
+    max-height: calc(100vh - 220px);
+  }
+  .settings-section { margin-bottom: 22px; }
+  .settings-section:last-child { margin-bottom: 0; }
+  .settings-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--navy);
+    margin: 0 0 12px;
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .settings-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .settings-row label.field {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--gray-700);
+    font-weight: 500;
+  }
+  .settings-row .input-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .settings-row input[type="number"] {
+    width: 72px;
+    padding: 6px 22px 6px 10px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    background: var(--white);
+  }
+  .settings-row input[type="number"]:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-soft);
+  }
+  .settings-row input[type="number"]::-webkit-outer-spin-button,
+  .settings-row input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .settings-row .unit {
+    position: absolute;
+    right: 8px;
+    font-size: 11px;
+    color: var(--gray-500);
+    pointer-events: none;
+  }
+  .settings-select {
+    padding: 6px 26px 6px 10px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--navy);
+    background-color: var(--white);
+    cursor: pointer;
+    min-width: 140px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23002D72'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 9px center;
+  }
+  .settings-select:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-soft);
+  }
+  .settings-select:disabled {
+    background-color: var(--gray-100);
+    color: var(--gray-500);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  .settings-row .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--gray-700);
+    cursor: pointer;
+  }
+  .settings-help {
+    font-size: 11px;
+    color: var(--gray-500);
+    margin: 8px 0 0;
+    line-height: 1.4;
+  }
+
+  /* Visible Locations */
+  .loc-filter-group { margin-bottom: 14px; }
+  .loc-filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background .12s ease;
+  }
+  .loc-filter-group.expanded .loc-filter-header { border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+  .loc-filter-header:hover { background: var(--gray-100); }
+  .loc-filter-title {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 500; color: var(--navy);
+  }
+  .loc-filter-title svg {
+    width: 12px; height: 12px;
+    transition: transform .15s ease;
+  }
+  .loc-filter-group.expanded .loc-filter-title svg { transform: rotate(90deg); }
+  .loc-filter-count {
+    font-size: 11px; color: var(--gray-500);
+    font-variant-numeric: tabular-nums;
+  }
+  .loc-filter-body {
+    display: none;
+    padding: 10px 12px;
+    border: 1px solid var(--gray-200);
+    border-top: none;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    background: var(--white);
+  }
+  .loc-filter-group.expanded .loc-filter-body { display: block; }
+
+  .loc-filter-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+  .loc-filter-actions button {
+    background: transparent;
+    border: none;
+    color: var(--blue);
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 2px 0;
+  }
+  .loc-filter-actions button:hover { color: var(--navy); }
+  .loc-filter-actions .spacer { flex: 1; }
+
+  .loc-filter-search {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 12px;
+    color: var(--gray-900);
+    background: var(--white);
+    margin-bottom: 8px;
+    box-sizing: border-box;
+  }
+  .loc-filter-search:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-soft);
+  }
+  .loc-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 2px 10px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 6px;
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+  }
+  .loc-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--gray-700);
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 3px;
+    transition: background .1s ease;
+  }
+  .loc-checkbox:hover { background: var(--white); }
+  .loc-checkbox input { cursor: pointer; flex-shrink: 0; }
+  .loc-checkbox .abbr {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--gray-500);
+    font-weight: 500;
+  }
+
+  .settings-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 22px;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+  }
+  .btn {
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all .12s ease;
+  }
+  .btn-primary {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .btn-primary:hover { background: var(--navy-700); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--gray-700);
+    border-color: var(--gray-300);
+  }
+  .btn-secondary:hover {
+    background: var(--white);
+    color: var(--navy);
+    border-color: var(--navy);
+  }
+
+  /* Empty sidebar message when no locations are visible */
+  .sidebar-empty {
+    padding: 24px 16px;
+    text-align: center;
+    color: var(--gray-500);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .sidebar-empty button {
+    background: none;
+    border: none;
+    color: var(--blue);
+    cursor: pointer;
+    font-size: 12px;
+    text-decoration: underline;
+    padding: 4px 0;
+    font-family: var(--font);
+  }
+
+  /* ---------- Profitability cell colors ---------- */
+  table.rates tbody td.profit-green   { background: #e8f4ed; }
+  table.rates tbody td.profit-orange  { background: #fff3e0; }
+  table.rates tbody td.profit-red     { background: #fceae8; }
+  table.rates tbody tr:hover td.profit-green   { background: #d6ecde; }
+  table.rates tbody tr:hover td.profit-orange  { background: #ffe8c8; }
+  table.rates tbody tr:hover td.profit-red     { background: #f7d6d1; }
+
+  /* Profitability indicator for construction rows */
+  .construction-row.profit-green   { background: #e8f4ed; border-radius: 3px; }
+  .construction-row.profit-orange  { background: #fff3e0; border-radius: 3px; }
+  .construction-row.profit-red     { background: #fceae8; border-radius: 3px; }
+  .construction-row.profit-green,
+  .construction-row.profit-orange,
+  .construction-row.profit-red {
+    padding-left: 4px; padding-right: 4px;
+  }
+
+  /* ---------- Content Tabs ---------- */
+  .content-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .content-tab {
+    background: none;
+    border: none;
+    padding: 10px 18px;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-500);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    letter-spacing: 0.02em;
+    transition: color .12s ease, border-color .12s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .content-tab:hover { color: var(--navy); }
+  .content-tab.active {
+    color: var(--navy);
+    border-bottom-color: var(--gold);
+    font-weight: 700;
+  }
+  .content-tab .tab-icon {
+    width: 14px; height: 14px;
+    stroke: currentColor; fill: none;
+    stroke-width: 1.8;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ---------- Tier Construction Chart ---------- */
+  .construction-section {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+  .construction-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+  }
+  .construction-grid.single { grid-template-columns: 1fr; }
+
+  .construction-panel {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 12px 14px 10px;
+    background: var(--gray-50);
+    cursor: pointer;
+    transition: border-color .12s ease, box-shadow .12s ease, background .12s ease;
+  }
+  .construction-panel:hover {
+    border-color: var(--blue);
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+  }
+  .construction-panel.single {
+    background: var(--white);
+    padding: 18px 22px 14px;
+  }
+  .construction-panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--gray-300);
+  }
+  .construction-panel-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+    letter-spacing: 0.02em;
+  }
+  .construction-panel.single .construction-panel-title { font-size: 15px; }
+  .construction-panel-group {
+    font-size: 10px;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .construction-row {
+    display: grid;
+    grid-template-columns: 52px 1fr 48px;
+    gap: 10px;
+    align-items: center;
+    padding: 3px 0;
+    font-size: 11px;
+  }
+  .construction-panel.single .construction-row {
+    grid-template-columns: 80px 1fr 70px;
+    font-size: 13px;
+    padding: 6px 0;
+  }
+  .tier-label {
+    color: var(--gray-700);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .range-track {
+    position: relative;
+    height: 14px;
+    background: var(--gray-100);
+    border-radius: 3px;
+  }
+  .construction-panel.single .range-track { height: 22px; }
+
+  .range-bar {
+    position: absolute;
+    top: 3px; bottom: 3px;
+    border-radius: 2px;
+    opacity: 0.45;
+  }
+  .construction-panel.single .range-bar { top: 5px; bottom: 5px; opacity: 0.4; }
+
+  .range-marker-low,
+  .range-marker-high {
+    position: absolute;
+    top: 50%;
+    width: 2px; height: 10px;
+    transform: translate(-50%, -50%);
+  }
+  .range-dot {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid var(--white);
+    box-shadow: 0 0 0 1px rgba(0,45,114,0.2);
+  }
+  .construction-panel.single .range-dot {
+    width: 12px; height: 12px;
+  }
+
+  .tier-avg {
+    font-weight: 700;
+    color: var(--navy);
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .construction-axis-row {
+    margin-top: 6px;
+    padding-top: 4px;
+    border-top: 1px solid var(--gray-200);
+  }
+  .construction-axis {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--gray-500);
+    font-variant-numeric: tabular-nums;
+  }
+  .construction-panel.single .construction-axis { font-size: 10.5px; }
+
+  .construction-legend {
+    display: flex;
+    gap: 18px;
+    font-size: 11px;
+    color: var(--gray-700);
+    margin-top: 4px;
+    align-items: center;
+  }
+  .construction-legend .lg-marker {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .construction-legend .lg-bar {
+    width: 24px; height: 6px;
+    background: var(--blue);
+    opacity: 0.45;
+    border-radius: 1px;
+  }
+  .construction-legend .lg-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--blue); border: 2px solid var(--white);
+    box-shadow: 0 0 0 1px rgba(0,45,114,0.3);
+  }
+
+  /* ---------- Table ---------- */
+  .table-wrap {
+    margin-bottom: 28px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--white);
+  }
+  table.rates {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  table.rates thead th {
+    background: var(--navy);
+    color: var(--white);
+    text-align: right;
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  table.rates thead th:first-child { text-align: left; }
+  table.rates thead th.group-th {
+    background: var(--navy-700);
+    text-align: center;
+    border-left: 1px solid var(--navy-700);
+  }
+
+  table.rates tbody td {
+    padding: 9px 12px;
+    text-align: right;
+    border-bottom: 1px solid var(--gray-200);
+    font-variant-numeric: tabular-nums;
+    color: var(--gray-900);
+  }
+  table.rates tbody td:first-child {
+    text-align: left;
+    color: var(--gray-700);
+    padding-left: 16px;
+  }
+  table.rates tbody tr:last-child td { border-bottom: none; }
+  table.rates tbody tr:hover { background: var(--gray-50); }
+
+  table.rates tbody tr.product-header td {
+    background: var(--gray-100);
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  table.rates tbody tr.product-header td:not(:first-child) {
+    background: var(--gray-100);
+  }
+
+  .rate-cell { font-weight: 500; color: var(--navy); }
+  .rate-cell.high { color: var(--up); font-weight: 700; }
+  .rate-cell.low { color: var(--gray-500); }
+
+  /* ---------- Sortable table headers ---------- */
+  table.rates thead th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: background .12s ease;
+    white-space: nowrap;
+  }
+  table.rates thead th.sortable:hover { background: var(--navy-700); }
+  table.rates thead th .sort-icon {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 9px;
+    opacity: 0.45;
+    transition: opacity .12s ease, color .12s ease;
+  }
+  table.rates thead th.sorted { background: var(--navy-700); }
+  table.rates thead th.sorted .sort-icon {
+    opacity: 1;
+    color: var(--gold);
+    font-size: 10px;
+  }
+
+  .sort-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 11px;
+    color: var(--gray-700);
+    padding: 6px 12px;
+    background: var(--navy-50);
+    border-radius: var(--radius-sm);
+    width: fit-content;
+  }
+  .sort-status strong { color: var(--navy); font-weight: 700; }
+  .sort-status button {
+    background: transparent;
+    border: none;
+    color: var(--blue);
+    cursor: pointer;
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    padding: 0;
+  }
+  .sort-status button:hover { color: var(--navy); }
+
+  .trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .trend.up    { color: var(--up); }
+  .trend.down  { color: var(--down); }
+  .trend.flat  { color: var(--flat); }
+  .trend .arrow { font-size: 10px; }
+
+  /* ---------- Chart ---------- */
+  .chart-section {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 18px 20px 8px;
+  }
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .chart-header h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .chart-header .chart-sub {
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-top: 2px;
+  }
+  .chart-legend {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 11px;
+    color: var(--gray-700);
+  }
+  .legend-group { display: flex; align-items: center; gap: 6px; }
+  .legend-dot {
+    border-radius: 50%;
+    display: inline-block;
+    background: var(--navy);
+    opacity: 0.7;
+  }
+  .legend-color-row { display: flex; gap: 10px; }
+  .legend-color { display: flex; align-items: center; gap: 5px; }
+  .legend-color .swatch {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+
+  .chart-svg {
+    display: block;
+    width: 100%;
+    height: 340px;
+    overflow: visible;
+  }
+  .chart-svg .axis-line { stroke: var(--gray-300); stroke-width: 1; }
+  .chart-svg .grid-line { stroke: var(--gray-200); stroke-width: 1; stroke-dasharray: 2 3; }
+  .chart-svg .axis-label {
+    fill: var(--gray-500);
+    font-size: 10px;
+    font-family: var(--font);
+  }
+  .chart-svg .axis-title {
+    fill: var(--gray-700);
+    font-size: 11px;
+    font-weight: 500;
+    font-family: var(--font);
+  }
+  .chart-svg .bubble {
+    cursor: pointer;
+    transition: opacity .15s ease, stroke-width .15s ease;
+  }
+  .chart-svg .bubble:hover { stroke-width: 2; opacity: 1; }
+
+  /* ---------- COF Chart ---------- */
+  .cof-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .cof-stat {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+  }
+  .cof-stat .cof-stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--gray-500);
+    font-weight: 500;
+  }
+  .cof-stat .cof-stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy);
+    font-variant-numeric: tabular-nums;
+    margin-top: 4px;
+  }
+  .cof-stat .cof-stat-sub {
+    font-size: 11px;
+    color: var(--gray-500);
+    margin-top: 2px;
+  }
+  .chart-svg .cof-line { fill: none; stroke-width: 2; }
+  .chart-svg .cof-line.sofr { stroke: var(--gold); stroke-dasharray: 5 4; }
+  .chart-svg .cof-line.proj { stroke: var(--navy); }
+  .chart-svg .cof-line.cof0 { stroke: var(--gray-500); stroke-dasharray: 2 3; stroke-width: 1; }
+  .chart-svg .cof-area { fill: var(--navy); fill-opacity: 0.06; }
+  .chart-svg .cof-dot { stroke: var(--white); stroke-width: 1.5; }
+
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--navy);
+    color: var(--white);
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+    opacity: 0;
+    transition: opacity .12s ease;
+    z-index: 10;
+    white-space: nowrap;
+    font-family: var(--font);
+  }
+  .tooltip.show { opacity: 1; }
+  .tooltip .tt-title { font-weight: 700; }
+  .tooltip .tt-row { font-weight: 400; font-size: 10.5px; opacity: 0.9; }
+
+  /* ---------- Footer ---------- */
+  .widget-footer {
+    padding: 12px 28px;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--gray-500);
+    font-size: 11px;
+  }
+  .widget-footer a { color: var(--blue); text-decoration: none; }
+
+  /* ---------- Responsive (basic) ---------- */
+  @media (max-width: 840px) {
+    .container, .container.sidebar-open { grid-template-columns: 1fr; }
+    .container.sidebar-open .sidebar { border-right: none; border-bottom: 1px solid var(--gray-200); max-height: 360px; }
+    .state-list { max-height: 240px; }
+    .main { padding: 18px; }
+    .main-header { flex-direction: column; align-items: stretch; }
+    .stats { justify-content: space-between; }
+    .stat { text-align: left; }
+    table.rates { font-size: 12px; }
+    table.rates thead th, table.rates tbody td { padding: 7px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="widget">
+
+  <header class="widget-header">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="8" fill="#002D72"/>
+          <rect x="9"    y="22" width="5" height="11" rx="1" fill="#ffffff" opacity="0.5"/>
+          <rect x="17.5" y="16" width="5" height="17" rx="1" fill="#ffffff" opacity="0.75"/>
+          <rect x="26"   y="10" width="5" height="23" rx="1" fill="#FFBF3F"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <div class="logo-name"><span class="accent">Deposit</span> Command</div>
+        <div class="subtitle">Rates by Region</div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <button class="finder-btn" id="openFinder" title="Find the most profitable rates across your visible locations">
+        <svg viewBox="0 0 16 16">
+          <path d="M2.5 13.5l8-8 1.5 1.5-8 8-1.5-1.5z"/>
+          <path d="M11 5l1-1 1.5 1.5-1 1L11 5z"/>
+          <circle cx="13.5" cy="2.5" r="0.8"/>
+          <circle cx="14.8" cy="5" r="0.5"/>
+          <circle cx="11.5" cy="2" r="0.5"/>
+        </svg>
+        Best Rates
+      </button>
+      <button class="settings-btn" id="openSettings" title="Settings" aria-label="Open settings">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- ===== Sidebar ===== -->
+    <aside class="sidebar">
+      <div class="geo-tabs" role="tablist">
+        <button class="geo-tab active" data-geo="state">State</button>
+        <button class="geo-tab" data-geo="msa">MSA</button>
+        <button class="geo-tab" data-geo="county">County</button>
+        <button class="geo-tab" data-geo="city">City</button>
+      </div>
+
+      <div class="sidebar-search">
+        <input type="text" id="stateSearch" placeholder="Search states…" autocomplete="off" />
+      </div>
+
+      <div class="state-list" id="stateList"></div>
+    </aside>
+
+    <!-- ===== Main ===== -->
+    <main class="main">
+      <div class="main-header">
+        <div class="main-header-left">
+          <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle locations sidebar" title="Show/hide locations sidebar">
+            <svg viewBox="0 0 24 24">
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+            Locations
+          </button>
+          <div class="location-info">
+            <div class="breadcrumb">State</div>
+            <h2 id="locationName">Find a location</h2>
+            <div id="filterTag"></div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <div class="value" id="instPct">—</div>
+            <div class="label">Area Coverage</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lens-indicator" id="lensIndicator">
+        <div class="lens-indicator-left">
+          <span class="lens-indicator-dot"></span>
+          <span id="lensIndicatorText">Profitability lens: COF <strong>1.85%</strong> · Beta <strong>50%</strong></span>
+          <span class="lens-indicator-legend">
+            <span class="legend-chip green">≤ COF</span>
+            <span class="legend-chip orange">+0–75bp</span>
+            <span class="legend-chip red">&gt; +75bp</span>
+          </span>
+        </div>
+        <button class="lens-adjust" id="lensAdjustBtn">Adjust in settings</button>
+      </div>
+
+      <div class="content-tabs" role="tablist">
+        <button class="content-tab active" data-panel="table" role="tab" aria-selected="true">
+          <svg class="tab-icon" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1"/><line x1="2" y1="7" x2="14" y2="7"/><line x1="6" y1="3" x2="6" y2="13"/></svg>
+          Rates Table
+        </button>
+        <button class="content-tab" data-panel="chart" role="tab" aria-selected="false">
+          <svg class="tab-icon" viewBox="0 0 16 16"><circle cx="4.5" cy="10.5" r="1.5"/><circle cx="8" cy="6" r="2.2"/><circle cx="12" cy="9" r="1"/><line x1="2" y1="13.5" x2="14" y2="13.5"/></svg>
+          Rate Distribution
+        </button>
+        <button class="content-tab" data-panel="construction" role="tab" aria-selected="false">
+          <svg class="tab-icon" viewBox="0 0 16 16"><line x1="3" y1="4" x2="11" y2="4"/><circle cx="6" cy="4" r="1.5" fill="currentColor"/><line x1="3" y1="8" x2="13" y2="8"/><circle cx="9" cy="8" r="1.5" fill="currentColor"/><line x1="3" y1="12" x2="10" y2="12"/><circle cx="5" cy="12" r="1.5" fill="currentColor"/></svg>
+          Tier Construction
+        </button>
+        <button class="content-tab" data-panel="cof" role="tab" aria-selected="false">
+          <svg class="tab-icon" viewBox="0 0 16 16"><polyline points="2,12 5,9 8,11 11,5 14,7"/><line x1="2" y1="14" x2="14" y2="14"/></svg>
+          Cost of Funds
+        </button>
+      </div>
+
+      <div class="tab-panel active" id="panel-table">
+        <div class="sort-status" id="sortStatus" style="display:none;">
+          <span id="sortStatusText"></span>
+          <button id="resetSort">Reset to default order</button>
+        </div>
+        <div class="table-wrap">
+          <table class="rates">
+            <thead>
+              <tr>
+                <th class="sortable" data-sort="product">Product · Tier <span class="sort-icon">↕</span></th>
+                <th class="sortable num" data-sort="avg">Avg Rate <span class="sort-icon">↕</span></th>
+                <th class="sortable num" data-sort="high">High Rate <span class="sort-icon">↕</span></th>
+                <th class="sortable num" data-sort="low">Low Rate <span class="sort-icon">↕</span></th>
+                <th class="sortable num" data-sort="m1">1M Trend <span class="sort-icon">↕</span></th>
+                <th class="sortable num" data-sort="m3">3M Trend <span class="sort-icon">↕</span></th>
+                <th class="sortable num" data-sort="m6">6M Trend <span class="sort-icon">↕</span></th>
+              </tr>
+            </thead>
+            <tbody id="ratesBody">
+              <tr><td colspan="7" style="text-align:center; padding:32px; color:var(--gray-500);">
+                Browse states, MSAs, counties, or cities to view deposit rates.
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="panel-chart">
+        <section class="chart-section">
+          <div class="chart-header">
+            <div>
+              <h3>Rate Distribution by Product &amp; Balance Tier</h3>
+              <div class="chart-sub" id="chartSub">Bubble size reflects deposit balance tier · Color reflects product family</div>
+            </div>
+            <div class="chart-legend">
+              <div class="legend-color-row" id="colorLegend"></div>
+              <div class="legend-group" title="Bubble sizes correspond to balance tiers">
+                <span class="legend-dot" style="width:6px; height:6px;"></span>
+                <span class="legend-dot" style="width:9px; height:9px;"></span>
+                <span class="legend-dot" style="width:13px; height:13px;"></span>
+                <span class="legend-dot" style="width:17px; height:17px;"></span>
+                <span style="color:var(--gray-500);">Tier</span>
+              </div>
+            </div>
+          </div>
+          <div style="position:relative;">
+            <svg class="chart-svg" id="chart" viewBox="0 0 800 340" preserveAspectRatio="none"></svg>
+            <div class="tooltip" id="tooltip"></div>
+          </div>
+        </section>
+      </div>
+      <div class="tab-panel" id="panel-construction">
+        <section class="construction-section">
+          <div class="chart-header">
+            <div>
+              <h3>Tier Construction · Low → Avg → High</h3>
+              <div class="chart-sub">How rates are constructed across balance tiers for each product. Click a panel to drill in.</div>
+            </div>
+            <div class="construction-legend">
+              <span class="lg-marker"><span class="lg-bar"></span>Low–High range</span>
+              <span class="lg-marker"><span class="lg-dot"></span>Average</span>
+            </div>
+          </div>
+          <div class="construction-grid" id="constructionGrid"></div>
+        </section>
+      </div>
+      <div class="tab-panel" id="panel-cof">
+        <section class="chart-section">
+          <div class="chart-header">
+            <div>
+              <h3>Projected Cost of Funds vs SOFR Forward Curve</h3>
+              <div class="chart-sub">Projected COF = Current COF + Deposit Beta × ΔSOFR. Hover the chart for monthly detail.</div>
+            </div>
+            <div class="chart-legend">
+              <span class="legend-color"><span class="swatch" style="background:var(--gold);"></span>SOFR 1M Forward</span>
+              <span class="legend-color"><span class="swatch" style="background:var(--navy);"></span>Projected COF</span>
+              <span class="legend-color"><span class="swatch" style="background:var(--gray-500); border-radius:0; height:3px;"></span>Current COF</span>
+            </div>
+          </div>
+          <div style="position:relative;">
+            <svg class="chart-svg" id="cofChart" viewBox="0 0 800 340" preserveAspectRatio="none"></svg>
+            <div class="tooltip" id="cofTooltip"></div>
+          </div>
+          <div class="cof-summary" id="cofSummary"></div>
+        </section>
+      </div>
+    </main>
+
+  </div>
+
+  <footer class="widget-footer">
+    <span>Source: Sample data for prototype only · Not production rates</span>
+    <span>v1.12</span>
+  </footer>
+
+</div>
+
+<!-- ===== Settings Modal ===== -->
+<div class="settings-overlay" id="settingsOverlay" role="dialog" aria-labelledby="settingsTitle" aria-modal="true">
+  <div class="settings-modal">
+    <div class="settings-header">
+      <h2 id="settingsTitle">Settings</h2>
+      <button class="settings-close" id="closeSettings" aria-label="Close settings">×</button>
+    </div>
+    <div class="settings-body">
+
+      <div class="settings-section">
+        <h3 class="settings-section-title">Profitability Lens</h3>
+        <div class="settings-row">
+          <label class="field">
+            Current Cost of Funds
+            <span class="input-wrap">
+              <input type="number" id="lensCOF" step="0.01" min="0" max="20" value="1.85" />
+              <span class="unit">%</span>
+            </span>
+          </label>
+          <label class="field">
+            Deposit Beta
+            <span class="input-wrap">
+              <input type="number" id="lensBeta" step="1" min="0" max="100" value="50" />
+              <span class="unit">%</span>
+            </span>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="lensToggle" checked />
+            Apply color coding to rates
+          </label>
+        </div>
+        <p class="settings-help">
+          Projected COF = Current COF + Beta × ΔSOFR. Rates within or below your projected COF show <span class="legend-chip green">green</span>,
+          0–75 bps above show <span class="legend-chip orange">orange</span>, and more than 75 bps above show <span class="legend-chip red">red</span>.
+        </p>
+      </div>
+
+      <div class="settings-section">
+        <h3 class="settings-section-title">Visible Locations</h3>
+        <p class="settings-help" style="margin: 0 0 10px;">
+          Choose which locations appear in the sidebar. Useful for narrowing the list to your footprint.
+        </p>
+        <div id="locFilters"></div>
+      </div>
+
+      <div class="settings-section">
+        <h3 class="settings-section-title">Default Location on Load</h3>
+        <p class="settings-help" style="margin: 0 0 10px;">
+          Skip the empty state and open this location automatically every time the widget loads.
+        </p>
+        <div class="settings-row">
+          <label class="field">
+            Geography
+            <select id="defaultGeo" class="settings-select">
+              <option value="">No default</option>
+              <option value="state">State</option>
+              <option value="msa">MSA</option>
+              <option value="county">County</option>
+              <option value="city">City</option>
+            </select>
+          </label>
+          <label class="field">
+            Location
+            <select id="defaultLocation" class="settings-select" disabled>
+              <option value="">—</option>
+            </select>
+          </label>
+        </div>
+        <p class="settings-help" id="defaultLocationHint" style="margin-top: 8px; display:none;"></p>
+      </div>
+
+    </div>
+    <div class="settings-footer">
+      <button class="btn btn-secondary" id="resetSettings">Reset to defaults</button>
+      <button class="btn btn-primary" id="doneSettings">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Best Rates Finder Modal ===== -->
+<div class="settings-overlay" id="finderOverlay" role="dialog" aria-labelledby="finderTitle" aria-modal="true">
+  <div class="settings-modal finder-modal">
+    <div class="settings-header">
+      <h2 id="finderTitle">Best Rate Opportunities</h2>
+      <button class="settings-close" id="closeFinder" aria-label="Close finder">×</button>
+    </div>
+
+    <div class="finder-controls">
+      <div class="finder-control-group">
+        <span class="label">Products</span>
+        <div class="finder-chips" data-filter="productFamily">
+          <button class="finder-chip active" data-value="all">All</button>
+          <button class="finder-chip" data-value="liquid">Liquid</button>
+          <button class="finder-chip" data-value="cd">CDs</button>
+        </div>
+      </div>
+      <div class="finder-control-group">
+        <span class="label">Geo</span>
+        <div class="finder-chips" data-filter="geoScope">
+          <button class="finder-chip active" data-value="all">All</button>
+          <button class="finder-chip" data-value="state">States</button>
+          <button class="finder-chip" data-value="msa">MSAs</button>
+          <button class="finder-chip" data-value="county">Counties</button>
+          <button class="finder-chip" data-value="city">Cities</button>
+        </div>
+      </div>
+      <div class="finder-control-group">
+        <span class="label">Show</span>
+        <div class="finder-chips" data-filter="limit">
+          <button class="finder-chip" data-value="10">Top 10</button>
+          <button class="finder-chip active" data-value="25">Top 25</button>
+          <button class="finder-chip" data-value="50">Top 50</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="finder-summary" id="finderSummary"></div>
+
+    <div class="finder-results-wrap">
+      <table class="finder-table">
+        <thead>
+          <tr>
+            <th class="num">#</th>
+            <th>Location</th>
+            <th>Product · Tier</th>
+            <th class="num">Rate</th>
+            <th class="num">Proj. COF</th>
+            <th class="num">Spread</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="finderResults"></tbody>
+      </table>
+    </div>
+
+    <div class="settings-footer">
+      <span style="font-size:11px; color:var(--gray-500);">Sorted ascending by spread vs projected COF · Most profitable first</span>
+      <button class="btn btn-primary" id="closeFinderBottom">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   Data definitions
+   ===================================================================== */
+const STATES = [
+  ["Alabama","AL"],["Alaska","AK"],["Arizona","AZ"],["Arkansas","AR"],
+  ["California","CA"],["Colorado","CO"],["Connecticut","CT"],["Delaware","DE"],
+  ["District of Columbia","DC"],["Florida","FL"],["Georgia","GA"],["Hawaii","HI"],
+  ["Idaho","ID"],["Illinois","IL"],["Indiana","IN"],["Iowa","IA"],
+  ["Kansas","KS"],["Kentucky","KY"],["Louisiana","LA"],["Maine","ME"],
+  ["Maryland","MD"],["Massachusetts","MA"],["Michigan","MI"],["Minnesota","MN"],
+  ["Mississippi","MS"],["Missouri","MO"],["Montana","MT"],["Nebraska","NE"],
+  ["Nevada","NV"],["New Hampshire","NH"],["New Jersey","NJ"],["New Mexico","NM"],
+  ["New York","NY"],["North Carolina","NC"],["North Dakota","ND"],["Ohio","OH"],
+  ["Oklahoma","OK"],["Oregon","OR"],["Pennsylvania","PA"],["Rhode Island","RI"],
+  ["South Carolina","SC"],["South Dakota","SD"],["Tennessee","TN"],["Texas","TX"],
+  ["Utah","UT"],["Vermont","VT"],["Virginia","VA"],["Washington","WA"],
+  ["West Virginia","WV"],["Wisconsin","WI"],["Wyoming","WY"]
+];
+
+const MSAS = [
+  ["Tampa-St. Petersburg-Clearwater","FL"],
+  ["Orlando-Kissimmee-Sanford","FL"]
+];
+
+const COUNTIES = [
+  ["Hillsborough County","FL"],
+  ["Polk County","FL"]
+];
+
+const CITIES = [
+  ["Apollo Beach",     "Hillsborough"],
+  ["Auburndale",       "Polk"],
+  ["Bartow",           "Polk"],
+  ["Brandon",          "Hillsborough"],
+  ["Carrollwood",      "Hillsborough"],
+  ["Citrus Park",      "Hillsborough"],
+  ["Davenport",        "Polk"],
+  ["Dundee",           "Polk"],
+  ["Eagle Lake",       "Polk"],
+  ["Fish Hawk",        "Hillsborough"],
+  ["Fort Meade",       "Polk"],
+  ["Frostproof",       "Polk"],
+  ["Haines City",      "Polk"],
+  ["Highland City",    "Polk"],
+  ["Lake Alfred",      "Polk"],
+  ["Lake Hamilton",    "Polk"],
+  ["Lake Wales",       "Polk"],
+  ["Lakeland",         "Polk"],
+  ["Lutz",             "Hillsborough"],
+  ["Mulberry",         "Polk"],
+  ["Plant City",       "Hillsborough"],
+  ["Poinciana",        "Polk"],
+  ["Polk City",        "Polk"],
+  ["Riverview",        "Hillsborough"],
+  ["Ruskin",           "Hillsborough"],
+  ["Sun City Center",  "Hillsborough"],
+  ["Tampa",            "Hillsborough"],
+  ["Temple Terrace",   "Hillsborough"],
+  ["Town 'n' Country", "Hillsborough"],
+  ["Valrico",          "Hillsborough"],
+  ["Westchase",        "Hillsborough"],
+  ["Winter Haven",     "Polk"]
+];
+
+const GEO_CONFIG = {
+  state:  { list: STATES,   label: "State",  placeholder: "Search states…",   countRange: [60, 380] },
+  msa:    { list: MSAS,     label: "MSA",    placeholder: "Search MSAs…",     countRange: [25, 110] },
+  county: { list: COUNTIES, label: "County", placeholder: "Search counties…", countRange: [10, 60]  },
+  city:   { list: CITIES,   label: "City",   placeholder: "Search cities…",   countRange: [4, 28]   }
+};
+
+/* =====================================================================
+   SOFR 1M Forward Curve  ·  HARDCODED SNAPSHOT
+   ---------------------------------------------------------------------
+   Updated: 2026-05-23  ·  Source: market reference (Pensford / Chatham)
+   Tenors are months from today. Rate = projected 1M Term SOFR (%).
+   To update: replace this array with the daily upload from the curve
+   provider. Linear interpolation handles intermediate tenors.
+   ===================================================================== */
+const SOFR_CURVE = [
+  { months: 0,   rate: 3.55 },  // Spot
+  { months: 1,   rate: 3.51 },
+  { months: 3,   rate: 3.40 },
+  { months: 6,   rate: 3.18 },
+  { months: 9,   rate: 2.98 },
+  { months: 12,  rate: 2.82 },
+  { months: 18,  rate: 2.58 },
+  { months: 24,  rate: 2.42 },
+  { months: 30,  rate: 2.38 },
+  { months: 36,  rate: 2.42 },
+  { months: 42,  rate: 2.50 },
+  { months: 48,  rate: 2.60 },
+  { months: 54,  rate: 2.72 },
+  { months: 60,  rate: 2.85 }
+];
+
+function getSOFR(months) {
+  if (months <= SOFR_CURVE[0].months) return SOFR_CURVE[0].rate;
+  const last = SOFR_CURVE[SOFR_CURVE.length - 1];
+  if (months >= last.months) return last.rate;
+  for (let i = 0; i < SOFR_CURVE.length - 1; i++) {
+    const a = SOFR_CURVE[i], b = SOFR_CURVE[i + 1];
+    if (months >= a.months && months <= b.months) {
+      const t = (months - a.months) / (b.months - a.months);
+      return a.rate + t * (b.rate - a.rate);
+    }
+  }
+  return SOFR_CURVE[0].rate;
+}
+
+function getProjectedCOF(months, currentCOF, betaPct) {
+  const beta = betaPct / 100;
+  return currentCOF + beta * (getSOFR(months) - getSOFR(0));
+}
+
+/* Map each deposit product to its effective tenor (months) for COF lookup.
+   Liquid accounts have no contractual maturity — anchor to 1M short end. */
+const PRODUCT_TENORS = {
+  checking: 1, savings: 1, mm: 1,
+  cd03: 3, cd06: 6, cd12: 12,
+  cd18: 18, cd24: 24, cd36: 36, cd48: 48, cd60: 60
+};
+
+/* Profitability bucket. spread = market rate - projected COF (in %).
+   Green: at or below COF (efficient acquisition)
+   Orange: 0 to 75 bps above COF
+   Red: more than 75 bps above COF */
+function getProfitabilityClass(marketRate, productKey) {
+  if (!state.lens.enabled) return '';
+  const months = PRODUCT_TENORS[productKey];
+  if (months == null) return '';
+  const projected = getProjectedCOF(months, state.lens.cof, state.lens.beta);
+  const spread = marketRate - projected;
+  if (spread <= 0) return 'profit-green';
+  if (spread <= 0.75) return 'profit-orange';
+  return 'profit-red';
+}
+
+const PRODUCT_GROUPS = [
+  { label: "Liquid Accounts", color: "#0960BB", products: [
+    { key: "checking", label: "Interest Checking", base: 0.20 },
+    { key: "savings",  label: "Savings",           base: 0.45 },
+    { key: "mm",       label: "Money Market",      base: 0.95 }
+  ]},
+  { label: "Short-Term CDs", color: "#FFBF3F", products: [
+    { key: "cd03", label: "CD · 3 Month",  base: 2.65 },
+    { key: "cd06", label: "CD · 6 Month",  base: 3.05 },
+    { key: "cd12", label: "CD · 12 Month", base: 3.45 }
+  ]},
+  { label: "Long-Term CDs", color: "#002D72", products: [
+    { key: "cd18", label: "CD · 18 Month", base: 3.30 },
+    { key: "cd24", label: "CD · 24 Month", base: 3.25 },
+    { key: "cd36", label: "CD · 36 Month", base: 3.15 },
+    { key: "cd48", label: "CD · 48 Month", base: 3.10 },
+    { key: "cd60", label: "CD · 60 Month", base: 3.10 }
+  ]}
+];
+const ALL_PRODUCTS = PRODUCT_GROUPS.flatMap(g =>
+  g.products.map(p => ({ ...p, group: g.label, color: g.color }))
+);
+
+const TIERS = [
+  { key: "u10",   label: "< $10K",    multiplier: 0.92, size: 5  },
+  { key: "t10",   label: "$10K+",     multiplier: 0.97, size: 7  },
+  { key: "t25",   label: "$25K+",     multiplier: 1.00, size: 9  },
+  { key: "t50",   label: "$50K+",     multiplier: 1.04, size: 11 },
+  { key: "t100",  label: "$100K+",    multiplier: 1.08, size: 14 },
+  { key: "t250",  label: "$250K+",    multiplier: 1.12, size: 17 }
+];
+
+// Natural-order indexes used as sort tie-breakers and for the "product" sort
+const PRODUCT_ORDER = {};
+ALL_PRODUCTS.forEach((p, i) => { PRODUCT_ORDER[p.key] = i; });
+const TIER_ORDER = {};
+TIERS.forEach((t, i) => { TIER_ORDER[t.key] = i; });
+
+// Sort key extractors. "product" is composite natural order.
+const SORT_KEYS = {
+  product: r => PRODUCT_ORDER[r.productKey] * 100 + TIER_ORDER[r.tierKey],
+  avg:     r => r.avg,
+  high:    r => r.high,
+  low:     r => r.low,
+  m1:      r => r.m1,
+  m3:      r => r.m3,
+  m6:      r => r.m6
+};
+const SORT_COLUMN_LABELS = {
+  product: 'Product · Tier',
+  avg: 'Avg Rate', high: 'High Rate', low: 'Low Rate',
+  m1: '1M Trend', m3: '3M Trend', m6: '6M Trend'
+};
+
+function sortRows(rows, column, direction) {
+  const keyFn = SORT_KEYS[column];
+  const sorted = rows.slice().sort((a, b) => {
+    let cmp = keyFn(a) - keyFn(b);
+    if (cmp === 0) cmp = SORT_KEYS.product(a) - SORT_KEYS.product(b);
+    return direction === 'asc' ? cmp : -cmp;
+  });
+  return sorted;
+}
+
+/* =====================================================================
+   Deterministic pseudo-random per state, so re-selecting a state shows
+   the same numbers and revisiting feels stable.
+   ===================================================================== */
+function hashStr(s){ let h=2166136261>>>0; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0; }
+function mulberry32(seed){ return function(){ let t=seed+=0x6D2B79F5; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
+
+function generateLocationData(locationName, geo = 'state') {
+  const cfg = GEO_CONFIG[geo] || GEO_CONFIG.state;
+  const rng = mulberry32(hashStr(geo + ':' + locationName));
+  const [min, max] = cfg.countRange;
+  const instCount = min + Math.floor(rng() * (max - min));
+  const instPct   = 70 + rng() * 25;                       // 70–95%
+  const stateBias = (rng() - 0.5) * 0.35;                  // ±0.175% shift
+
+  const rows = [];
+  for (const group of PRODUCT_GROUPS) {
+    for (const p of group.products) {
+      for (const tier of TIERS) {
+        const noise = (rng() - 0.5) * 0.25;
+        const avg = Math.max(0.02, (p.base + stateBias + noise) * tier.multiplier);
+        const high = avg * (1.8 + rng() * 0.9);
+        const low  = avg * (0.20 + rng() * 0.25);
+        // Trend bps — current environment, mildly negative bias
+        const m1 = Math.round((rng() - 0.55) * 18);
+        const m3 = Math.round((rng() - 0.55) * 38) + Math.round(m1 * 0.5);
+        const m6 = Math.round((rng() - 0.55) * 70) + Math.round(m3 * 0.5);
+
+        rows.push({
+          group: group.label,
+          groupColor: group.color,
+          productKey: p.key,
+          productLabel: p.label,
+          tierKey: tier.key,
+          tierLabel: tier.label,
+          tierSize: tier.size,
+          avg, high, low, m1, m3, m6
+        });
+      }
+    }
+  }
+  return { instCount, instPct, rows };
+}
+
+/* =====================================================================
+   State management
+   ===================================================================== */
+const state = {
+  geo: 'state',                  // 'state' | 'msa' | 'county'
+  selectedState: null,           // currently selected location name (any geo)
+  expandedStates: new Set(),     // expanded location names (any geo)
+  selectedProduct: null,         // e.g. "cd12" — filters table + chart to this product
+  data: null,
+  sidebarOpen: false,   // default closed; user can open via toggle, persisted in settings
+  tableSort: { column: null, direction: 'asc' },  // null = default grouped view
+  // Default location loaded automatically on init. null = no default.
+  defaults: { geo: null, location: null },
+  lens: {
+    enabled: true,
+    cof: 1.85,                   // % — bank's current blended cost of funds
+    beta: 50                     // % — deposit beta applied to ΔSOFR
+  },
+  // Visible-location filters. Empty Set = show all. Populated = whitelist.
+  // Long-term: load from user profile on login. Today: persisted to localStorage.
+  visibleLocations: {
+    state:  new Set(),
+    msa:    new Set(),
+    county: new Set(),
+    city:   new Set()
+  }
+};
+
+/* =====================================================================
+   Settings persistence (localStorage placeholder for user profile)
+   ===================================================================== */
+const SETTINGS_KEY = 'cb-deposit-rates-settings-v1';
+
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (s.lens) Object.assign(state.lens, s.lens);
+    if (typeof s.sidebarOpen === 'boolean') state.sidebarOpen = s.sidebarOpen;
+    if (s.defaults && typeof s.defaults === 'object') {
+      state.defaults.geo      = s.defaults.geo || null;
+      state.defaults.location = s.defaults.location || null;
+    }
+    if (s.visibleLocations) {
+      ['state','msa','county','city'].forEach(g => {
+        if (Array.isArray(s.visibleLocations[g])) {
+          state.visibleLocations[g] = new Set(s.visibleLocations[g]);
+        }
+      });
+    }
+  } catch (e) { /* ignore */ }
+}
+
+function saveSettings() {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+      lens: state.lens,
+      sidebarOpen: state.sidebarOpen,
+      defaults: state.defaults,
+      visibleLocations: {
+        state:  Array.from(state.visibleLocations.state),
+        msa:    Array.from(state.visibleLocations.msa),
+        county: Array.from(state.visibleLocations.county),
+        city:   Array.from(state.visibleLocations.city)
+      }
+    }));
+  } catch (e) { /* ignore */ }
+}
+
+/* =====================================================================
+   Rendering
+   ===================================================================== */
+const el = id => document.getElementById(id);
+
+function renderSidebar(filterText="") {
+  const list = el('stateList');
+  list.innerHTML = '';
+  const lc = filterText.trim().toLowerCase();
+  const allItems = GEO_CONFIG[state.geo].list;
+  const visibleSet = state.visibleLocations[state.geo];
+  const useFilter = visibleSet && visibleSet.size > 0;
+  const items = allItems.filter(([name]) => !useFilter || visibleSet.has(name));
+
+  if (items.length === 0) {
+    const msg = document.createElement('div');
+    msg.className = 'sidebar-empty';
+    msg.innerHTML = `No ${GEO_CONFIG[state.geo].label.toLowerCase()}s visible.<br/><button id="emptyOpenSettings">Open settings</button> to choose locations.`;
+    list.appendChild(msg);
+    el('emptyOpenSettings').addEventListener('click', openSettings);
+    return;
+  }
+
+  items.forEach(([name, abbr]) => {
+    if (lc && !name.toLowerCase().includes(lc) && !abbr.toLowerCase().includes(lc)) return;
+
+    const item = document.createElement('div');
+    item.className = 'state-item';
+    if (state.expandedStates.has(name)) item.classList.add('expanded');
+
+    const row = document.createElement('button');
+    row.className = 'state-row';
+    if (state.selectedState === name) row.classList.add('selected');
+    if (state.expandedStates.has(name)) row.classList.add('expanded');
+
+    row.innerHTML = `
+      <svg class="caret" viewBox="0 0 16 16" fill="none">
+        <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="state-name">${name}</span>
+      <span class="state-count">${abbr}</span>
+    `;
+    row.addEventListener('click', () => onLocationClick(name));
+    item.appendChild(row);
+
+    // Sublist
+    const sub = document.createElement('div');
+    sub.className = 'state-sublist';
+    const data = state.expandedStates.has(name) ? generateLocationData(name, state.geo) : null;
+    if (data) {
+      for (const group of PRODUCT_GROUPS) {
+        const gh = document.createElement('div');
+        gh.className = 'sub-group';
+        gh.textContent = group.label;
+        sub.appendChild(gh);
+
+        for (const p of group.products) {
+          const r = data.rows.find(r => r.productKey === p.key && r.tierKey === 't25');
+          const si = document.createElement('div');
+          si.className = 'sub-item';
+          if (state.selectedState === name && state.selectedProduct === p.key) si.classList.add('selected');
+          si.innerHTML = `<span>${p.label}</span><span class="rate">${r ? r.avg.toFixed(2)+'%' : '—'}</span>`;
+          si.addEventListener('click', (e) => { e.stopPropagation(); onProductClick(name, p.key); });
+          sub.appendChild(si);
+        }
+      }
+    }
+    item.appendChild(sub);
+    list.appendChild(item);
+  });
+}
+
+function renderMain() {
+  const geoLabel = GEO_CONFIG[state.geo].label;
+  const breadcrumb = document.querySelector('.location-info .breadcrumb');
+
+  if (!state.selectedState) {
+    breadcrumb.style.display = 'none';
+    el('locationName').textContent = 'Find a location';
+    el('filterTag').innerHTML = '';
+    el('instPct').textContent = '—';
+    el('ratesBody').innerHTML = `<tr><td colspan="7" style="text-align:center; padding:36px 24px; color:var(--gray-500);">
+      Browse states, MSAs, counties, or cities to view deposit rates.<br/>
+      <button id="emptyStateOpenSidebar" style="margin-top:14px; background:var(--navy); color:var(--white); border:none; padding:9px 18px; border-radius:4px; font-family:var(--font); font-size:13px; font-weight:500; cursor:pointer;">Find a location</button>
+    </td></tr>`;
+    // Wire the inline button — opens the sidebar
+    const openBtn = document.getElementById('emptyStateOpenSidebar');
+    if (openBtn) openBtn.addEventListener('click', () => setSidebarOpen(true));
+    el('chart').innerHTML = '';
+    el('constructionGrid').innerHTML = '';
+    el('colorLegend').innerHTML = '';
+    renderCOF();
+    return;
+  }
+
+  breadcrumb.style.display = '';
+  breadcrumb.textContent = geoLabel;
+  const data = state.data;
+  el('locationName').textContent = state.selectedState;
+
+  if (state.selectedProduct) {
+    const p = ALL_PRODUCTS.find(p => p.key === state.selectedProduct);
+    el('filterTag').innerHTML = `<span class="filter-tag">Filtered: ${p.label} <span class="clear" id="clearFilter">×</span></span>`;
+    el('clearFilter').addEventListener('click', () => { state.selectedProduct = null; renderMain(); renderSidebar(el('stateSearch').value); });
+  } else {
+    el('filterTag').innerHTML = '';
+  }
+
+  el('instPct').textContent = data.instPct.toFixed(1) + '%';
+
+  renderTable();
+  renderChart();
+  renderConstruction();
+  renderCOF();
+  renderColorLegend();
+  postResize();
+}
+
+function buildRateRow(r) {
+  const profClass = getProfitabilityClass(r.avg, r.productKey);
+  const tr = document.createElement('tr');
+  tr.setAttribute('data-product', r.productKey);
+  tr.setAttribute('data-tier', r.tierKey);
+  tr.innerHTML = `
+    <td>${r.productLabel} · <span style="color:var(--gray-500);">${r.tierLabel}</span></td>
+    <td class="rate-cell ${profClass}">${r.avg.toFixed(2)}%</td>
+    <td class="rate-cell high">${r.high.toFixed(2)}%</td>
+    <td class="rate-cell low">${r.low.toFixed(2)}%</td>
+    <td>${trendCell(r.m1)}</td>
+    <td>${trendCell(r.m3)}</td>
+    <td>${trendCell(r.m6)}</td>
+  `;
+  return tr;
+}
+
+function renderTable() {
+  const data = state.data;
+  const tbody = el('ratesBody');
+  tbody.innerHTML = '';
+
+  const filterProduct = state.selectedProduct;
+  let rows = data.rows.filter(r => !filterProduct || r.productKey === filterProduct);
+
+  if (state.tableSort.column) {
+    // Flat sorted view — no group headers
+    rows = sortRows(rows, state.tableSort.column, state.tableSort.direction);
+    rows.forEach(r => tbody.appendChild(buildRateRow(r)));
+  } else {
+    // Default grouped view
+    for (const group of PRODUCT_GROUPS) {
+      const groupRows = rows.filter(r => r.group === group.label);
+      if (!groupRows.length) continue;
+      const gh = document.createElement('tr');
+      gh.className = 'product-header';
+      gh.innerHTML = `<td colspan="7">${group.label}</td>`;
+      tbody.appendChild(gh);
+      groupRows.forEach(r => tbody.appendChild(buildRateRow(r)));
+    }
+  }
+
+  applyTableSortIndicators();
+  updateSortStatus();
+}
+
+function applyTableSortIndicators() {
+  document.querySelectorAll('table.rates thead th.sortable').forEach(th => {
+    const icon = th.querySelector('.sort-icon');
+    if (state.tableSort.column === th.dataset.sort) {
+      th.classList.add('sorted');
+      icon.textContent = state.tableSort.direction === 'asc' ? '▲' : '▼';
+    } else {
+      th.classList.remove('sorted');
+      icon.textContent = '↕';
+    }
+  });
+}
+
+function updateSortStatus() {
+  const wrap = el('sortStatus');
+  if (!state.tableSort.column) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'inline-flex';
+  const dir = state.tableSort.direction === 'asc' ? 'ascending' : 'descending';
+  el('sortStatusText').innerHTML =
+    `Sorted by <strong>${SORT_COLUMN_LABELS[state.tableSort.column]}</strong> · ${dir}`;
+}
+
+function trendCell(bps) {
+  let cls = 'flat', arrow = '●';
+  if (bps > 1)      { cls = 'up';   arrow = '▲'; }
+  else if (bps < -1){ cls = 'down'; arrow = '▼'; }
+  const sign = bps > 0 ? '+' : '';
+  return `<span class="trend ${cls}"><span class="arrow">${arrow}</span>${sign}${bps} bps</span>`;
+}
+
+function renderColorLegend() {
+  el('colorLegend').innerHTML = PRODUCT_GROUPS.map(g =>
+    `<span class="legend-color"><span class="swatch" style="background:${g.color};"></span>${g.label}</span>`
+  ).join('');
+}
+
+/* =====================================================================
+   Chart — custom SVG bubble plot
+   X = product (categorical), Y = avg APY, size = balance tier
+   ===================================================================== */
+function renderChart() {
+  const svg = el('chart');
+  const data = state.data;
+  const visibleProducts = state.selectedProduct
+    ? ALL_PRODUCTS.filter(p => p.key === state.selectedProduct)
+    : ALL_PRODUCTS;
+
+  const W = 800, H = 340;
+  const pad = { top: 20, right: 24, bottom: 56, left: 50 };
+  const innerW = W - pad.left - pad.right;
+  const innerH = H - pad.top - pad.bottom;
+
+  // Data points: one bubble per (product, tier)
+  const points = [];
+  for (const p of visibleProducts) {
+    for (const t of TIERS) {
+      const r = data.rows.find(r => r.productKey === p.key && r.tierKey === t.key);
+      if (r) points.push({ product: p, tier: t, row: r });
+    }
+  }
+
+  const maxRate = Math.max(...points.map(p => p.row.avg)) * 1.15;
+  const yMax = Math.max(1, Math.ceil(maxRate * 2) / 2); // round up to nearest 0.5
+
+  const xStep = innerW / Math.max(1, visibleProducts.length);
+  const xOf = (productIndex, tierIndex) => {
+    const center = pad.left + xStep * (productIndex + 0.5);
+    const jitter = (tierIndex - (TIERS.length - 1) / 2) * Math.min(8, xStep / 14);
+    return center + jitter;
+  };
+  const yOf = (rate) => pad.top + innerH - (rate / yMax) * innerH;
+
+  let svgContent = '';
+
+  // Grid lines + Y labels
+  const yTicks = 6;
+  for (let i = 0; i <= yTicks; i++) {
+    const v = (yMax / yTicks) * i;
+    const y = yOf(v);
+    svgContent += `<line class="grid-line" x1="${pad.left}" x2="${W - pad.right}" y1="${y}" y2="${y}"/>`;
+    svgContent += `<text class="axis-label" x="${pad.left - 8}" y="${y + 3}" text-anchor="end">${v.toFixed(2)}%</text>`;
+  }
+
+  // Axes
+  svgContent += `<line class="axis-line" x1="${pad.left}" x2="${pad.left}" y1="${pad.top}" y2="${pad.top + innerH}"/>`;
+  svgContent += `<line class="axis-line" x1="${pad.left}" x2="${W - pad.right}" y1="${pad.top + innerH}" y2="${pad.top + innerH}"/>`;
+
+  // X labels (product names)
+  visibleProducts.forEach((p, i) => {
+    const cx = pad.left + xStep * (i + 0.5);
+    const labelY = pad.top + innerH + 16;
+    // Two-line wrap for "CD · Nm" style
+    const parts = p.label.split('·').map(s => s.trim());
+    if (parts.length === 2) {
+      svgContent += `<text class="axis-label" x="${cx}" y="${labelY}" text-anchor="middle">${parts[0]}</text>`;
+      svgContent += `<text class="axis-label" x="${cx}" y="${labelY + 11}" text-anchor="middle">${parts[1]}</text>`;
+    } else {
+      svgContent += `<text class="axis-label" x="${cx}" y="${labelY}" text-anchor="middle">${p.label}</text>`;
+    }
+  });
+
+  // Axis titles
+  svgContent += `<text class="axis-title" x="${pad.left + innerW / 2}" y="${H - 4}" text-anchor="middle">Product</text>`;
+  svgContent += `<text class="axis-title" x="${15}" y="${pad.top + innerH / 2}" text-anchor="middle" transform="rotate(-90 15 ${pad.top + innerH / 2})">Average APY</text>`;
+
+  // Bubbles
+  visibleProducts.forEach((p, pi) => {
+    TIERS.forEach((t, ti) => {
+      const r = data.rows.find(r => r.productKey === p.key && r.tierKey === t.key);
+      if (!r) return;
+      const cx = xOf(pi, ti);
+      const cy = yOf(r.avg);
+      const radius = t.size;
+      svgContent += `<circle class="bubble"
+        cx="${cx}" cy="${cy}" r="${radius}"
+        fill="${p.color}" fill-opacity="0.55"
+        stroke="${p.color}" stroke-width="1"
+        data-product="${p.label}" data-tier="${t.label}"
+        data-avg="${r.avg.toFixed(2)}" data-high="${r.high.toFixed(2)}" data-low="${r.low.toFixed(2)}"/>`;
+    });
+  });
+
+  svg.innerHTML = svgContent;
+
+  // Tooltip interactions
+  const tooltip = el('tooltip');
+  svg.querySelectorAll('.bubble').forEach(b => {
+    b.addEventListener('mouseenter', (e) => {
+      const t = e.target;
+      tooltip.innerHTML =
+        `<div class="tt-title">${t.dataset.product} · ${t.dataset.tier}</div>
+         <div class="tt-row">Avg: ${t.dataset.avg}% · High: ${t.dataset.high}% · Low: ${t.dataset.low}%</div>`;
+      tooltip.classList.add('show');
+    });
+    b.addEventListener('mousemove', (e) => {
+      const rect = svg.getBoundingClientRect();
+      tooltip.style.left = (e.clientX - rect.left + 12) + 'px';
+      tooltip.style.top  = (e.clientY - rect.top - 30) + 'px';
+    });
+    b.addEventListener('mouseleave', () => tooltip.classList.remove('show'));
+  });
+}
+
+/* =====================================================================
+   Tier Construction chart — Low / Avg / High range bars per tier,
+   grouped into a small-multiples grid (one panel per product).
+   When a product is filtered, switches to a single full-width panel.
+   ===================================================================== */
+function renderConstruction() {
+  const grid = el('constructionGrid');
+  const data = state.data;
+  if (!data) { grid.innerHTML = ''; return; }
+
+  const visibleProducts = state.selectedProduct
+    ? ALL_PRODUCTS.filter(p => p.key === state.selectedProduct)
+    : ALL_PRODUCTS;
+  const single = visibleProducts.length === 1;
+
+  // Shared X scale across all panels — based on the global max across this location
+  const allHighs = data.rows.map(r => r.high);
+  const globalMax = Math.max(...allHighs) * 1.08;
+  const xMax = Math.max(1, Math.ceil(globalMax * 2) / 2); // round up to nearest 0.5%
+
+  grid.classList.toggle('single', single);
+  grid.innerHTML = '';
+
+  for (const p of visibleProducts) {
+    const panel = document.createElement('div');
+    panel.className = 'construction-panel' + (single ? ' single' : '');
+
+    let html = `
+      <div class="construction-panel-head">
+        <span class="construction-panel-title">${p.label}</span>
+        <span class="construction-panel-group">${p.group}</span>
+      </div>
+    `;
+
+    for (const tier of TIERS) {
+      const r = data.rows.find(r => r.productKey === p.key && r.tierKey === tier.key);
+      if (!r) continue;
+      const lowPct  = (r.low  / xMax) * 100;
+      const highPct = (r.high / xMax) * 100;
+      const avgPct  = (r.avg  / xMax) * 100;
+      const widthPct = Math.max(0.5, highPct - lowPct);
+      const profClass = getProfitabilityClass(r.avg, p.key);
+
+      html += `
+        <div class="construction-row ${profClass}" title="${p.label} · ${tier.label} — Low ${r.low.toFixed(2)}% · Avg ${r.avg.toFixed(2)}% · High ${r.high.toFixed(2)}%">
+          <span class="tier-label">${tier.label}</span>
+          <div class="range-track">
+            <div class="range-bar" style="left:${lowPct}%; width:${widthPct}%; background:${p.color};"></div>
+            <div class="range-marker-low"  style="left:${lowPct}%;  background:${p.color};"></div>
+            <div class="range-marker-high" style="left:${highPct}%; background:${p.color};"></div>
+            <div class="range-dot" style="left:${avgPct}%; background:${p.color};"></div>
+          </div>
+          <span class="tier-avg">${r.avg.toFixed(2)}%</span>
+        </div>
+      `;
+    }
+
+    // Axis labels under the bars
+    html += `
+      <div class="construction-row construction-axis-row">
+        <span></span>
+        <div class="construction-axis">
+          <span>0.00%</span>
+          <span>${(xMax/2).toFixed(2)}%</span>
+          <span>${xMax.toFixed(2)}%</span>
+        </div>
+        <span></span>
+      </div>
+    `;
+
+    panel.innerHTML = html;
+    // Click to filter/unfilter to this product
+    panel.addEventListener('click', () => {
+      if (state.selectedState) onProductClick(state.selectedState, p.key);
+    });
+
+    grid.appendChild(panel);
+  }
+}
+
+/* =====================================================================
+   Cost of Funds chart — projected COF vs SOFR forward curve.
+   Two-line chart over 0–60 months with shaded spread area between them.
+   ===================================================================== */
+function renderCOF() {
+  const svg = el('cofChart');
+  const summary = el('cofSummary');
+  const { cof, beta } = state.lens;
+
+  const W = 800, H = 340;
+  const pad = { top: 18, right: 28, bottom: 46, left: 50 };
+  const innerW = W - pad.left - pad.right;
+  const innerH = H - pad.top - pad.bottom;
+
+  // Build series — one point per month from 0 to 60
+  const months = [];
+  for (let m = 0; m <= 60; m++) months.push(m);
+  const sofrPts = months.map(m => ({ m, v: getSOFR(m) }));
+  const cofPts  = months.map(m => ({ m, v: getProjectedCOF(m, cof, beta) }));
+
+  const allVals = sofrPts.concat(cofPts).map(p => p.v).concat([cof]);
+  const yMin = Math.max(0, Math.floor(Math.min(...allVals) * 4) / 4 - 0.25);
+  const yMax = Math.ceil(Math.max(...allVals) * 4) / 4 + 0.25;
+
+  const xOf = m => pad.left + (m / 60) * innerW;
+  const yOf = v => pad.top + innerH - ((v - yMin) / (yMax - yMin)) * innerH;
+
+  let svgContent = '';
+
+  // Grid + Y labels
+  const yTicks = 5;
+  for (let i = 0; i <= yTicks; i++) {
+    const v = yMin + ((yMax - yMin) / yTicks) * i;
+    const y = yOf(v);
+    svgContent += `<line class="grid-line" x1="${pad.left}" x2="${W - pad.right}" y1="${y}" y2="${y}"/>`;
+    svgContent += `<text class="axis-label" x="${pad.left - 8}" y="${y + 3}" text-anchor="end">${v.toFixed(2)}%</text>`;
+  }
+
+  // X-axis tick months
+  const xTicks = [0, 6, 12, 18, 24, 36, 48, 60];
+  xTicks.forEach(m => {
+    const x = xOf(m);
+    svgContent += `<line class="grid-line" x1="${x}" x2="${x}" y1="${pad.top}" y2="${pad.top + innerH}"/>`;
+    svgContent += `<text class="axis-label" x="${x}" y="${pad.top + innerH + 16}" text-anchor="middle">${m}m</text>`;
+  });
+
+  // Axes
+  svgContent += `<line class="axis-line" x1="${pad.left}" x2="${pad.left}" y1="${pad.top}" y2="${pad.top + innerH}"/>`;
+  svgContent += `<line class="axis-line" x1="${pad.left}" x2="${W - pad.right}" y1="${pad.top + innerH}" y2="${pad.top + innerH}"/>`;
+
+  // Axis titles
+  svgContent += `<text class="axis-title" x="${pad.left + innerW / 2}" y="${H - 4}" text-anchor="middle">Months Forward</text>`;
+  svgContent += `<text class="axis-title" x="${14}" y="${pad.top + innerH / 2}" text-anchor="middle" transform="rotate(-90 14 ${pad.top + innerH / 2})">Rate (%)</text>`;
+
+  // Shaded area between projected COF and SOFR (visualizes the gap)
+  const areaPath = [
+    ...sofrPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xOf(p.m)} ${yOf(p.v)}`),
+    ...cofPts.slice().reverse().map(p => `L ${xOf(p.m)} ${yOf(p.v)}`),
+    'Z'
+  ].join(' ');
+  svgContent += `<path class="cof-area" d="${areaPath}"/>`;
+
+  // Current COF reference line (flat horizontal)
+  svgContent += `<line class="cof-line cof0" x1="${pad.left}" x2="${W - pad.right}" y1="${yOf(cof)}" y2="${yOf(cof)}"/>`;
+  svgContent += `<text class="axis-label" x="${W - pad.right + 4}" y="${yOf(cof) + 3}" text-anchor="start" fill="var(--gray-500)">COF₀</text>`;
+
+  // SOFR line
+  const sofrPath = sofrPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xOf(p.m)} ${yOf(p.v)}`).join(' ');
+  svgContent += `<path class="cof-line sofr" d="${sofrPath}"/>`;
+
+  // Projected COF line
+  const cofPath = cofPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xOf(p.m)} ${yOf(p.v)}`).join(' ');
+  svgContent += `<path class="cof-line proj" d="${cofPath}"/>`;
+
+  // Markers at the key tenors on the projected COF line
+  xTicks.forEach(m => {
+    if (m === 0) return;
+    const v = getProjectedCOF(m, cof, beta);
+    svgContent += `<circle class="cof-dot" cx="${xOf(m)}" cy="${yOf(v)}" r="4" fill="var(--navy)"/>`;
+  });
+
+  // Hover overlay for tooltip
+  svgContent += `<rect id="cofHover" x="${pad.left}" y="${pad.top}" width="${innerW}" height="${innerH}" fill="transparent" style="cursor:crosshair;"/>`;
+  svgContent += `<line id="cofGuide" x1="0" x2="0" y1="${pad.top}" y2="${pad.top + innerH}" stroke="var(--navy)" stroke-width="1" stroke-dasharray="2 3" opacity="0"/>`;
+
+  svg.innerHTML = svgContent;
+
+  // Wire tooltip
+  const tooltip = el('cofTooltip');
+  const guide = svg.querySelector('#cofGuide');
+  const hover = svg.querySelector('#cofHover');
+  hover.addEventListener('mousemove', (e) => {
+    const rect = svg.getBoundingClientRect();
+    const relX = ((e.clientX - rect.left) / rect.width) * W;
+    const months = Math.max(0, Math.min(60, Math.round(((relX - pad.left) / innerW) * 60)));
+    const sofrV = getSOFR(months);
+    const cofV  = getProjectedCOF(months, cof, beta);
+    const spread = sofrV - cofV;
+    guide.setAttribute('x1', xOf(months));
+    guide.setAttribute('x2', xOf(months));
+    guide.setAttribute('opacity', '0.6');
+    tooltip.innerHTML = `
+      <div class="tt-title">${months} months forward</div>
+      <div class="tt-row">SOFR 1M: ${sofrV.toFixed(2)}%</div>
+      <div class="tt-row">Projected COF: ${cofV.toFixed(2)}%</div>
+      <div class="tt-row">Spread: ${spread >= 0 ? '+' : ''}${(spread * 100).toFixed(0)} bps</div>
+    `;
+    tooltip.classList.add('show');
+    tooltip.style.left = (e.clientX - rect.left + 12) + 'px';
+    tooltip.style.top  = (e.clientY - rect.top - 50) + 'px';
+  });
+  hover.addEventListener('mouseleave', () => {
+    tooltip.classList.remove('show');
+    guide.setAttribute('opacity', '0');
+  });
+
+  // Summary cards
+  const cof12 = getProjectedCOF(12, cof, beta);
+  const cof24 = getProjectedCOF(24, cof, beta);
+  const cof60 = getProjectedCOF(60, cof, beta);
+  const sofr0 = getSOFR(0);
+  const sofr60 = getSOFR(60);
+  summary.innerHTML = `
+    <div class="cof-stat">
+      <div class="cof-stat-label">Current COF</div>
+      <div class="cof-stat-value">${cof.toFixed(2)}%</div>
+      <div class="cof-stat-sub">Spot SOFR ${sofr0.toFixed(2)}%</div>
+    </div>
+    <div class="cof-stat">
+      <div class="cof-stat-label">Projected COF · 12M</div>
+      <div class="cof-stat-value">${cof12.toFixed(2)}%</div>
+      <div class="cof-stat-sub">${((cof12 - cof) * 100 >= 0 ? '+' : '')}${((cof12 - cof) * 100).toFixed(0)} bps vs today</div>
+    </div>
+    <div class="cof-stat">
+      <div class="cof-stat-label">Projected COF · 24M</div>
+      <div class="cof-stat-value">${cof24.toFixed(2)}%</div>
+      <div class="cof-stat-sub">${((cof24 - cof) * 100 >= 0 ? '+' : '')}${((cof24 - cof) * 100).toFixed(0)} bps vs today</div>
+    </div>
+    <div class="cof-stat">
+      <div class="cof-stat-label">Projected COF · 60M</div>
+      <div class="cof-stat-value">${cof60.toFixed(2)}%</div>
+      <div class="cof-stat-sub">SOFR 60M ${sofr60.toFixed(2)}%</div>
+    </div>
+    <div class="cof-stat">
+      <div class="cof-stat-label">Deposit Beta</div>
+      <div class="cof-stat-value">${beta}%</div>
+      <div class="cof-stat-sub">applied to ΔSOFR</div>
+    </div>
+  `;
+}
+
+/* =====================================================================
+   Event handlers
+   ===================================================================== */
+function onLocationClick(name) {
+  // Toggle expand
+  if (state.expandedStates.has(name)) state.expandedStates.delete(name);
+  else state.expandedStates.add(name);
+
+  // Select this location and clear product filter when switching
+  if (state.selectedState !== name) {
+    state.selectedState = name;
+    state.selectedProduct = null;
+    state.data = generateLocationData(name, state.geo);
+  }
+
+  renderSidebar(el('stateSearch').value);
+  renderMain();
+}
+
+function onProductClick(locationName, productKey) {
+  if (state.selectedState !== locationName) {
+    state.selectedState = locationName;
+    state.data = generateLocationData(locationName, state.geo);
+  }
+  state.selectedProduct = (state.selectedProduct === productKey) ? null : productKey;
+  renderSidebar(el('stateSearch').value);
+  renderMain();
+}
+
+function onGeoChange(newGeo) {
+  if (state.geo === newGeo) return;
+  state.geo = newGeo;
+  state.selectedState = null;
+  state.selectedProduct = null;
+  state.expandedStates.clear();
+  state.data = null;
+
+  // Update active tab visual + search placeholder + clear search
+  document.querySelectorAll('.geo-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.geo === newGeo);
+  });
+  const search = el('stateSearch');
+  search.value = '';
+  search.placeholder = GEO_CONFIG[newGeo].placeholder;
+
+  renderSidebar();
+  renderMain();
+}
+
+document.querySelectorAll('.geo-tab').forEach(tab => {
+  tab.addEventListener('click', () => onGeoChange(tab.dataset.geo));
+});
+
+document.querySelectorAll('.content-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const target = tab.dataset.panel;
+    document.querySelectorAll('.content-tab').forEach(t => {
+      const active = t.dataset.panel === target;
+      t.classList.toggle('active', active);
+      t.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    document.querySelectorAll('.tab-panel').forEach(p => {
+      p.classList.toggle('active', p.id === 'panel-' + target);
+    });
+    // Re-render chart on activation in case layout changed while hidden
+    if (target === 'chart' && state.data) renderChart();
+    if (target === 'construction' && state.data) renderConstruction();
+    if (target === 'cof') renderCOF();
+    postResize();
+  });
+});
+
+/* =====================================================================
+   Settings — Profitability Lens + Visible Locations
+   Modal-based settings panel; live updates as user changes inputs.
+   ===================================================================== */
+function updateLensIndicator() {
+  const ind = el('lensIndicator');
+  const txt = el('lensIndicatorText');
+  if (state.lens.enabled) {
+    ind.classList.remove('disabled');
+    txt.innerHTML = `Profitability lens: COF <strong>${state.lens.cof.toFixed(2)}%</strong> · Beta <strong>${state.lens.beta}%</strong>`;
+  } else {
+    ind.classList.add('disabled');
+    txt.innerHTML = `Profitability lens: <strong>off</strong>`;
+  }
+}
+
+function syncSettingsInputs() {
+  el('lensCOF').value    = state.lens.cof;
+  el('lensBeta').value   = state.lens.beta;
+  el('lensToggle').checked = state.lens.enabled;
+}
+
+function onLensChange() {
+  const cofVal  = parseFloat(el('lensCOF').value);
+  const betaVal = parseFloat(el('lensBeta').value);
+  if (!isNaN(cofVal))  state.lens.cof  = cofVal;
+  if (!isNaN(betaVal)) state.lens.beta = Math.max(0, Math.min(100, betaVal));
+  state.lens.enabled = el('lensToggle').checked;
+  updateLensIndicator();
+  if (state.data) {
+    renderTable();
+    renderConstruction();
+  }
+  renderCOF();
+  saveSettings();
+  postResize();
+}
+['lensCOF', 'lensBeta', 'lensToggle'].forEach(id => {
+  el(id).addEventListener('input', onLensChange);
+  el(id).addEventListener('change', onLensChange);
+});
+
+/* ---- Visible Locations filter (per geo) ---- */
+const LOC_GROUPS = [
+  { geo: 'state',  label: 'States' },
+  { geo: 'msa',    label: 'MSAs' },
+  { geo: 'county', label: 'Counties' },
+  { geo: 'city',   label: 'Cities' }
+];
+// Expansion state for each filter group inside the modal
+const locGroupExpanded = { state: true, msa: false, county: false, city: false };
+
+function renderLocationFilters() {
+  const container = el('locFilters');
+  container.innerHTML = '';
+
+  LOC_GROUPS.forEach(({ geo, label }) => {
+    const all = GEO_CONFIG[geo].list;
+    const visible = state.visibleLocations[geo];
+    const shownCount = visible.size === 0 ? all.length : visible.size;
+
+    const group = document.createElement('div');
+    group.className = 'loc-filter-group';
+    if (locGroupExpanded[geo]) group.classList.add('expanded');
+
+    group.innerHTML = `
+      <div class="loc-filter-header" data-geo="${geo}">
+        <span class="loc-filter-title">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          ${label}
+        </span>
+        <span class="loc-filter-count">${shownCount} of ${all.length} shown</span>
+      </div>
+      <div class="loc-filter-body">
+        <div class="loc-filter-actions">
+          <button data-action="all"  data-geo="${geo}">Select all</button>
+          <button data-action="none" data-geo="${geo}">Clear all</button>
+          <span class="spacer"></span>
+          ${all.length > 10 ? `<input type="text" class="loc-filter-search" placeholder="Filter..." data-geo="${geo}" style="width:140px; margin: 0;"/>` : ''}
+        </div>
+        <div class="loc-filter-grid" id="locGrid-${geo}"></div>
+      </div>
+    `;
+    container.appendChild(group);
+    renderLocationCheckboxes(geo);
+  });
+
+  // Wire events
+  container.querySelectorAll('.loc-filter-header').forEach(h => {
+    h.addEventListener('click', () => {
+      const geo = h.dataset.geo;
+      locGroupExpanded[geo] = !locGroupExpanded[geo];
+      renderLocationFilters();
+    });
+  });
+  container.querySelectorAll('.loc-filter-actions button').forEach(b => {
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const geo = b.dataset.geo;
+      const all = GEO_CONFIG[geo].list;
+      if (b.dataset.action === 'all') {
+        // "Select all" = empty set (= show all). Clearer semantics + smaller payload.
+        state.visibleLocations[geo] = new Set();
+      } else {
+        // "Clear all" = explicitly hide everything (empty whitelist with sentinel)
+        state.visibleLocations[geo] = new Set(['__none__']);
+      }
+      applyLocationFilters();
+      renderLocationFilters();
+    });
+  });
+  container.querySelectorAll('.loc-filter-search').forEach(inp => {
+    inp.addEventListener('input', (e) => {
+      const geo = inp.dataset.geo;
+      renderLocationCheckboxes(geo, e.target.value);
+    });
+  });
+}
+
+function renderLocationCheckboxes(geo, searchText='') {
+  const grid = el(`locGrid-${geo}`);
+  if (!grid) return;
+  grid.innerHTML = '';
+  const all = GEO_CONFIG[geo].list;
+  const visible = state.visibleLocations[geo];
+  const lc = searchText.trim().toLowerCase();
+
+  all.forEach(([name, abbr]) => {
+    if (lc && !name.toLowerCase().includes(lc) && !abbr.toLowerCase().includes(lc)) return;
+    const isChecked = visible.size === 0 ? true : (visible.has(name) && !visible.has('__none__'));
+    const lbl = document.createElement('label');
+    lbl.className = 'loc-checkbox';
+    lbl.innerHTML = `
+      <input type="checkbox" data-geo="${geo}" data-name="${name.replace(/"/g, '&quot;')}" ${isChecked ? 'checked' : ''}/>
+      <span>${name}</span>
+      <span class="abbr">${abbr}</span>
+    `;
+    grid.appendChild(lbl);
+  });
+
+  grid.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', (e) => {
+      const g = cb.dataset.geo;
+      const n = cb.dataset.name;
+      let vis = state.visibleLocations[g];
+      const allItems = GEO_CONFIG[g].list;
+      const wasHideAll = vis.has('__none__');
+      const wasShowAll = vis.size === 0;
+
+      if (wasHideAll) {
+        // Coming from "show none". Start fresh with just this item if checked.
+        vis = cb.checked ? new Set([n]) : new Set(['__none__']);
+      } else if (wasShowAll) {
+        // From "show all", every box renders checked — they can only be unchecking.
+        // Materialize the full set, then remove the one they unchecked.
+        if (!cb.checked) {
+          vis = new Set(allItems.map(([nm]) => nm));
+          vis.delete(n);
+        }
+      } else {
+        // Normal whitelist toggle
+        if (cb.checked) vis.add(n); else vis.delete(n);
+      }
+
+      // Normalize: full whitelist collapses back to "show all"
+      if (!vis.has('__none__') && vis.size === allItems.length) vis = new Set();
+      // Empty whitelist from a non-"show all" path means "show none"
+      if (vis.size === 0 && !cb.checked && !wasShowAll && !wasHideAll) vis = new Set(['__none__']);
+
+      state.visibleLocations[g] = vis;
+      applyLocationFilters();
+      // Update count in header without full re-render
+      const header = el(`locGrid-${g}`).closest('.loc-filter-group').querySelector('.loc-filter-count');
+      const shown = vis.has('__none__') ? 0 : (vis.size === 0 ? allItems.length : vis.size);
+      header.textContent = `${shown} of ${allItems.length} shown`;
+    });
+  });
+}
+
+function applyLocationFilters() {
+  // If currently selected state is no longer visible, clear selection
+  const vis = state.visibleLocations[state.geo];
+  if (state.selectedState && vis.size > 0 && !vis.has(state.selectedState)) {
+    state.selectedState = null;
+    state.selectedProduct = null;
+    state.data = null;
+    renderMain();
+  }
+  renderSidebar(el('stateSearch').value);
+  // Keep default-location dropdowns in sync if settings is open
+  if (el('settingsOverlay').classList.contains('open')) {
+    syncDefaultLocationSelectors();
+  }
+  saveSettings();
+}
+
+/* ---- Modal open/close ---- */
+function openSettings() {
+  syncSettingsInputs();
+  renderLocationFilters();
+  syncDefaultLocationSelectors();
+  el('settingsOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSettings() {
+  el('settingsOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function resetSettingsToDefaults() {
+  state.lens = { enabled: true, cof: 1.85, beta: 50 };
+  state.visibleLocations = { state: new Set(), msa: new Set(), county: new Set(), city: new Set() };
+  state.defaults = { geo: null, location: null };
+  syncSettingsInputs();
+  renderLocationFilters();
+  syncDefaultLocationSelectors();
+  applyLocationFilters();
+  updateLensIndicator();
+  if (state.data) { renderTable(); renderConstruction(); }
+  renderCOF();
+  saveSettings();
+}
+
+/* ---- Default Location selectors ---- */
+function visibleListForGeo(geo) {
+  const allItems = GEO_CONFIG[geo].list;
+  const vis = state.visibleLocations[geo];
+  const useFilter = vis && vis.size > 0 && !vis.has('__none__');
+  return allItems.filter(([name]) => !useFilter || vis.has(name));
+}
+
+function populateDefaultLocationDropdown(geo) {
+  const sel = el('defaultLocation');
+  if (!geo) {
+    sel.innerHTML = '<option value="">—</option>';
+    sel.disabled = true;
+    return;
+  }
+  const items = visibleListForGeo(geo);
+  if (items.length === 0) {
+    sel.innerHTML = '<option value="">No visible locations</option>';
+    sel.disabled = true;
+    return;
+  }
+  sel.disabled = false;
+  sel.innerHTML = '<option value="">— Choose —</option>' +
+    items.map(([name, abbr]) => `<option value="${escapeAttr(name)}">${name} · ${abbr}</option>`).join('');
+}
+
+function syncDefaultLocationSelectors() {
+  const geoSel = el('defaultGeo');
+  const locSel = el('defaultLocation');
+  const hint   = el('defaultLocationHint');
+  geoSel.value = state.defaults.geo || '';
+  populateDefaultLocationDropdown(state.defaults.geo);
+  // Set the location value if the saved default is currently visible
+  if (state.defaults.geo && state.defaults.location) {
+    const visible = visibleListForGeo(state.defaults.geo).some(([n]) => n === state.defaults.location);
+    if (visible) {
+      locSel.value = state.defaults.location;
+      hint.style.display = 'none';
+    } else {
+      locSel.value = '';
+      hint.style.display = 'block';
+      hint.textContent = `Saved default "${state.defaults.location}" is no longer in your visible ${GEO_CONFIG[state.defaults.geo].label.toLowerCase()}s. Either re-add it under Visible Locations or pick a new default.`;
+    }
+  } else {
+    hint.style.display = 'none';
+  }
+}
+
+function onDefaultGeoChange() {
+  const geoVal = el('defaultGeo').value;
+  state.defaults.geo = geoVal || null;
+  state.defaults.location = null;
+  syncDefaultLocationSelectors();
+  saveSettings();
+}
+
+function onDefaultLocationChange() {
+  state.defaults.location = el('defaultLocation').value || null;
+  el('defaultLocationHint').style.display = 'none';
+  saveSettings();
+}
+
+function applyDefaultLocation() {
+  const { geo, location } = state.defaults;
+  if (!geo || !location) return false;
+  const exists = GEO_CONFIG[geo] && GEO_CONFIG[geo].list.some(([n]) => n === location);
+  if (!exists) return false;
+  const vis = state.visibleLocations[geo];
+  if (vis && vis.has('__none__')) return false;  // user hid everything in this geo
+  const useFilter = vis && vis.size > 0;
+  if (useFilter && !vis.has(location)) return false;  // silent fallback
+
+  // Switch geo, select & expand location, generate data
+  state.geo = geo;
+  document.querySelectorAll('.geo-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.geo === geo);
+  });
+  const search = el('stateSearch');
+  search.value = '';
+  search.placeholder = GEO_CONFIG[geo].placeholder;
+  state.selectedState = location;
+  state.expandedStates.add(location);
+  state.data = generateLocationData(location, geo);
+  return true;
+}
+
+el('defaultGeo').addEventListener('change', onDefaultGeoChange);
+el('defaultLocation').addEventListener('change', onDefaultLocationChange);
+
+el('openSettings').addEventListener('click', openSettings);
+el('closeSettings').addEventListener('click', closeSettings);
+el('doneSettings').addEventListener('click', closeSettings);
+el('resetSettings').addEventListener('click', resetSettingsToDefaults);
+el('lensAdjustBtn').addEventListener('click', openSettings);
+el('settingsOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'settingsOverlay') closeSettings();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && el('settingsOverlay').classList.contains('open')) closeSettings();
+});
+
+el('stateSearch').addEventListener('input', (e) => renderSidebar(e.target.value));
+
+/* ---------- Sidebar collapse ---------- */
+function setSidebarOpen(open) {
+  state.sidebarOpen = !!open;
+  document.querySelector('.container').classList.toggle('sidebar-open', state.sidebarOpen);
+  el('sidebarToggle').classList.toggle('active', state.sidebarOpen);
+  saveSettings();
+  postResize();
+}
+function toggleSidebar() { setSidebarOpen(!state.sidebarOpen); }
+el('sidebarToggle').addEventListener('click', toggleSidebar);
+
+/* ---------- Sortable table headers ---------- */
+function onSortColumnClick(col) {
+  if (state.tableSort.column === col) {
+    state.tableSort.direction = state.tableSort.direction === 'asc' ? 'desc' : 'asc';
+  } else {
+    state.tableSort.column = col;
+    state.tableSort.direction = 'asc';
+  }
+  applyTableSortIndicators();
+  updateSortStatus();
+  if (state.data) renderTable();
+}
+function onResetSort() {
+  state.tableSort = { column: null, direction: 'asc' };
+  applyTableSortIndicators();
+  updateSortStatus();
+  if (state.data) renderTable();
+}
+document.querySelectorAll('table.rates thead th.sortable').forEach(th => {
+  th.addEventListener('click', () => onSortColumnClick(th.dataset.sort));
+});
+el('resetSort').addEventListener('click', onResetSort);
+
+/* =====================================================================
+   Best Rate Finder
+   Cross-geo scanner that iterates every visible location and scores
+   each (product, tier) by spread vs the bank's projected COF.
+   Sorted ascending — most profitable acquisitions surface first.
+   ===================================================================== */
+state.finder = {
+  productFamily: 'all',  // 'all' | 'liquid' | 'cd'
+  geoScope:      'all',  // 'all' | 'state' | 'msa' | 'county' | 'city'
+  limit:         25
+};
+
+function scanForBestRates() {
+  const { productFamily, geoScope, limit } = state.finder;
+  const results = [];
+  const geos = geoScope === 'all' ? ['state','msa','county','city'] : [geoScope];
+  let locationsScanned = 0;
+
+  geos.forEach(geo => {
+    const all = GEO_CONFIG[geo].list;
+    const vis = state.visibleLocations[geo];
+    const useFilter = vis && vis.size > 0;
+    const hideAll = useFilter && vis.has('__none__');
+    if (hideAll) return;
+
+    all.forEach(([name, abbr]) => {
+      if (useFilter && !vis.has(name)) return;
+      locationsScanned++;
+      const data = generateLocationData(name, geo);
+      data.rows.forEach(row => {
+        // Product family filter
+        if (productFamily === 'liquid' && !['checking','savings','mm'].includes(row.productKey)) return;
+        if (productFamily === 'cd' && !row.productKey.startsWith('cd')) return;
+
+        const months = PRODUCT_TENORS[row.productKey];
+        const projectedCOF = getProjectedCOF(months, state.lens.cof, state.lens.beta);
+        const spread = row.avg - projectedCOF;
+
+        results.push({
+          geo,
+          geoLabel: GEO_CONFIG[geo].label,
+          locationName: name,
+          locationAbbr: abbr,
+          productKey:   row.productKey,
+          productLabel: row.productLabel,
+          productGroup: row.group,
+          productColor: row.groupColor,
+          tierKey:      row.tierKey,
+          tierLabel:    row.tierLabel,
+          rate:         row.avg,
+          projectedCOF,
+          spread,
+          spreadBps:    Math.round(spread * 100)
+        });
+      });
+    });
+  });
+
+  results.sort((a, b) => a.spread - b.spread);
+  return {
+    results: results.slice(0, limit),
+    totalCount: results.length,
+    locationsScanned
+  };
+}
+
+function spreadClass(spread) {
+  if (spread <= 0)     return 'green';
+  if (spread <= 0.75)  return 'orange';
+  return 'red';
+}
+
+function escapeAttr(s) { return String(s).replace(/"/g, '&quot;'); }
+
+function renderFinderResults() {
+  const tbody = el('finderResults');
+  const summary = el('finderSummary');
+  const { results, totalCount, locationsScanned } = scanForBestRates();
+
+  // Filter summary line
+  const familyLabel = { all: 'all products', liquid: 'liquid accounts only', cd: 'CDs only' }[state.finder.productFamily];
+  const geoLabel = state.finder.geoScope === 'all' ? 'all geos' : GEO_CONFIG[state.finder.geoScope].label + 's';
+  summary.innerHTML = `Scanned <strong>${locationsScanned}</strong> locations across <strong>${geoLabel}</strong> · ${familyLabel} · <strong>${totalCount.toLocaleString()}</strong> rate points evaluated · showing top <strong>${results.length}</strong>`;
+
+  if (results.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="finder-empty">
+      No rates match those filters. Try widening your geo scope, switching products, or making more locations visible in Settings.
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = results.map((r, i) => `
+    <tr class="finder-row"
+        data-geo="${r.geo}"
+        data-loc="${escapeAttr(r.locationName)}"
+        data-product="${r.productKey}"
+        data-tier="${r.tierKey}">
+      <td class="num finder-rank">${i + 1}</td>
+      <td class="finder-loc">
+        <strong>${r.locationName}</strong>
+        <span class="finder-meta">${r.geoLabel} · ${r.locationAbbr}</span>
+      </td>
+      <td>
+        <span class="finder-product-group" style="background:${r.productColor};"></span>
+        ${r.productLabel} · <span style="color:var(--gray-500);">${r.tierLabel}</span>
+      </td>
+      <td class="num finder-rate">${r.rate.toFixed(2)}%</td>
+      <td class="num finder-cof">${r.projectedCOF.toFixed(2)}%</td>
+      <td class="num"><span class="finder-spread ${spreadClass(r.spread)}">${r.spread >= 0 ? '+' : ''}${r.spreadBps} bps</span></td>
+      <td class="num"><span class="finder-arrow">→</span></td>
+    </tr>
+  `).join('');
+
+  // Wire click → navigation
+  tbody.querySelectorAll('.finder-row').forEach(row => {
+    row.addEventListener('click', () => {
+      navigateFromFinder(row.dataset.geo, row.dataset.loc, row.dataset.product, row.dataset.tier);
+    });
+  });
+}
+
+function navigateFromFinder(geo, locationName, productKey, tierKey) {
+  // Switch geo if needed (inline so we don't trigger onGeoChange's reset)
+  if (state.geo !== geo) {
+    state.geo = geo;
+    document.querySelectorAll('.geo-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.geo === geo);
+    });
+    const search = el('stateSearch');
+    search.value = '';
+    search.placeholder = GEO_CONFIG[geo].placeholder;
+    state.expandedStates.clear();
+  }
+  // Set location + product
+  state.selectedState = locationName;
+  state.selectedProduct = productKey;
+  state.expandedStates.add(locationName);
+  state.data = generateLocationData(locationName, geo);
+
+  // Switch to the Rates Table tab so the user lands where the row lives
+  document.querySelectorAll('.content-tab').forEach(t => {
+    const isTable = t.dataset.panel === 'table';
+    t.classList.toggle('active', isTable);
+    t.setAttribute('aria-selected', isTable ? 'true' : 'false');
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => {
+    p.classList.toggle('active', p.id === 'panel-table');
+  });
+
+  renderSidebar();
+  renderMain();
+  closeFinder();
+  highlightTableRow(productKey, tierKey);
+}
+
+function highlightTableRow(productKey, tierKey) {
+  // Wait a frame for the table to render, then highlight + scroll
+  setTimeout(() => {
+    const row = document.querySelector(`#ratesBody tr[data-product="${productKey}"][data-tier="${tierKey}"]`);
+    if (!row) return;
+    row.classList.add('highlight-pulse');
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => row.classList.remove('highlight-pulse'), 2400);
+  }, 120);
+}
+
+/* ---- Modal open/close + filter chips ---- */
+function openFinder() {
+  // Sync chip states from current filter settings
+  document.querySelectorAll('#finderOverlay .finder-chips').forEach(group => {
+    const filter = group.dataset.filter;
+    group.querySelectorAll('.finder-chip').forEach(c => {
+      c.classList.toggle('active', String(state.finder[filter]) === c.dataset.value);
+    });
+  });
+  renderFinderResults();
+  el('finderOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeFinder() {
+  el('finderOverlay').classList.remove('open');
+  // Only release scroll lock if settings modal isn't also open
+  if (!el('settingsOverlay').classList.contains('open')) {
+    document.body.style.overflow = '';
+  }
+}
+
+el('openFinder').addEventListener('click', openFinder);
+el('closeFinder').addEventListener('click', closeFinder);
+el('closeFinderBottom').addEventListener('click', closeFinder);
+el('finderOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'finderOverlay') closeFinder();
+});
+
+// Filter chip handlers
+document.querySelectorAll('#finderOverlay .finder-chips').forEach(group => {
+  const filter = group.dataset.filter;
+  group.querySelectorAll('.finder-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      group.querySelectorAll('.finder-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const v = chip.dataset.value;
+      state.finder[filter] = (filter === 'limit') ? parseInt(v, 10) : v;
+      renderFinderResults();
+    });
+  });
+});
+
+// Esc closes whichever modal is open (settings handler already covers settings;
+// extend to also handle finder)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && el('finderOverlay').classList.contains('open')) closeFinder();
+});
+
+/* =====================================================================
+   Iframe resize (postMessage to parent)
+   ===================================================================== */
+function postResize() {
+  try {
+    const h = document.querySelector('.widget').getBoundingClientRect().height;
+    window.parent.postMessage({ type: 'RESIZE', height: Math.ceil(h) }, '*');
+  } catch (e) {}
+}
+window.addEventListener('load', postResize);
+window.addEventListener('resize', postResize);
+
+/* =====================================================================
+   Init
+   ===================================================================== */
+loadSettings();
+setSidebarOpen(state.sidebarOpen);
+syncSettingsInputs();
+updateLensIndicator();
+applyDefaultLocation();
+renderSidebar();
+renderMain();
+</script>
+
+</body>
+</html>
