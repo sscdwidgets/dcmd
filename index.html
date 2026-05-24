@@ -837,6 +837,22 @@
     margin: 8px 0 0;
     line-height: 1.4;
   }
+  .subsection-help {
+    font-size: 11px;
+    color: var(--gray-500);
+    margin: 7px 0 0;
+    line-height: 1.5;
+    padding-left: 2px;
+  }
+  .subsection-help em {
+    font-style: italic;
+    color: var(--gray-700);
+    font-size: inherit;
+  }
+  .subsection-help strong {
+    color: var(--gray-700);
+    font-weight: 600;
+  }
 
   /* Visible Locations */
   .loc-filter-group { margin-bottom: 14px; }
@@ -1436,6 +1452,110 @@
   }
   .chart-svg .bubble:hover { stroke-width: 2; opacity: 1; }
 
+  /* ---------- Profitability Heatmap ---------- */
+  .heatmap-section {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+  }
+  .heatmap-grid-wrap {
+    overflow-x: auto;
+    margin-top: 14px;
+  }
+  .heatmap-grid {
+    display: grid;
+    grid-template-columns: 150px repeat(6, minmax(92px, 1fr));
+    gap: 1px;
+    background: var(--gray-200);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    min-width: 700px;
+  }
+  .hm-cell {
+    background: var(--white);
+    padding: 8px 10px;
+  }
+  .hm-corner {
+    background: var(--gray-50);
+  }
+  .hm-col-header {
+    background: var(--navy);
+    color: var(--white);
+    font-size: 10.5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 6px;
+  }
+  .hm-row-header {
+    background: var(--gray-50);
+    color: var(--gray-900);
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+  }
+  .hm-row-header .product-group-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+  .hm-data {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    cursor: default;
+    padding: 6px 4px;
+    font-variant-numeric: tabular-nums;
+    transition: transform .12s ease, box-shadow .12s ease;
+    position: relative;
+    min-height: 48px;
+  }
+  .hm-data:hover {
+    transform: scale(1.06);
+    z-index: 1;
+    box-shadow: 0 2px 8px rgba(0,45,114,0.18);
+    border-radius: 3px;
+  }
+  .hm-data .hm-rate {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.1;
+  }
+  .hm-data .hm-spread {
+    font-size: 10px;
+    color: rgba(0,0,0,0.6);
+    margin-top: 2px;
+    font-weight: 500;
+  }
+  .hm-data.no-lens .hm-rate { color: var(--navy); }
+
+  .heatmap-gradient-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: var(--gray-500);
+  }
+  .heatmap-gradient-bar .grad {
+    width: 180px;
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(to right, #5fa380, #c5e2d2, #fff3e0, #f0a868, #e89289);
+  }
+
   /* ---------- COF Chart ---------- */
   .cof-summary {
     display: grid;
@@ -1618,8 +1738,8 @@
           Rates Table
         </button>
         <button class="content-tab" data-panel="chart" role="tab" aria-selected="false">
-          <svg class="tab-icon" viewBox="0 0 16 16"><circle cx="4.5" cy="10.5" r="1.5"/><circle cx="8" cy="6" r="2.2"/><circle cx="12" cy="9" r="1"/><line x1="2" y1="13.5" x2="14" y2="13.5"/></svg>
-          Rate Distribution
+          <svg class="tab-icon" viewBox="0 0 16 16"><rect x="2" y="2" width="4" height="4" rx="0.5"/><rect x="7" y="2" width="4" height="4" rx="0.5"/><rect x="12" y="2" width="2" height="4" rx="0.5"/><rect x="2" y="7" width="4" height="4" rx="0.5"/><rect x="7" y="7" width="4" height="4" rx="0.5"/><rect x="12" y="7" width="2" height="4" rx="0.5"/><rect x="2" y="12" width="4" height="2" rx="0.5"/><rect x="7" y="12" width="4" height="2" rx="0.5"/></svg>
+          Heatmap
         </button>
         <button class="content-tab" data-panel="construction" role="tab" aria-selected="false">
           <svg class="tab-icon" viewBox="0 0 16 16"><line x1="3" y1="4" x2="11" y2="4"/><circle cx="6" cy="4" r="1.5" fill="currentColor"/><line x1="3" y1="8" x2="13" y2="8"/><circle cx="9" cy="8" r="1.5" fill="currentColor"/><line x1="3" y1="12" x2="10" y2="12"/><circle cx="5" cy="12" r="1.5" fill="currentColor"/></svg>
@@ -1659,26 +1779,20 @@
       </div>
 
       <div class="tab-panel" id="panel-chart">
-        <section class="chart-section">
+        <section class="heatmap-section">
           <div class="chart-header">
             <div>
-              <h3>Rate Distribution by Product &amp; Balance Tier</h3>
-              <div class="chart-sub" id="chartSub">Bubble size reflects deposit balance tier · Color reflects product family</div>
+              <h3>Profitability Heatmap</h3>
+              <div class="chart-sub">Each cell scored by spread vs your projected COF. All products and tiers shown regardless of product filter.</div>
             </div>
-            <div class="chart-legend">
-              <div class="legend-color-row" id="colorLegend"></div>
-              <div class="legend-group" title="Bubble sizes correspond to balance tiers">
-                <span class="legend-dot" style="width:6px; height:6px;"></span>
-                <span class="legend-dot" style="width:9px; height:9px;"></span>
-                <span class="legend-dot" style="width:13px; height:13px;"></span>
-                <span class="legend-dot" style="width:17px; height:17px;"></span>
-                <span style="color:var(--gray-500);">Tier</span>
-              </div>
+            <div class="heatmap-gradient-bar">
+              <span>More profitable</span>
+              <span class="grad"></span>
+              <span>Less profitable</span>
             </div>
           </div>
-          <div style="position:relative;">
-            <svg class="chart-svg" id="chart" viewBox="0 0 800 340" preserveAspectRatio="none"></svg>
-            <div class="tooltip" id="tooltip"></div>
+          <div class="heatmap-grid-wrap">
+            <div class="heatmap-grid" id="heatmapGrid"></div>
           </div>
         </section>
       </div>
@@ -1724,7 +1838,7 @@
 
   <footer class="widget-footer">
     <span>Source: Sample data for prototype only · Not production rates</span>
-    <span>v1.18</span>
+    <span>v1.21</span>
   </footer>
 
 </div>
@@ -1760,8 +1874,11 @@
             Apply color coding to rates
           </label>
         </div>
+        <p class="subsection-help">
+          Projected COF = Current COF + Beta × ΔSOFR. Spread = market rate − benchmark. Color coding scores each rate by its spread vs the product's benchmark.
+        </p>
 
-        <div class="settings-row" style="border-top:1px dashed var(--gray-200); padding-top:12px; margin-top:4px;">
+        <div class="settings-row" style="border-top:1px dashed var(--gray-200); padding-top:12px; margin-top:14px;">
           <span style="font-size:10px; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.06em; font-weight:500;">Grading thresholds</span>
           <label class="field">
             <span class="legend-chip green" style="font-size:10px;">Green</span> when spread ≤
@@ -1778,8 +1895,11 @@
             </span>
           </label>
         </div>
+        <p class="subsection-help">
+          Rates at or below the green threshold show <span class="legend-chip green">green</span>, between green and orange show <span class="legend-chip orange">orange</span>, and above orange show <span class="legend-chip red">red</span>.
+        </p>
 
-        <div class="settings-row" style="border-top:1px dashed var(--gray-200); padding-top:12px; margin-top:4px;">
+        <div class="settings-row" style="border-top:1px dashed var(--gray-200); padding-top:12px; margin-top:14px;">
           <span style="font-size:10px; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.06em; font-weight:500;">Pass-through timing</span>
           <label class="toggle">
             <input type="checkbox" id="lensLagToggle" />
@@ -1793,14 +1913,44 @@
             </span>
           </label>
         </div>
+        <p class="subsection-help">
+          Holds your projected COF flat for the first N months before it starts responding to SOFR moves — reflecting the real-world delay between Fed rate changes and your portfolio repricing. Typical community-bank lag is 6–9 months.
+        </p>
 
-        <p class="settings-help">
-          Projected COF = Current COF + Beta × ΔSOFR. Spread = market rate − projected COF.
-          Rates at or below the green threshold show <span class="legend-chip green">green</span>,
-          between green and orange show <span class="legend-chip orange">orange</span>,
-          and above orange show <span class="legend-chip red">red</span>.
-          <br/><br/>
-          <strong>Repricing lag</strong> (optional) holds your projected COF flat for the first N months before it starts responding to SOFR moves — reflecting the real-world delay between Fed rate changes and your portfolio repricing. Typical community-bank lag is 6–9 months.
+        <div class="settings-row" style="border-top:1px dashed var(--gray-200); padding-top:12px; margin-top:14px;">
+          <span style="font-size:10px; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.06em; font-weight:500;">CD benchmarks</span>
+          <label class="field">
+            Short CDs: COF +
+            <span class="input-wrap">
+              <input type="number" id="lensShortCdPremium" step="5" min="0" max="500" value="100" />
+              <span class="unit">bps</span>
+            </span>
+          </label>
+          <label class="field">
+            Long CDs: COF +
+            <span class="input-wrap">
+              <input type="number" id="lensLongCdPremium" step="5" min="0" max="500" value="150" />
+              <span class="unit">bps</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="settings-row" style="padding-top:4px;">
+          <span style="font-size:10px; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.06em; font-weight:500; visibility:hidden;">.</span>
+          <label class="toggle">
+            <input type="checkbox" id="lensCdSofrMode" />
+            Override: score CDs against matched-tenor SOFR
+          </label>
+          <label class="field">
+            SOFR +
+            <span class="input-wrap">
+              <input type="number" id="lensCdSofrSpread" step="5" min="0" max="500" value="50" disabled />
+              <span class="unit">bps</span>
+            </span>
+          </label>
+        </div>
+        <p class="subsection-help">
+          CDs are expected to cost more than blended COF, so each CD family compares to <em>COF + premium</em> instead of COF directly. Override mode swaps that for <em>matched-tenor SOFR + spread</em>, useful when evaluating CDs as a replacement for wholesale funding (FHLB advances, brokered CDs).
         </p>
       </div>
 
@@ -1893,7 +2043,7 @@
             <th>Location</th>
             <th>Product · Tier</th>
             <th class="num">Rate</th>
-            <th class="num">Proj. COF</th>
+            <th class="num">Benchmark</th>
             <th class="num">Spread</th>
             <th></th>
           </tr>
@@ -2033,6 +2183,33 @@ function getProjectedCOF(months, currentCOF, betaPct) {
   return getProjectedCOFAt(months, currentCOF, betaPct, lag);
 }
 
+/* Product family classification — drives per-family benchmarks. */
+function getProductFamily(productKey) {
+  if (productKey === 'checking' || productKey === 'savings' || productKey === 'mm') return 'liquid';
+  if (productKey === 'cd03' || productKey === 'cd06' || productKey === 'cd12') return 'shortCd';
+  return 'longCd';  // cd18, cd24, cd36, cd48, cd60
+}
+
+/* The actual benchmark a market rate is scored against, per product.
+   - Liquid: projected COF (the bank's blended funding cost)
+   - CDs: projected COF + family premium, OR matched-tenor SOFR + spread (override) */
+function getProductBenchmark(productKey) {
+  const months = PRODUCT_TENORS[productKey];
+  if (months == null) return null;
+  const family = getProductFamily(productKey);
+  if (family === 'liquid') {
+    return getProjectedCOF(months, state.lens.cof, state.lens.beta);
+  }
+  // CD families
+  if (state.benchmarks.cdSofrMode) {
+    return getSOFR(months) + state.benchmarks.cdSofrSpread;
+  }
+  const premium = family === 'shortCd'
+    ? state.benchmarks.shortCdPremium
+    : state.benchmarks.longCdPremium;
+  return getProjectedCOF(months, state.lens.cof, state.lens.beta) + premium;
+}
+
 /* Map each deposit product to its effective tenor (months) for COF lookup.
    Liquid accounts have no contractual maturity — anchor to 1M short end. */
 const PRODUCT_TENORS = {
@@ -2045,10 +2222,9 @@ const PRODUCT_TENORS = {
    Thresholds are user-customizable in Settings (state.lens.greenMax / orangeMax). */
 function getProfitabilityClass(marketRate, productKey) {
   if (!state.lens.enabled) return '';
-  const months = PRODUCT_TENORS[productKey];
-  if (months == null) return '';
-  const projected = getProjectedCOF(months, state.lens.cof, state.lens.beta);
-  const spread = marketRate - projected;
+  const benchmark = getProductBenchmark(productKey);
+  if (benchmark == null) return '';
+  const spread = marketRate - benchmark;
   if (spread <= state.lens.greenMax)  return 'profit-green';
   if (spread <= state.lens.orangeMax) return 'profit-orange';
   return 'profit-red';
@@ -2184,6 +2360,15 @@ const state = {
     lagEnabled: false,           // optional — applies a repricing lag to the COF projection
     lag: 6                       // months — how long before COF starts responding to SOFR moves
   },
+  // Product-specific benchmarks: CDs are expected to cost more than blended COF,
+  // so we add a per-family premium. SOFR override mode scores CDs against matched-
+  // tenor SOFR + a community-bank spread (treats CDs like replacement funding).
+  benchmarks: {
+    shortCdPremium: 1.00,        // % — default 100 bps premium over projected COF for short CDs
+    longCdPremium:  1.50,        // % — default 150 bps for long CDs
+    cdSofrMode: false,           // override toggle
+    cdSofrSpread: 0.50           // % — community-bank spread over SOFR for CDs when in override mode
+  },
   // Visible-location filters. Empty Set = show all. Populated = whitelist.
   // Long-term: load from user profile on login. Today: persisted to localStorage.
   visibleLocations: {
@@ -2205,6 +2390,7 @@ function loadSettings() {
     if (!raw) return;
     const s = JSON.parse(raw);
     if (s.lens) Object.assign(state.lens, s.lens);
+    if (s.benchmarks) Object.assign(state.benchmarks, s.benchmarks);
     if (typeof s.sidebarOpen === 'boolean') state.sidebarOpen = s.sidebarOpen;
     if (s.defaults && typeof s.defaults === 'object') {
       state.defaults.geo      = s.defaults.geo || null;
@@ -2224,6 +2410,7 @@ function saveSettings() {
   try {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({
       lens: state.lens,
+      benchmarks: state.benchmarks,
       sidebarOpen: state.sidebarOpen,
       defaults: state.defaults,
       visibleLocations: {
@@ -2325,9 +2512,8 @@ function renderMain() {
     // Wire the inline button — opens the sidebar
     const openBtn = document.getElementById('emptyStateOpenSidebar');
     if (openBtn) openBtn.addEventListener('click', () => setSidebarOpen(true));
-    el('chart').innerHTML = '';
+    el('heatmapGrid').innerHTML = '';
     el('constructionGrid').innerHTML = '';
-    el('colorLegend').innerHTML = '';
     renderCOF();
     return;
   }
@@ -2348,10 +2534,9 @@ function renderMain() {
   el('instPct').textContent = data.instPct.toFixed(1) + '%';
 
   renderTable();
-  renderChart();
+  renderHeatmap();
   renderConstruction();
   renderCOF();
-  renderColorLegend();
   postResize();
 }
 
@@ -2453,118 +2638,76 @@ function trendCell(bps) {
   return `<span class="trend ${cls}"><span class="arrow">${arrow}</span>${sign}${bps} bps</span>`;
 }
 
-function renderColorLegend() {
-  el('colorLegend').innerHTML = PRODUCT_GROUPS.map(g =>
-    `<span class="legend-color"><span class="swatch" style="background:${g.color};"></span>${g.label}</span>`
-  ).join('');
-}
-
 /* =====================================================================
-   Chart — custom SVG bubble plot
-   X = product (categorical), Y = avg APY, size = balance tier
+   Profitability Heatmap — 11 products × 6 tiers, colored by spread
+   vs projected COF. Continuous gradient respects user's lens thresholds.
    ===================================================================== */
-function renderChart() {
-  const svg = el('chart');
-  const data = state.data;
-  const visibleProducts = state.selectedProduct
-    ? ALL_PRODUCTS.filter(p => p.key === state.selectedProduct)
-    : ALL_PRODUCTS;
-
-  const W = 800, H = 340;
-  const pad = { top: 20, right: 24, bottom: 56, left: 50 };
-  const innerW = W - pad.left - pad.right;
-  const innerH = H - pad.top - pad.bottom;
-
-  // Data points: one bubble per (product, tier)
-  const points = [];
-  for (const p of visibleProducts) {
-    for (const t of TIERS) {
-      const r = data.rows.find(r => r.productKey === p.key && r.tierKey === t.key);
-      if (r) points.push({ product: p, tier: t, row: r });
-    }
-  }
-
-  const maxRate = Math.max(...points.map(p => p.row.avg)) * 1.15;
-  const yMax = Math.max(1, Math.ceil(maxRate * 2) / 2); // round up to nearest 0.5
-
-  const xStep = innerW / Math.max(1, visibleProducts.length);
-  const xOf = (productIndex, tierIndex) => {
-    const center = pad.left + xStep * (productIndex + 0.5);
-    const jitter = (tierIndex - (TIERS.length - 1) / 2) * Math.min(8, xStep / 14);
-    return center + jitter;
-  };
-  const yOf = (rate) => pad.top + innerH - (rate / yMax) * innerH;
-
-  let svgContent = '';
-
-  // Grid lines + Y labels
-  const yTicks = 6;
-  for (let i = 0; i <= yTicks; i++) {
-    const v = (yMax / yTicks) * i;
-    const y = yOf(v);
-    svgContent += `<line class="grid-line" x1="${pad.left}" x2="${W - pad.right}" y1="${y}" y2="${y}"/>`;
-    svgContent += `<text class="axis-label" x="${pad.left - 8}" y="${y + 3}" text-anchor="end">${v.toFixed(2)}%</text>`;
-  }
-
-  // Axes
-  svgContent += `<line class="axis-line" x1="${pad.left}" x2="${pad.left}" y1="${pad.top}" y2="${pad.top + innerH}"/>`;
-  svgContent += `<line class="axis-line" x1="${pad.left}" x2="${W - pad.right}" y1="${pad.top + innerH}" y2="${pad.top + innerH}"/>`;
-
-  // X labels (product names)
-  visibleProducts.forEach((p, i) => {
-    const cx = pad.left + xStep * (i + 0.5);
-    const labelY = pad.top + innerH + 16;
-    // Two-line wrap for "CD · Nm" style
-    const parts = p.label.split('·').map(s => s.trim());
-    if (parts.length === 2) {
-      svgContent += `<text class="axis-label" x="${cx}" y="${labelY}" text-anchor="middle">${parts[0]}</text>`;
-      svgContent += `<text class="axis-label" x="${cx}" y="${labelY + 11}" text-anchor="middle">${parts[1]}</text>`;
-    } else {
-      svgContent += `<text class="axis-label" x="${cx}" y="${labelY}" text-anchor="middle">${p.label}</text>`;
-    }
-  });
-
-  // Axis titles
-  svgContent += `<text class="axis-title" x="${pad.left + innerW / 2}" y="${H - 4}" text-anchor="middle">Product</text>`;
-  svgContent += `<text class="axis-title" x="${15}" y="${pad.top + innerH / 2}" text-anchor="middle" transform="rotate(-90 15 ${pad.top + innerH / 2})">Average APY</text>`;
-
-  // Bubbles
-  visibleProducts.forEach((p, pi) => {
-    TIERS.forEach((t, ti) => {
-      const r = data.rows.find(r => r.productKey === p.key && r.tierKey === t.key);
-      if (!r) return;
-      const cx = xOf(pi, ti);
-      const cy = yOf(r.avg);
-      const radius = t.size;
-      svgContent += `<circle class="bubble"
-        cx="${cx}" cy="${cy}" r="${radius}"
-        fill="${p.color}" fill-opacity="0.55"
-        stroke="${p.color}" stroke-width="1"
-        data-product="${p.label}" data-tier="${t.label}"
-        data-avg="${r.avg.toFixed(2)}" data-high="${r.high.toFixed(2)}" data-low="${r.low.toFixed(2)}"/>`;
-    });
-  });
-
-  svg.innerHTML = svgContent;
-
-  // Tooltip interactions
-  const tooltip = el('tooltip');
-  svg.querySelectorAll('.bubble').forEach(b => {
-    b.addEventListener('mouseenter', (e) => {
-      const t = e.target;
-      tooltip.innerHTML =
-        `<div class="tt-title">${t.dataset.product} · ${t.dataset.tier}</div>
-         <div class="tt-row">Avg: ${t.dataset.avg}% · High: ${t.dataset.high}% · Low: ${t.dataset.low}%</div>`;
-      tooltip.classList.add('show');
-    });
-    b.addEventListener('mousemove', (e) => {
-      const rect = svg.getBoundingClientRect();
-      tooltip.style.left = (e.clientX - rect.left + 12) + 'px';
-      tooltip.style.top  = (e.clientY - rect.top - 30) + 'px';
-    });
-    b.addEventListener('mouseleave', () => tooltip.classList.remove('show'));
-  });
+function hexToRgb(h) {
+  const v = h.replace('#', '');
+  return { r: parseInt(v.slice(0,2), 16), g: parseInt(v.slice(2,4), 16), b: parseInt(v.slice(4,6), 16) };
 }
+function lerpColor(c1, c2, t) {
+  const a = hexToRgb(c1), b = hexToRgb(c2);
+  return `rgb(${Math.round(a.r + (b.r - a.r) * t)}, ${Math.round(a.g + (b.g - a.g) * t)}, ${Math.round(a.b + (b.b - a.b) * t)})`;
+}
+function heatmapColor(spread) {
+  const { greenMax, orangeMax } = state.lens;
+  if (spread <= greenMax) {
+    // Green band — deeper saturation the further below greenMax (capped at 200 bps below)
+    const t = Math.min(1, Math.max(0, (greenMax - spread) / 2));
+    return lerpColor('#e8f4ed', '#5fa380', t);
+  } else if (spread <= orangeMax) {
+    // Orange band — deeper closer to orangeMax
+    const range = Math.max(0.01, orangeMax - greenMax);
+    const t = (spread - greenMax) / range;
+    return lerpColor('#fff3e0', '#f0a868', t);
+  } else {
+    // Red band — deeper the further above orangeMax (capped at 150 bps above)
+    const t = Math.min(1, (spread - orangeMax) / 1.5);
+    return lerpColor('#fceae8', '#e89289', t);
+  }
+}
+
+function renderHeatmap() {
+  const data = state.data;
+  const grid = el('heatmapGrid');
+  if (!data) { grid.innerHTML = ''; return; }
+
+  const lensOn = state.lens.enabled;
+  let html = '';
+
+  // Corner + tier column headers
+  html += '<div class="hm-cell hm-corner"></div>';
+  TIERS.forEach(tier => {
+    html += `<div class="hm-cell hm-col-header">${tier.label}</div>`;
+  });
+
+  // One row per product
+  ALL_PRODUCTS.forEach(p => {
+    html += `<div class="hm-cell hm-row-header">
+      <span class="product-group-dot" style="background:${p.color};"></span>
+      ${p.label}
+    </div>`;
+
+    TIERS.forEach(tier => {
+      const r = data.rows.find(r => r.productKey === p.key && r.tierKey === tier.key);
+      const benchmark = getProductBenchmark(p.key);
+      const spread = r.avg - benchmark;
+      const spreadBps = Math.round(spread * 100);
+      const bg = lensOn ? heatmapColor(spread) : '';
+      const title = `${p.label} · ${tier.label}\nRate: ${r.avg.toFixed(2)}%\nBenchmark: ${benchmark.toFixed(2)}%\nSpread: ${spread >= 0 ? '+' : ''}${spreadBps} bps`;
+      const cellClass = lensOn ? 'hm-data' : 'hm-data no-lens';
+      const styleAttr = bg ? ` style="background:${bg};"` : '';
+      html += `<div class="${cellClass}"${styleAttr} title="${title}">
+        <div class="hm-rate">${r.avg.toFixed(2)}%</div>
+        ${lensOn ? `<div class="hm-spread">${spread >= 0 ? '+' : ''}${spreadBps} bps</div>` : ''}
+      </div>`;
+    });
+  });
+
+  grid.innerHTML = html;
+}
+
 
 /* =====================================================================
    Tier Construction chart — Low / Avg / High range bars per tier,
@@ -2874,7 +3017,7 @@ document.querySelectorAll('.content-tab').forEach(tab => {
       p.classList.toggle('active', p.id === 'panel-' + target);
     });
     // Re-render chart on activation in case layout changed while hidden
-    if (target === 'chart' && state.data) renderChart();
+    if (target === 'chart' && state.data) renderHeatmap();
     if (target === 'construction' && state.data) renderConstruction();
     if (target === 'cof') renderCOF();
     postResize();
@@ -2919,6 +3062,13 @@ function syncSettingsInputs() {
   el('lensLagToggle').checked = state.lens.lagEnabled;
   el('lensLag').value         = state.lens.lag;
   el('lensLag').disabled      = !state.lens.lagEnabled;
+  el('lensShortCdPremium').value = Math.round(state.benchmarks.shortCdPremium * 100);
+  el('lensLongCdPremium').value  = Math.round(state.benchmarks.longCdPremium  * 100);
+  el('lensCdSofrMode').checked   = state.benchmarks.cdSofrMode;
+  el('lensCdSofrSpread').value   = Math.round(state.benchmarks.cdSofrSpread * 100);
+  el('lensCdSofrSpread').disabled = !state.benchmarks.cdSofrMode;
+  el('lensShortCdPremium').disabled = state.benchmarks.cdSofrMode;
+  el('lensLongCdPremium').disabled  = state.benchmarks.cdSofrMode;
 }
 
 function onLensChange() {
@@ -2927,24 +3077,36 @@ function onLensChange() {
   const greenBps   = parseFloat(el('lensGreenMax').value);
   const orangeBps  = parseFloat(el('lensOrangeMax').value);
   const lagVal     = parseFloat(el('lensLag').value);
+  const shortBps   = parseFloat(el('lensShortCdPremium').value);
+  const longBps    = parseFloat(el('lensLongCdPremium').value);
+  const sofrSpread = parseFloat(el('lensCdSofrSpread').value);
   if (!isNaN(cofVal))     state.lens.cof   = cofVal;
   if (!isNaN(betaVal))    state.lens.beta  = Math.max(0, Math.min(100, betaVal));
   if (!isNaN(greenBps))   state.lens.greenMax  = greenBps / 100;
   if (!isNaN(orangeBps))  state.lens.orangeMax = orangeBps / 100;
   if (!isNaN(lagVal))     state.lens.lag = Math.max(0, Math.min(36, lagVal));
-  state.lens.enabled    = el('lensToggle').checked;
-  state.lens.lagEnabled = el('lensLagToggle').checked;
-  el('lensLag').disabled = !state.lens.lagEnabled;
+  if (!isNaN(shortBps))   state.benchmarks.shortCdPremium = Math.max(0, shortBps / 100);
+  if (!isNaN(longBps))    state.benchmarks.longCdPremium  = Math.max(0, longBps / 100);
+  if (!isNaN(sofrSpread)) state.benchmarks.cdSofrSpread   = Math.max(0, sofrSpread / 100);
+  state.lens.enabled         = el('lensToggle').checked;
+  state.lens.lagEnabled      = el('lensLagToggle').checked;
+  state.benchmarks.cdSofrMode = el('lensCdSofrMode').checked;
+  el('lensLag').disabled            = !state.lens.lagEnabled;
+  el('lensCdSofrSpread').disabled   = !state.benchmarks.cdSofrMode;
+  el('lensShortCdPremium').disabled = state.benchmarks.cdSofrMode;
+  el('lensLongCdPremium').disabled  = state.benchmarks.cdSofrMode;
   updateLensIndicator();
   if (state.data) {
     renderTable();
+    renderHeatmap();
     renderConstruction();
   }
   renderCOF();
   saveSettings();
   postResize();
 }
-['lensCOF', 'lensBeta', 'lensToggle', 'lensGreenMax', 'lensOrangeMax', 'lensLagToggle', 'lensLag'].forEach(id => {
+['lensCOF', 'lensBeta', 'lensToggle', 'lensGreenMax', 'lensOrangeMax', 'lensLagToggle', 'lensLag',
+ 'lensShortCdPremium', 'lensLongCdPremium', 'lensCdSofrMode', 'lensCdSofrSpread'].forEach(id => {
   el(id).addEventListener('input', onLensChange);
   el(id).addEventListener('change', onLensChange);
 });
@@ -3117,6 +3279,7 @@ function closeSettings() {
 }
 function resetSettingsToDefaults() {
   state.lens = { enabled: true, cof: 1.85, beta: 50, greenMax: 0, orangeMax: 0.75, lagEnabled: false, lag: 6 };
+  state.benchmarks = { shortCdPremium: 1.00, longCdPremium: 1.50, cdSofrMode: false, cdSofrSpread: 0.50 };
   state.visibleLocations = { state: new Set(), msa: new Set(), county: new Set(), city: new Set() };
   state.defaults = { geo: null, location: null };
   syncSettingsInputs();
@@ -3124,7 +3287,7 @@ function resetSettingsToDefaults() {
   syncDefaultLocationSelectors();
   applyLocationFilters();
   updateLensIndicator();
-  if (state.data) { renderTable(); renderConstruction(); }
+  if (state.data) { renderTable(); renderHeatmap(); renderConstruction(); }
   renderCOF();
   saveSettings();
 }
@@ -3300,9 +3463,8 @@ function scanForBestRates() {
         if (productFamily === 'liquid' && !['checking','savings','mm'].includes(row.productKey)) return;
         if (productFamily === 'cd' && !row.productKey.startsWith('cd')) return;
 
-        const months = PRODUCT_TENORS[row.productKey];
-        const projectedCOF = getProjectedCOF(months, state.lens.cof, state.lens.beta);
-        const spread = row.avg - projectedCOF;
+        const benchmark = getProductBenchmark(row.productKey);
+        const spread = row.avg - benchmark;
 
         results.push({
           geo,
@@ -3316,7 +3478,7 @@ function scanForBestRates() {
           tierKey:      row.tierKey,
           tierLabel:    row.tierLabel,
           rate:         row.avg,
-          projectedCOF,
+          benchmark,
           spread,
           spreadBps:    Math.round(spread * 100)
         });
@@ -3373,7 +3535,7 @@ function renderFinderResults() {
         ${r.productLabel} · <span style="color:var(--gray-500);">${r.tierLabel}</span>
       </td>
       <td class="num finder-rate">${r.rate.toFixed(2)}%</td>
-      <td class="num finder-cof">${r.projectedCOF.toFixed(2)}%</td>
+      <td class="num finder-cof">${r.benchmark.toFixed(2)}%</td>
       <td class="num"><span class="finder-spread ${spreadClass(r.spread)}">${r.spread >= 0 ? '+' : ''}${r.spreadBps} bps</span></td>
       <td class="num"><span class="finder-arrow">→</span></td>
     </tr>
