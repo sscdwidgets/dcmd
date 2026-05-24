@@ -104,6 +104,29 @@
     font-weight: 400;
     letter-spacing: 0;
   }
+  .partner-attribution {
+    margin-top: 3px;
+    font-size: 10.5px;
+    color: var(--gray-500);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .partner-attribution .partner-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+  .partner-attribution strong {
+    color: var(--navy);
+    font-weight: 600;
+  }
+  @media (max-width: 720px) {
+    .partner-attribution { display: none; }
+  }
 
   /* ---------- Sidebar toggle button ---------- */
   .sidebar-toggle {
@@ -138,6 +161,19 @@
     width: 14px; height: 14px;
     fill: none; stroke: currentColor; stroke-width: 2;
     stroke-linecap: round;
+  }
+  .sidebar-toggle .chevron {
+    width: 11px; height: 11px;
+    fill: none; stroke: currentColor;
+    stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
+    transition: transform .22s ease;
+    margin-left: 1px;
+    opacity: 0.65;
+  }
+  .sidebar-toggle:hover .chevron { opacity: 1; }
+  .sidebar-toggle.active .chevron {
+    transform: rotate(180deg);
+    opacity: 1;
   }
 
   .main-header-left {
@@ -413,6 +449,34 @@
   .finder-btn svg {
     width: 14px; height: 14px;
     fill: var(--gold); stroke: none;
+  }
+
+  .broker-btn {
+    background: var(--white);
+    color: var(--navy);
+    border: 1px solid var(--navy);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: background .12s ease, color .12s ease, transform .12s ease;
+    height: 34px;
+    letter-spacing: 0.01em;
+  }
+  .broker-btn:hover {
+    background: var(--navy);
+    color: var(--white);
+    transform: translateY(-1px);
+  }
+  .broker-btn:active { transform: translateY(0); }
+  .broker-btn svg {
+    width: 13px; height: 13px;
+    fill: currentColor; stroke: none;
   }
 
   .settings-btn {
@@ -737,6 +801,111 @@
   }
   .settings-section { margin-bottom: 22px; }
   .settings-section:last-child { margin-bottom: 0; }
+
+  /* ---------- Brokered CDs modal ---------- */
+  .brokered-intro {
+    font-size: 13px;
+    color: var(--gray-700);
+    line-height: 1.6;
+    margin: 0 0 18px;
+  }
+  .brokered-h3 {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 18px 0 10px;
+  }
+  .brokered-bullets {
+    margin: 0 0 22px;
+    padding-left: 18px;
+  }
+  .brokered-bullets li {
+    font-size: 12.5px;
+    color: var(--gray-700);
+    line-height: 1.55;
+    margin-bottom: 8px;
+  }
+  .brokered-bullets li::marker { color: var(--gold); }
+  .brokered-bullets strong {
+    color: var(--navy);
+    font-weight: 600;
+  }
+  .brokered-subnote {
+    font-size: 10.5px;
+    color: var(--gray-500);
+    margin: -4px 0 14px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+  .brokered-rates {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font);
+    font-variant-numeric: tabular-nums;
+    margin: 0 0 22px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+  .brokered-rates thead th {
+    background: var(--navy);
+    color: var(--white);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 9px 12px;
+    text-align: left;
+  }
+  .brokered-rates thead th.num { text-align: right; }
+  .brokered-rates tbody td {
+    padding: 9px 12px;
+    font-size: 12.5px;
+    color: var(--gray-900);
+    border-top: 1px solid var(--gray-100);
+  }
+  .brokered-rates tbody tr:first-child td { border-top: none; }
+  .brokered-rates tbody tr:hover td { background: var(--gray-50); }
+  .brokered-rates td.num {
+    text-align: right;
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .brokered-rates td.spread {
+    color: var(--gray-500);
+    font-weight: 500;
+    font-size: 11.5px;
+  }
+  .brokered-cta {
+    text-align: center;
+    padding-top: 18px;
+    border-top: 1px solid var(--gray-200);
+    margin-top: 4px;
+  }
+  .brokered-contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-size: 13px;
+    padding: 11px 26px;
+  }
+  .brokered-contact-btn svg {
+    width: 12px; height: 12px;
+    fill: none; stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round; stroke-linejoin: round;
+    transition: transform .15s ease;
+  }
+  .brokered-contact-btn:hover svg { transform: translateX(3px); }
+  .brokered-fineprint {
+    font-size: 10.5px;
+    color: var(--gray-500);
+    margin-top: 12px;
+    line-height: 1.5;
+  }
   .settings-section-title {
     font-size: 11px;
     font-weight: 700;
@@ -1589,7 +1758,7 @@
     margin-top: 2px;
   }
   .chart-svg .cof-line { fill: none; stroke-width: 2; }
-  .chart-svg .cof-line.sofr { stroke: var(--gold); stroke-dasharray: 5 4; }
+  .chart-svg .cof-line.yield { stroke: var(--gold); stroke-dasharray: 5 4; }
   .chart-svg .cof-line.proj { stroke: var(--navy); }
   .chart-svg .cof-line.proj-nolag { stroke: var(--navy); stroke-dasharray: 4 4; stroke-width: 1.5; opacity: 0.4; }
   .chart-svg .cof-line.cof0 { stroke: var(--gray-500); stroke-dasharray: 2 3; stroke-width: 1; }
@@ -1653,9 +1822,13 @@
       <div class="logo-text">
         <div class="logo-name"><span class="accent">Deposit</span> Command</div>
         <div class="subtitle">Rates by Region</div>
+        <div class="partner-attribution">
+          <span class="partner-dot"></span>
+          In collaboration with <strong>S&amp;P Global Market Intelligence</strong>
+        </div>
       </div>
     </div>
-    <div style="display:flex; align-items:center; gap:10px;">
+    <div style="display:flex; align-items:center; gap:8px;">
       <button class="finder-btn" id="openFinder" title="Find the most profitable rates across your visible locations">
         <svg viewBox="0 0 16 16">
           <path d="M2.5 13.5l8-8 1.5 1.5-8 8-1.5-1.5z"/>
@@ -1665,6 +1838,17 @@
           <circle cx="11.5" cy="2" r="0.5"/>
         </svg>
         Best Rates
+      </button>
+      <button class="broker-btn" id="openBrokered" title="Learn about Brokered CD funding solutions">
+        <svg viewBox="0 0 16 16">
+          <path d="M8 0.5L1 3.5v1.2h14V3.5L8 0.5z"/>
+          <rect x="2.5" y="5.5" width="1.6" height="6.5"/>
+          <rect x="5.6" y="5.5" width="1.6" height="6.5"/>
+          <rect x="8.8" y="5.5" width="1.6" height="6.5"/>
+          <rect x="11.9" y="5.5" width="1.6" height="6.5"/>
+          <rect x="1" y="13" width="14" height="1.6"/>
+        </svg>
+        Brokered CDs
       </button>
       <button class="settings-btn" id="openSettings" title="Settings" aria-label="Open settings">
         <svg viewBox="0 0 24 24">
@@ -1697,13 +1881,16 @@
     <main class="main">
       <div class="main-header">
         <div class="main-header-left">
-          <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle locations sidebar" title="Show/hide locations sidebar">
+          <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle locations sidebar" aria-expanded="false" title="Show locations">
             <svg viewBox="0 0 24 24">
               <line x1="3" y1="6" x2="21" y2="6"/>
               <line x1="3" y1="12" x2="21" y2="12"/>
               <line x1="3" y1="18" x2="21" y2="18"/>
             </svg>
             Locations
+            <svg class="chevron" viewBox="0 0 12 12">
+              <polyline points="4,3 8,6 4,9"/>
+            </svg>
           </button>
           <div class="location-info">
             <div class="breadcrumb">State</div>
@@ -1815,11 +2002,11 @@
         <section class="chart-section">
           <div class="chart-header">
             <div>
-              <h3>Projected Cost of Funds vs SOFR Forward Curve</h3>
-              <div class="chart-sub">Projected COF = Current COF + Deposit Beta × ΔSOFR. Hover the chart for monthly detail.</div>
+              <h3>Projected Cost of Funds vs Yield Curve</h3>
+              <div class="chart-sub">Projected COF = Current COF + Deposit Beta × ΔYield. Hover the chart for monthly detail.</div>
             </div>
             <div class="chart-legend">
-              <span class="legend-color"><span class="swatch" style="background:var(--gold);"></span>SOFR 1M Forward</span>
+              <span class="legend-color"><span class="swatch" style="background:var(--gold);"></span>Yield Curve</span>
               <span class="legend-color"><span class="swatch" style="background:var(--navy);"></span>Projected COF</span>
               <span class="legend-color" id="cofLegendNoLag" style="display:none;"><span class="swatch" style="background:var(--navy); opacity:0.4;"></span>Projected COF (no lag)</span>
               <span class="legend-color"><span class="swatch" style="background:var(--gray-500); border-radius:0; height:3px;"></span>Current COF</span>
@@ -1838,7 +2025,7 @@
 
   <footer class="widget-footer">
     <span>Source: Sample data for prototype only · Not production rates</span>
-    <span>v1.21</span>
+    <span>v1.24</span>
   </footer>
 
 </div>
@@ -1875,7 +2062,7 @@
           </label>
         </div>
         <p class="subsection-help">
-          Projected COF = Current COF + Beta × ΔSOFR. Spread = market rate − benchmark. Color coding scores each rate by its spread vs the product's benchmark.
+          Projected COF = Current COF + Beta × ΔYield. Spread = market rate − benchmark. Color coding scores each rate by its spread vs the product's benchmark.
         </p>
 
         <div class="settings-row" style="border-top:1px dashed var(--gray-200); padding-top:12px; margin-top:14px;">
@@ -1914,7 +2101,7 @@
           </label>
         </div>
         <p class="subsection-help">
-          Holds your projected COF flat for the first N months before it starts responding to SOFR moves — reflecting the real-world delay between Fed rate changes and your portfolio repricing. Typical community-bank lag is 6–9 months.
+          Holds your projected COF flat for the first N months before it starts responding to yield curve moves — reflecting the real-world delay between Fed rate changes and your portfolio repricing. Typical community-bank lag is 6–9 months.
         </p>
 
         <div class="settings-row" style="border-top:1px dashed var(--gray-200); padding-top:12px; margin-top:14px;">
@@ -1938,19 +2125,19 @@
         <div class="settings-row" style="padding-top:4px;">
           <span style="font-size:10px; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.06em; font-weight:500; visibility:hidden;">.</span>
           <label class="toggle">
-            <input type="checkbox" id="lensCdSofrMode" />
-            Override: score CDs against matched-tenor SOFR
+            <input type="checkbox" id="lensCdCurveMode" />
+            Override: score CDs against matched-tenor yield curve
           </label>
           <label class="field">
-            SOFR +
+            Curve +
             <span class="input-wrap">
-              <input type="number" id="lensCdSofrSpread" step="5" min="0" max="500" value="50" disabled />
+              <input type="number" id="lensCdCurveSpread" step="5" min="0" max="500" value="50" disabled />
               <span class="unit">bps</span>
             </span>
           </label>
         </div>
         <p class="subsection-help">
-          CDs are expected to cost more than blended COF, so each CD family compares to <em>COF + premium</em> instead of COF directly. Override mode swaps that for <em>matched-tenor SOFR + spread</em>, useful when evaluating CDs as a replacement for wholesale funding (FHLB advances, brokered CDs).
+          CDs are expected to cost more than blended COF, so each CD family compares to <em>COF + premium</em> instead of COF directly. Override mode swaps that for <em>matched-tenor yield curve + spread</em>, useful when evaluating CDs as a replacement for wholesale funding (FHLB advances, brokered CDs).
         </p>
       </div>
 
@@ -2059,6 +2246,55 @@
   </div>
 </div>
 
+<!-- ===== Brokered CDs Modal ===== -->
+<div class="settings-overlay" id="brokeredOverlay" role="dialog" aria-labelledby="brokeredTitle" aria-modal="true">
+  <div class="settings-modal" style="max-width:580px;">
+    <div class="settings-header">
+      <h2 id="brokeredTitle">Brokered CDs</h2>
+      <button class="settings-close" id="closeBrokered" aria-label="Close">×</button>
+    </div>
+    <div class="settings-body">
+      <p class="brokered-intro">
+        Access institutional CD funding to diversify your deposit base, manage liquidity, and reach beyond your local market — without the operational overhead of running additional retail promotions.
+      </p>
+
+      <h3 class="brokered-h3">Sample Brokered CD Rates</h3>
+      <div class="brokered-subnote">Indicative bullet CD rates as of May 23, 2026 · Subject to change · For illustration only</div>
+      <table class="brokered-rates">
+        <thead>
+          <tr>
+            <th>Tenor</th>
+            <th class="num">APY</th>
+            <th class="num">vs Yield Curve</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>3 Month</td>  <td class="num">3.60%</td> <td class="num spread">+9 bps</td></tr>
+          <tr><td>6 Month</td>  <td class="num">3.45%</td> <td class="num spread">+27 bps</td></tr>
+          <tr><td>1 Year</td>   <td class="num">3.20%</td> <td class="num spread">+38 bps</td></tr>
+          <tr><td>2 Year</td>   <td class="num">2.95%</td> <td class="num spread">+53 bps</td></tr>
+          <tr><td>3 Year</td>   <td class="num">2.95%</td> <td class="num spread">+60 bps</td></tr>
+          <tr><td>5 Year</td>   <td class="num">3.35%</td> <td class="num spread">+50 bps</td></tr>
+          <tr><td>7 Year</td>   <td class="num">3.65%</td> <td class="num spread">+55 bps</td></tr>
+          <tr><td>10 Year</td>  <td class="num">3.95%</td> <td class="num spread">+65 bps</td></tr>
+        </tbody>
+      </table>
+
+      <div class="brokered-cta">
+        <a href="https://www.southstatecorrespondent.com/contact?utm_source=deposit-command&amp;utm_medium=widget&amp;utm_campaign=brokered-cds"
+           target="_blank" rel="noopener"
+           class="btn btn-primary brokered-contact-btn">
+          Contact our Brokered CD desk
+          <svg viewBox="0 0 16 16"><polyline points="6,3 11,8 6,13"/></svg>
+        </a>
+        <div class="brokered-fineprint">
+          A specialist will respond within one business day. For urgent liquidity needs, please call your relationship officer directly.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* =====================================================================
    Data definitions
@@ -2132,14 +2368,14 @@ const GEO_CONFIG = {
 };
 
 /* =====================================================================
-   SOFR 1M Forward Curve  ·  HARDCODED SNAPSHOT
+   Yield Curve Curve  ·  HARDCODED SNAPSHOT
    ---------------------------------------------------------------------
    Updated: 2026-05-23  ·  Source: market reference (Pensford / Chatham)
-   Tenors are months from today. Rate = projected 1M Term SOFR (%).
+   Tenors are months from today. Rate = projected yield (%).
    To update: replace this array with the daily upload from the curve
    provider. Linear interpolation handles intermediate tenors.
    ===================================================================== */
-const SOFR_CURVE = [
+const YIELD_CURVE = [
   { months: 0,   rate: 3.55 },  // Spot
   { months: 1,   rate: 3.51 },
   { months: 3,   rate: 3.40 },
@@ -2156,18 +2392,18 @@ const SOFR_CURVE = [
   { months: 60,  rate: 2.85 }
 ];
 
-function getSOFR(months) {
-  if (months <= SOFR_CURVE[0].months) return SOFR_CURVE[0].rate;
-  const last = SOFR_CURVE[SOFR_CURVE.length - 1];
+function getYield(months) {
+  if (months <= YIELD_CURVE[0].months) return YIELD_CURVE[0].rate;
+  const last = YIELD_CURVE[YIELD_CURVE.length - 1];
   if (months >= last.months) return last.rate;
-  for (let i = 0; i < SOFR_CURVE.length - 1; i++) {
-    const a = SOFR_CURVE[i], b = SOFR_CURVE[i + 1];
+  for (let i = 0; i < YIELD_CURVE.length - 1; i++) {
+    const a = YIELD_CURVE[i], b = YIELD_CURVE[i + 1];
     if (months >= a.months && months <= b.months) {
       const t = (months - a.months) / (b.months - a.months);
       return a.rate + t * (b.rate - a.rate);
     }
   }
-  return SOFR_CURVE[0].rate;
+  return YIELD_CURVE[0].rate;
 }
 
 /* Projection with an explicit lag override — used by the COF chart to draw
@@ -2175,7 +2411,7 @@ function getSOFR(months) {
 function getProjectedCOFAt(months, currentCOF, betaPct, lagMonths) {
   const beta = betaPct / 100;
   const effectiveMonths = Math.max(0, months - (lagMonths || 0));
-  return currentCOF + beta * (getSOFR(effectiveMonths) - getSOFR(0));
+  return currentCOF + beta * (getYield(effectiveMonths) - getYield(0));
 }
 
 function getProjectedCOF(months, currentCOF, betaPct) {
@@ -2192,7 +2428,7 @@ function getProductFamily(productKey) {
 
 /* The actual benchmark a market rate is scored against, per product.
    - Liquid: projected COF (the bank's blended funding cost)
-   - CDs: projected COF + family premium, OR matched-tenor SOFR + spread (override) */
+   - CDs: projected COF + family premium, OR matched-tenor yield curve + spread (override) */
 function getProductBenchmark(productKey) {
   const months = PRODUCT_TENORS[productKey];
   if (months == null) return null;
@@ -2201,8 +2437,8 @@ function getProductBenchmark(productKey) {
     return getProjectedCOF(months, state.lens.cof, state.lens.beta);
   }
   // CD families
-  if (state.benchmarks.cdSofrMode) {
-    return getSOFR(months) + state.benchmarks.cdSofrSpread;
+  if (state.benchmarks.cdCurveMode) {
+    return getYield(months) + state.benchmarks.cdCurveSpread;
   }
   const premium = family === 'shortCd'
     ? state.benchmarks.shortCdPremium
@@ -2354,20 +2590,20 @@ const state = {
   lens: {
     enabled: true,
     cof: 1.85,                   // % — bank's current blended cost of funds
-    beta: 50,                    // % — deposit beta applied to ΔSOFR
+    beta: 50,                    // % — deposit beta applied to ΔYield
     greenMax:  0,                // % spread — rates with spread ≤ this are green
     orangeMax: 0.75,             // % spread — rates with spread ≤ this are orange; otherwise red
     lagEnabled: false,           // optional — applies a repricing lag to the COF projection
-    lag: 6                       // months — how long before COF starts responding to SOFR moves
+    lag: 6                       // months — how long before COF starts responding to yield curve moves
   },
   // Product-specific benchmarks: CDs are expected to cost more than blended COF,
-  // so we add a per-family premium. SOFR override mode scores CDs against matched-
-  // tenor SOFR + a community-bank spread (treats CDs like replacement funding).
+  // so we add a per-family premium. Override mode scores CDs against the matched-
+  // tenor yield curve + a community-bank spread (treats CDs like replacement funding).
   benchmarks: {
     shortCdPremium: 1.00,        // % — default 100 bps premium over projected COF for short CDs
     longCdPremium:  1.50,        // % — default 150 bps for long CDs
-    cdSofrMode: false,           // override toggle
-    cdSofrSpread: 0.50           // % — community-bank spread over SOFR for CDs when in override mode
+    cdCurveMode: false,           // override toggle
+    cdCurveSpread: 0.50           // % — community-bank spread over the yield curve for CDs when in override mode
   },
   // Visible-location filters. Empty Set = show all. Populated = whitelist.
   // Long-term: load from user profile on login. Today: persisted to localStorage.
@@ -2790,7 +3026,7 @@ function renderConstruction() {
 }
 
 /* =====================================================================
-   Cost of Funds chart — projected COF vs SOFR forward curve.
+   Cost of Funds chart — projected COF vs yield curve.
    Two-line chart over 0–60 months with shaded spread area between them.
    ===================================================================== */
 function renderCOF() {
@@ -2806,7 +3042,7 @@ function renderCOF() {
   // Build series — one point per month from 0 to 60
   const months = [];
   for (let m = 0; m <= 60; m++) months.push(m);
-  const sofrPts = months.map(m => ({ m, v: getSOFR(m) }));
+  const yieldPts = months.map(m => ({ m, v: getYield(m) }));
   const cofPts  = months.map(m => ({ m, v: getProjectedCOF(m, cof, beta) }));
   const showNoLag = state.lens.lagEnabled && state.lens.lag > 0;
   const cofPtsNoLag = showNoLag
@@ -2816,7 +3052,7 @@ function renderCOF() {
   const noLagLegend = el('cofLegendNoLag');
   if (noLagLegend) noLagLegend.style.display = showNoLag ? '' : 'none';
 
-  const allVals = sofrPts.concat(cofPts).concat(cofPtsNoLag || []).map(p => p.v).concat([cof]);
+  const allVals = yieldPts.concat(cofPts).concat(cofPtsNoLag || []).map(p => p.v).concat([cof]);
   const yMin = Math.max(0, Math.floor(Math.min(...allVals) * 4) / 4 - 0.25);
   const yMax = Math.ceil(Math.max(...allVals) * 4) / 4 + 0.25;
 
@@ -2850,9 +3086,9 @@ function renderCOF() {
   svgContent += `<text class="axis-title" x="${pad.left + innerW / 2}" y="${H - 4}" text-anchor="middle">Months Forward</text>`;
   svgContent += `<text class="axis-title" x="${14}" y="${pad.top + innerH / 2}" text-anchor="middle" transform="rotate(-90 14 ${pad.top + innerH / 2})">Rate (%)</text>`;
 
-  // Shaded area between projected COF and SOFR (visualizes the gap)
+  // Shaded area between projected COF and yield curve (visualizes the gap)
   const areaPath = [
-    ...sofrPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xOf(p.m)} ${yOf(p.v)}`),
+    ...yieldPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xOf(p.m)} ${yOf(p.v)}`),
     ...cofPts.slice().reverse().map(p => `L ${xOf(p.m)} ${yOf(p.v)}`),
     'Z'
   ].join(' ');
@@ -2862,9 +3098,9 @@ function renderCOF() {
   svgContent += `<line class="cof-line cof0" x1="${pad.left}" x2="${W - pad.right}" y1="${yOf(cof)}" y2="${yOf(cof)}"/>`;
   svgContent += `<text class="axis-label" x="${W - pad.right + 4}" y="${yOf(cof) + 3}" text-anchor="start" fill="var(--gray-500)">COF₀</text>`;
 
-  // SOFR line
-  const sofrPath = sofrPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xOf(p.m)} ${yOf(p.v)}`).join(' ');
-  svgContent += `<path class="cof-line sofr" d="${sofrPath}"/>`;
+  // Yield curve line
+  const yieldPath = yieldPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xOf(p.m)} ${yOf(p.v)}`).join(' ');
+  svgContent += `<path class="cof-line yield" d="${yieldPath}"/>`;
 
   // Projected COF line (active — respects lag setting)
   const cofPath = cofPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xOf(p.m)} ${yOf(p.v)}`).join(' ');
@@ -2896,15 +3132,15 @@ function renderCOF() {
     const rect = svg.getBoundingClientRect();
     const relX = ((e.clientX - rect.left) / rect.width) * W;
     const months = Math.max(0, Math.min(60, Math.round(((relX - pad.left) / innerW) * 60)));
-    const sofrV = getSOFR(months);
+    const yieldV = getYield(months);
     const cofV  = getProjectedCOF(months, cof, beta);
-    const spread = sofrV - cofV;
+    const spread = yieldV - cofV;
     guide.setAttribute('x1', xOf(months));
     guide.setAttribute('x2', xOf(months));
     guide.setAttribute('opacity', '0.6');
     tooltip.innerHTML = `
       <div class="tt-title">${months} months forward</div>
-      <div class="tt-row">SOFR 1M: ${sofrV.toFixed(2)}%</div>
+      <div class="tt-row">Yield Curve: ${yieldV.toFixed(2)}%</div>
       <div class="tt-row">Projected COF: ${cofV.toFixed(2)}%</div>
       <div class="tt-row">Spread: ${spread >= 0 ? '+' : ''}${(spread * 100).toFixed(0)} bps</div>
     `;
@@ -2921,13 +3157,13 @@ function renderCOF() {
   const cof12 = getProjectedCOF(12, cof, beta);
   const cof24 = getProjectedCOF(24, cof, beta);
   const cof60 = getProjectedCOF(60, cof, beta);
-  const sofr0 = getSOFR(0);
-  const sofr60 = getSOFR(60);
+  const yield0 = getYield(0);
+  const yield60 = getYield(60);
   summary.innerHTML = `
     <div class="cof-stat">
       <div class="cof-stat-label">Current COF</div>
       <div class="cof-stat-value">${cof.toFixed(2)}%</div>
-      <div class="cof-stat-sub">Spot SOFR ${sofr0.toFixed(2)}%</div>
+      <div class="cof-stat-sub">Spot Curve ${yield0.toFixed(2)}%</div>
     </div>
     <div class="cof-stat">
       <div class="cof-stat-label">Projected COF · 12M</div>
@@ -2942,12 +3178,12 @@ function renderCOF() {
     <div class="cof-stat">
       <div class="cof-stat-label">Projected COF · 60M</div>
       <div class="cof-stat-value">${cof60.toFixed(2)}%</div>
-      <div class="cof-stat-sub">SOFR 60M ${sofr60.toFixed(2)}%</div>
+      <div class="cof-stat-sub">Curve 60M ${yield60.toFixed(2)}%</div>
     </div>
     <div class="cof-stat">
       <div class="cof-stat-label">Deposit Beta</div>
       <div class="cof-stat-value">${beta}%</div>
-      <div class="cof-stat-sub">applied to ΔSOFR</div>
+      <div class="cof-stat-sub">applied to ΔYield</div>
     </div>
   `;
 }
@@ -3064,11 +3300,11 @@ function syncSettingsInputs() {
   el('lensLag').disabled      = !state.lens.lagEnabled;
   el('lensShortCdPremium').value = Math.round(state.benchmarks.shortCdPremium * 100);
   el('lensLongCdPremium').value  = Math.round(state.benchmarks.longCdPremium  * 100);
-  el('lensCdSofrMode').checked   = state.benchmarks.cdSofrMode;
-  el('lensCdSofrSpread').value   = Math.round(state.benchmarks.cdSofrSpread * 100);
-  el('lensCdSofrSpread').disabled = !state.benchmarks.cdSofrMode;
-  el('lensShortCdPremium').disabled = state.benchmarks.cdSofrMode;
-  el('lensLongCdPremium').disabled  = state.benchmarks.cdSofrMode;
+  el('lensCdCurveMode').checked   = state.benchmarks.cdCurveMode;
+  el('lensCdCurveSpread').value   = Math.round(state.benchmarks.cdCurveSpread * 100);
+  el('lensCdCurveSpread').disabled = !state.benchmarks.cdCurveMode;
+  el('lensShortCdPremium').disabled = state.benchmarks.cdCurveMode;
+  el('lensLongCdPremium').disabled  = state.benchmarks.cdCurveMode;
 }
 
 function onLensChange() {
@@ -3079,7 +3315,7 @@ function onLensChange() {
   const lagVal     = parseFloat(el('lensLag').value);
   const shortBps   = parseFloat(el('lensShortCdPremium').value);
   const longBps    = parseFloat(el('lensLongCdPremium').value);
-  const sofrSpread = parseFloat(el('lensCdSofrSpread').value);
+  const yieldSpread = parseFloat(el('lensCdCurveSpread').value);
   if (!isNaN(cofVal))     state.lens.cof   = cofVal;
   if (!isNaN(betaVal))    state.lens.beta  = Math.max(0, Math.min(100, betaVal));
   if (!isNaN(greenBps))   state.lens.greenMax  = greenBps / 100;
@@ -3087,14 +3323,14 @@ function onLensChange() {
   if (!isNaN(lagVal))     state.lens.lag = Math.max(0, Math.min(36, lagVal));
   if (!isNaN(shortBps))   state.benchmarks.shortCdPremium = Math.max(0, shortBps / 100);
   if (!isNaN(longBps))    state.benchmarks.longCdPremium  = Math.max(0, longBps / 100);
-  if (!isNaN(sofrSpread)) state.benchmarks.cdSofrSpread   = Math.max(0, sofrSpread / 100);
+  if (!isNaN(yieldSpread)) state.benchmarks.cdCurveSpread   = Math.max(0, yieldSpread / 100);
   state.lens.enabled         = el('lensToggle').checked;
   state.lens.lagEnabled      = el('lensLagToggle').checked;
-  state.benchmarks.cdSofrMode = el('lensCdSofrMode').checked;
+  state.benchmarks.cdCurveMode = el('lensCdCurveMode').checked;
   el('lensLag').disabled            = !state.lens.lagEnabled;
-  el('lensCdSofrSpread').disabled   = !state.benchmarks.cdSofrMode;
-  el('lensShortCdPremium').disabled = state.benchmarks.cdSofrMode;
-  el('lensLongCdPremium').disabled  = state.benchmarks.cdSofrMode;
+  el('lensCdCurveSpread').disabled   = !state.benchmarks.cdCurveMode;
+  el('lensShortCdPremium').disabled = state.benchmarks.cdCurveMode;
+  el('lensLongCdPremium').disabled  = state.benchmarks.cdCurveMode;
   updateLensIndicator();
   if (state.data) {
     renderTable();
@@ -3106,7 +3342,7 @@ function onLensChange() {
   postResize();
 }
 ['lensCOF', 'lensBeta', 'lensToggle', 'lensGreenMax', 'lensOrangeMax', 'lensLagToggle', 'lensLag',
- 'lensShortCdPremium', 'lensLongCdPremium', 'lensCdSofrMode', 'lensCdSofrSpread'].forEach(id => {
+ 'lensShortCdPremium', 'lensLongCdPremium', 'lensCdCurveMode', 'lensCdCurveSpread'].forEach(id => {
   el(id).addEventListener('input', onLensChange);
   el(id).addEventListener('change', onLensChange);
 });
@@ -3279,7 +3515,7 @@ function closeSettings() {
 }
 function resetSettingsToDefaults() {
   state.lens = { enabled: true, cof: 1.85, beta: 50, greenMax: 0, orangeMax: 0.75, lagEnabled: false, lag: 6 };
-  state.benchmarks = { shortCdPremium: 1.00, longCdPremium: 1.50, cdSofrMode: false, cdSofrSpread: 0.50 };
+  state.benchmarks = { shortCdPremium: 1.00, longCdPremium: 1.50, cdCurveMode: false, cdCurveSpread: 0.50 };
   state.visibleLocations = { state: new Set(), msa: new Set(), county: new Set(), city: new Set() };
   state.defaults = { geo: null, location: null };
   syncSettingsInputs();
@@ -3399,7 +3635,10 @@ el('stateSearch').addEventListener('input', (e) => renderSidebar(e.target.value)
 function setSidebarOpen(open) {
   state.sidebarOpen = !!open;
   document.querySelector('.container').classList.toggle('sidebar-open', state.sidebarOpen);
-  el('sidebarToggle').classList.toggle('active', state.sidebarOpen);
+  const btn = el('sidebarToggle');
+  btn.classList.toggle('active', state.sidebarOpen);
+  btn.setAttribute('aria-expanded', state.sidebarOpen ? 'true' : 'false');
+  btn.title = state.sidebarOpen ? 'Hide locations' : 'Show locations';
   saveSettings();
   postResize();
 }
@@ -3622,6 +3861,25 @@ el('finderOverlay').addEventListener('click', (e) => {
   if (e.target.id === 'finderOverlay') closeFinder();
 });
 
+/* ---------- Brokered CDs modal ---------- */
+function openBrokered() {
+  el('brokeredOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeBrokered() {
+  el('brokeredOverlay').classList.remove('open');
+  // Only release scroll lock if no other modal is open
+  if (!el('settingsOverlay').classList.contains('open') &&
+      !el('finderOverlay').classList.contains('open')) {
+    document.body.style.overflow = '';
+  }
+}
+el('openBrokered').addEventListener('click', openBrokered);
+el('closeBrokered').addEventListener('click', closeBrokered);
+el('brokeredOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'brokeredOverlay') closeBrokered();
+});
+
 // Filter chip handlers
 document.querySelectorAll('#finderOverlay .finder-chips').forEach(group => {
   const filter = group.dataset.filter;
@@ -3640,6 +3898,7 @@ document.querySelectorAll('#finderOverlay .finder-chips').forEach(group => {
 // extend to also handle finder)
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && el('finderOverlay').classList.contains('open')) closeFinder();
+  if (e.key === 'Escape' && el('brokeredOverlay').classList.contains('open')) closeBrokered();
 });
 
 /* =====================================================================
