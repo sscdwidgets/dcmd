@@ -83,8 +83,12 @@
     align-items: center;
     gap: 12px;
   }
-  .logo-mark { flex-shrink: 0; }
-  .logo-mark svg { width: 40px; height: 40px; display: block; }
+  .logo-mark { flex-shrink: 0; display: flex; }
+  .logo-mark ion-icon {
+    font-size: 42px;
+    color: var(--navy);
+    display: block;
+  }
   .logo-text { line-height: 1.15; }
   .logo-name {
     font-size: 18px;
@@ -765,8 +769,8 @@
     align-items: center;
   }
   .settings-row input[type="number"] {
-    width: 72px;
-    padding: 6px 22px 6px 10px;
+    width: 84px;
+    padding: 6px 30px 6px 10px;
     border: 1px solid var(--gray-300);
     border-radius: var(--radius-sm);
     font-family: var(--font);
@@ -992,12 +996,45 @@
   }
 
   /* ---------- Profitability cell colors ---------- */
-  table.rates tbody td.profit-green   { background: #e8f4ed; }
-  table.rates tbody td.profit-orange  { background: #fff3e0; }
-  table.rates tbody td.profit-red     { background: #fceae8; }
-  table.rates tbody tr:hover td.profit-green   { background: #d6ecde; }
-  table.rates tbody tr:hover td.profit-orange  { background: #ffe8c8; }
-  table.rates tbody tr:hover td.profit-red     { background: #f7d6d1; }
+  table.rates tbody td.profit-green   { background-color: #e8f4ed; }
+  table.rates tbody td.profit-orange  { background-color: #fff3e0; }
+  table.rates tbody td.profit-red     { background-color: #fceae8; }
+  table.rates tbody tr:hover td.profit-green   { background-color: #d6ecde; }
+  table.rates tbody tr:hover td.profit-orange  { background-color: #ffe8c8; }
+  table.rates tbody tr:hover td.profit-red     { background-color: #f7d6d1; }
+
+  /* ---------- Rate Table load animations ---------- */
+  @keyframes rowEnter {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes profitGreenIn  { from { background-color: transparent; } to { background-color: #e8f4ed; } }
+  @keyframes profitOrangeIn { from { background-color: transparent; } to { background-color: #fff3e0; } }
+  @keyframes profitRedIn    { from { background-color: transparent; } to { background-color: #fceae8; } }
+
+  table.rates tbody.animate-in tr {
+    animation: rowEnter 240ms ease-out backwards;
+    animation-delay: calc(var(--row-i, 0) * 10ms);
+  }
+  table.rates tbody.animate-in td.profit-green {
+    animation: profitGreenIn 280ms ease-out backwards;
+    animation-delay: calc(var(--row-i, 0) * 10ms + 180ms);
+  }
+  table.rates tbody.animate-in td.profit-orange {
+    animation: profitOrangeIn 280ms ease-out backwards;
+    animation-delay: calc(var(--row-i, 0) * 10ms + 180ms);
+  }
+  table.rates tbody.animate-in td.profit-red {
+    animation: profitRedIn 280ms ease-out backwards;
+    animation-delay: calc(var(--row-i, 0) * 10ms + 180ms);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    table.rates tbody.animate-in tr,
+    table.rates tbody.animate-in td {
+      animation: none !important;
+    }
+  }
 
   /* Profitability indicator for construction rows */
   .construction-row.profit-green   { background: #e8f4ed; border-radius: 3px; }
@@ -1434,6 +1471,7 @@
   .chart-svg .cof-line { fill: none; stroke-width: 2; }
   .chart-svg .cof-line.sofr { stroke: var(--gold); stroke-dasharray: 5 4; }
   .chart-svg .cof-line.proj { stroke: var(--navy); }
+  .chart-svg .cof-line.proj-nolag { stroke: var(--navy); stroke-dasharray: 4 4; stroke-width: 1.5; opacity: 0.4; }
   .chart-svg .cof-line.cof0 { stroke: var(--gray-500); stroke-dasharray: 2 3; stroke-width: 1; }
   .chart-svg .cof-area { fill: var(--navy); fill-opacity: 0.06; }
   .chart-svg .cof-dot { stroke: var(--white); stroke-width: 1.5; }
@@ -1490,12 +1528,7 @@
   <header class="widget-header">
     <div class="logo">
       <div class="logo-mark">
-        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-          <rect width="40" height="40" rx="8" fill="#002D72"/>
-          <rect x="9"    y="22" width="5" height="11" rx="1" fill="#ffffff" opacity="0.5"/>
-          <rect x="17.5" y="16" width="5" height="17" rx="1" fill="#ffffff" opacity="0.75"/>
-          <rect x="26"   y="10" width="5" height="23" rx="1" fill="#FFBF3F"/>
-        </svg>
+        <ion-icon name="wallet"></ion-icon>
       </div>
       <div class="logo-text">
         <div class="logo-name"><span class="accent">Deposit</span> Command</div>
@@ -1571,9 +1604,9 @@
           <span class="lens-indicator-dot"></span>
           <span id="lensIndicatorText">Profitability lens: COF <strong>1.85%</strong> · Beta <strong>50%</strong></span>
           <span class="lens-indicator-legend">
-            <span class="legend-chip green">≤ COF</span>
-            <span class="legend-chip orange">+0–75bp</span>
-            <span class="legend-chip red">&gt; +75bp</span>
+            <span class="legend-chip green" id="lensChipGreen">≤ 0bp</span>
+            <span class="legend-chip orange" id="lensChipOrange">+0–75bp</span>
+            <span class="legend-chip red" id="lensChipRed">&gt; +75bp</span>
           </span>
         </div>
         <button class="lens-adjust" id="lensAdjustBtn">Adjust in settings</button>
@@ -1674,6 +1707,7 @@
             <div class="chart-legend">
               <span class="legend-color"><span class="swatch" style="background:var(--gold);"></span>SOFR 1M Forward</span>
               <span class="legend-color"><span class="swatch" style="background:var(--navy);"></span>Projected COF</span>
+              <span class="legend-color" id="cofLegendNoLag" style="display:none;"><span class="swatch" style="background:var(--navy); opacity:0.4;"></span>Projected COF (no lag)</span>
               <span class="legend-color"><span class="swatch" style="background:var(--gray-500); border-radius:0; height:3px;"></span>Current COF</span>
             </div>
           </div>
@@ -1690,7 +1724,7 @@
 
   <footer class="widget-footer">
     <span>Source: Sample data for prototype only · Not production rates</span>
-    <span>v1.12</span>
+    <span>v1.18</span>
   </footer>
 
 </div>
@@ -1726,9 +1760,47 @@
             Apply color coding to rates
           </label>
         </div>
+
+        <div class="settings-row" style="border-top:1px dashed var(--gray-200); padding-top:12px; margin-top:4px;">
+          <span style="font-size:10px; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.06em; font-weight:500;">Grading thresholds</span>
+          <label class="field">
+            <span class="legend-chip green" style="font-size:10px;">Green</span> when spread ≤
+            <span class="input-wrap">
+              <input type="number" id="lensGreenMax" step="5" min="-500" max="500" value="0" />
+              <span class="unit">bps</span>
+            </span>
+          </label>
+          <label class="field">
+            <span class="legend-chip orange" style="font-size:10px;">Orange</span> when spread ≤
+            <span class="input-wrap">
+              <input type="number" id="lensOrangeMax" step="5" min="-500" max="500" value="75" />
+              <span class="unit">bps</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="settings-row" style="border-top:1px dashed var(--gray-200); padding-top:12px; margin-top:4px;">
+          <span style="font-size:10px; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.06em; font-weight:500;">Pass-through timing</span>
+          <label class="toggle">
+            <input type="checkbox" id="lensLagToggle" />
+            Apply repricing lag
+          </label>
+          <label class="field">
+            COF responds after
+            <span class="input-wrap">
+              <input type="number" id="lensLag" step="1" min="0" max="36" value="6" disabled />
+              <span class="unit">mo</span>
+            </span>
+          </label>
+        </div>
+
         <p class="settings-help">
-          Projected COF = Current COF + Beta × ΔSOFR. Rates within or below your projected COF show <span class="legend-chip green">green</span>,
-          0–75 bps above show <span class="legend-chip orange">orange</span>, and more than 75 bps above show <span class="legend-chip red">red</span>.
+          Projected COF = Current COF + Beta × ΔSOFR. Spread = market rate − projected COF.
+          Rates at or below the green threshold show <span class="legend-chip green">green</span>,
+          between green and orange show <span class="legend-chip orange">orange</span>,
+          and above orange show <span class="legend-chip red">red</span>.
+          <br/><br/>
+          <strong>Repricing lag</strong> (optional) holds your projected COF flat for the first N months before it starts responding to SOFR moves — reflecting the real-world delay between Fed rate changes and your portfolio repricing. Typical community-bank lag is 6–9 months.
         </p>
       </div>
 
@@ -1948,9 +2020,17 @@ function getSOFR(months) {
   return SOFR_CURVE[0].rate;
 }
 
-function getProjectedCOF(months, currentCOF, betaPct) {
+/* Projection with an explicit lag override — used by the COF chart to draw
+   the "no-lag" comparison line. */
+function getProjectedCOFAt(months, currentCOF, betaPct, lagMonths) {
   const beta = betaPct / 100;
-  return currentCOF + beta * (getSOFR(months) - getSOFR(0));
+  const effectiveMonths = Math.max(0, months - (lagMonths || 0));
+  return currentCOF + beta * (getSOFR(effectiveMonths) - getSOFR(0));
+}
+
+function getProjectedCOF(months, currentCOF, betaPct) {
+  const lag = (state.lens.lagEnabled && state.lens.lag > 0) ? state.lens.lag : 0;
+  return getProjectedCOFAt(months, currentCOF, betaPct, lag);
 }
 
 /* Map each deposit product to its effective tenor (months) for COF lookup.
@@ -1962,17 +2042,15 @@ const PRODUCT_TENORS = {
 };
 
 /* Profitability bucket. spread = market rate - projected COF (in %).
-   Green: at or below COF (efficient acquisition)
-   Orange: 0 to 75 bps above COF
-   Red: more than 75 bps above COF */
+   Thresholds are user-customizable in Settings (state.lens.greenMax / orangeMax). */
 function getProfitabilityClass(marketRate, productKey) {
   if (!state.lens.enabled) return '';
   const months = PRODUCT_TENORS[productKey];
   if (months == null) return '';
   const projected = getProjectedCOF(months, state.lens.cof, state.lens.beta);
   const spread = marketRate - projected;
-  if (spread <= 0) return 'profit-green';
-  if (spread <= 0.75) return 'profit-orange';
+  if (spread <= state.lens.greenMax)  return 'profit-green';
+  if (spread <= state.lens.orangeMax) return 'profit-orange';
   return 'profit-red';
 }
 
@@ -2100,7 +2178,11 @@ const state = {
   lens: {
     enabled: true,
     cof: 1.85,                   // % — bank's current blended cost of funds
-    beta: 50                     // % — deposit beta applied to ΔSOFR
+    beta: 50,                    // % — deposit beta applied to ΔSOFR
+    greenMax:  0,                // % spread — rates with spread ≤ this are green
+    orangeMax: 0.75,             // % spread — rates with spread ≤ this are orange; otherwise red
+    lagEnabled: false,           // optional — applies a repricing lag to the COF projection
+    lag: 6                       // months — how long before COF starts responding to SOFR moves
   },
   // Visible-location filters. Empty Set = show all. Populated = whitelist.
   // Long-term: load from user profile on login. Today: persisted to localStorage.
@@ -2231,6 +2313,7 @@ function renderMain() {
   const breadcrumb = document.querySelector('.location-info .breadcrumb');
 
   if (!state.selectedState) {
+    _lastRenderedLocation = null;
     breadcrumb.style.display = 'none';
     el('locationName').textContent = 'Find a location';
     el('filterTag').innerHTML = '';
@@ -2289,18 +2372,32 @@ function buildRateRow(r) {
   return tr;
 }
 
+// Module-scope flag: was the previous render for the same location?
+// Only animate on a fresh load (location/geo change), not on sort/filter/lens tweaks.
+let _lastRenderedLocation = null;
+
 function renderTable() {
   const data = state.data;
   const tbody = el('ratesBody');
   tbody.innerHTML = '';
 
+  // Toggle the load animation only when the underlying location actually changed
+  const animateNew = state.selectedState !== _lastRenderedLocation;
+  tbody.classList.toggle('animate-in', animateNew);
+  _lastRenderedLocation = state.selectedState;
+
   const filterProduct = state.selectedProduct;
   let rows = data.rows.filter(r => !filterProduct || r.productKey === filterProduct);
+  let rowIdx = 0;
 
   if (state.tableSort.column) {
     // Flat sorted view — no group headers
     rows = sortRows(rows, state.tableSort.column, state.tableSort.direction);
-    rows.forEach(r => tbody.appendChild(buildRateRow(r)));
+    rows.forEach(r => {
+      const tr = buildRateRow(r);
+      tr.style.setProperty('--row-i', rowIdx++);
+      tbody.appendChild(tr);
+    });
   } else {
     // Default grouped view
     for (const group of PRODUCT_GROUPS) {
@@ -2308,9 +2405,14 @@ function renderTable() {
       if (!groupRows.length) continue;
       const gh = document.createElement('tr');
       gh.className = 'product-header';
+      gh.style.setProperty('--row-i', rowIdx++);
       gh.innerHTML = `<td colspan="7">${group.label}</td>`;
       tbody.appendChild(gh);
-      groupRows.forEach(r => tbody.appendChild(buildRateRow(r)));
+      groupRows.forEach(r => {
+        const tr = buildRateRow(r);
+        tr.style.setProperty('--row-i', rowIdx++);
+        tbody.appendChild(tr);
+      });
     }
   }
 
@@ -2563,8 +2665,15 @@ function renderCOF() {
   for (let m = 0; m <= 60; m++) months.push(m);
   const sofrPts = months.map(m => ({ m, v: getSOFR(m) }));
   const cofPts  = months.map(m => ({ m, v: getProjectedCOF(m, cof, beta) }));
+  const showNoLag = state.lens.lagEnabled && state.lens.lag > 0;
+  const cofPtsNoLag = showNoLag
+    ? months.map(m => ({ m, v: getProjectedCOFAt(m, cof, beta, 0) }))
+    : null;
+  // Toggle legend entry for the no-lag comparison line
+  const noLagLegend = el('cofLegendNoLag');
+  if (noLagLegend) noLagLegend.style.display = showNoLag ? '' : 'none';
 
-  const allVals = sofrPts.concat(cofPts).map(p => p.v).concat([cof]);
+  const allVals = sofrPts.concat(cofPts).concat(cofPtsNoLag || []).map(p => p.v).concat([cof]);
   const yMin = Math.max(0, Math.floor(Math.min(...allVals) * 4) / 4 - 0.25);
   const yMax = Math.ceil(Math.max(...allVals) * 4) / 4 + 0.25;
 
@@ -2614,8 +2723,13 @@ function renderCOF() {
   const sofrPath = sofrPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xOf(p.m)} ${yOf(p.v)}`).join(' ');
   svgContent += `<path class="cof-line sofr" d="${sofrPath}"/>`;
 
-  // Projected COF line
+  // Projected COF line (active — respects lag setting)
   const cofPath = cofPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xOf(p.m)} ${yOf(p.v)}`).join(' ');
+  // No-lag comparison line (faint dashed) — only when lag is enabled
+  if (cofPtsNoLag) {
+    const noLagPath = cofPtsNoLag.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xOf(p.m)} ${yOf(p.v)}`).join(' ');
+    svgContent += `<path class="cof-line proj-nolag" d="${noLagPath}"/>`;
+  }
   svgContent += `<path class="cof-line proj" d="${cofPath}"/>`;
 
   // Markers at the key tenors on the projected COF line
@@ -2776,25 +2890,51 @@ function updateLensIndicator() {
   const txt = el('lensIndicatorText');
   if (state.lens.enabled) {
     ind.classList.remove('disabled');
-    txt.innerHTML = `Profitability lens: COF <strong>${state.lens.cof.toFixed(2)}%</strong> · Beta <strong>${state.lens.beta}%</strong>`;
+    const lagBit = state.lens.lagEnabled && state.lens.lag > 0
+      ? ` · Lag <strong>${state.lens.lag}mo</strong>`
+      : '';
+    txt.innerHTML = `Profitability lens: COF <strong>${state.lens.cof.toFixed(2)}%</strong> · Beta <strong>${state.lens.beta}%</strong>${lagBit}`;
   } else {
     ind.classList.add('disabled');
     txt.innerHTML = `Profitability lens: <strong>off</strong>`;
   }
+  // Update threshold chip labels
+  const greenBps  = Math.round(state.lens.greenMax  * 100);
+  const orangeBps = Math.round(state.lens.orangeMax * 100);
+  const fmt = b => (b > 0 ? '+' : '') + b + 'bp';
+  const g = el('lensChipGreen');
+  const o = el('lensChipOrange');
+  const r = el('lensChipRed');
+  if (g) g.textContent = `≤ ${fmt(greenBps)}`;
+  if (o) o.textContent = `to ${fmt(orangeBps)}`;
+  if (r) r.textContent = `> ${fmt(orangeBps)}`;
 }
 
 function syncSettingsInputs() {
-  el('lensCOF').value    = state.lens.cof;
-  el('lensBeta').value   = state.lens.beta;
+  el('lensCOF').value      = state.lens.cof;
+  el('lensBeta').value     = state.lens.beta;
   el('lensToggle').checked = state.lens.enabled;
+  el('lensGreenMax').value  = Math.round(state.lens.greenMax  * 100);
+  el('lensOrangeMax').value = Math.round(state.lens.orangeMax * 100);
+  el('lensLagToggle').checked = state.lens.lagEnabled;
+  el('lensLag').value         = state.lens.lag;
+  el('lensLag').disabled      = !state.lens.lagEnabled;
 }
 
 function onLensChange() {
-  const cofVal  = parseFloat(el('lensCOF').value);
-  const betaVal = parseFloat(el('lensBeta').value);
-  if (!isNaN(cofVal))  state.lens.cof  = cofVal;
-  if (!isNaN(betaVal)) state.lens.beta = Math.max(0, Math.min(100, betaVal));
-  state.lens.enabled = el('lensToggle').checked;
+  const cofVal     = parseFloat(el('lensCOF').value);
+  const betaVal    = parseFloat(el('lensBeta').value);
+  const greenBps   = parseFloat(el('lensGreenMax').value);
+  const orangeBps  = parseFloat(el('lensOrangeMax').value);
+  const lagVal     = parseFloat(el('lensLag').value);
+  if (!isNaN(cofVal))     state.lens.cof   = cofVal;
+  if (!isNaN(betaVal))    state.lens.beta  = Math.max(0, Math.min(100, betaVal));
+  if (!isNaN(greenBps))   state.lens.greenMax  = greenBps / 100;
+  if (!isNaN(orangeBps))  state.lens.orangeMax = orangeBps / 100;
+  if (!isNaN(lagVal))     state.lens.lag = Math.max(0, Math.min(36, lagVal));
+  state.lens.enabled    = el('lensToggle').checked;
+  state.lens.lagEnabled = el('lensLagToggle').checked;
+  el('lensLag').disabled = !state.lens.lagEnabled;
   updateLensIndicator();
   if (state.data) {
     renderTable();
@@ -2804,7 +2944,7 @@ function onLensChange() {
   saveSettings();
   postResize();
 }
-['lensCOF', 'lensBeta', 'lensToggle'].forEach(id => {
+['lensCOF', 'lensBeta', 'lensToggle', 'lensGreenMax', 'lensOrangeMax', 'lensLagToggle', 'lensLag'].forEach(id => {
   el(id).addEventListener('input', onLensChange);
   el(id).addEventListener('change', onLensChange);
 });
@@ -2976,7 +3116,7 @@ function closeSettings() {
   document.body.style.overflow = '';
 }
 function resetSettingsToDefaults() {
-  state.lens = { enabled: true, cof: 1.85, beta: 50 };
+  state.lens = { enabled: true, cof: 1.85, beta: 50, greenMax: 0, orangeMax: 0.75, lagEnabled: false, lag: 6 };
   state.visibleLocations = { state: new Set(), msa: new Set(), county: new Set(), city: new Set() };
   state.defaults = { geo: null, location: null };
   syncSettingsInputs();
@@ -3193,8 +3333,8 @@ function scanForBestRates() {
 }
 
 function spreadClass(spread) {
-  if (spread <= 0)     return 'green';
-  if (spread <= 0.75)  return 'orange';
+  if (spread <= state.lens.greenMax)  return 'green';
+  if (spread <= state.lens.orangeMax) return 'orange';
   return 'red';
 }
 
@@ -3363,6 +3503,10 @@ applyDefaultLocation();
 renderSidebar();
 renderMain();
 </script>
+
+<!-- Ionicons web component (for logo icon) -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://cdn.jsdelivr.net/npm/ionicons@7.4.0/dist/ionicons/ionicons.js"></script>
 
 </body>
 </html>
