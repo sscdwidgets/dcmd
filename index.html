@@ -481,7 +481,7 @@
   .finder-btn:active { transform: translateY(0); }
   .finder-btn svg {
     width: 14px; height: 14px;
-    fill: var(--gold); stroke: none;
+    fill: none; stroke: var(--gold); stroke-width: 1.7; stroke-linecap: round;
   }
 
   .broker-btn {
@@ -3504,7 +3504,7 @@
           Preview as an app
         </button>
       </nav>
-      <div class="m-drawer-footer">v1.62</div>
+      <div class="m-drawer-footer">v1.64</div>
     </aside>
   </div>
 
@@ -3520,11 +3520,8 @@
     <div style="display:flex; align-items:center; gap:8px;">
       <button class="finder-btn" id="openFinder" title="Find the most profitable rates across your visible locations" aria-label="Best Rates Finder">
         <svg viewBox="0 0 16 16">
-          <path d="M2.5 13.5l8-8 1.5 1.5-8 8-1.5-1.5z"/>
-          <path d="M11 5l1-1 1.5 1.5-1 1L11 5z"/>
-          <circle cx="13.5" cy="2.5" r="0.8"/>
-          <circle cx="14.8" cy="5" r="0.5"/>
-          <circle cx="11.5" cy="2" r="0.5"/>
+          <circle cx="7" cy="7" r="4.5"/>
+          <line x1="10.3" y1="10.3" x2="13.7" y2="13.7"/>
         </svg>
         <span class="btn-label">Best Rates</span>
       </button>
@@ -3766,7 +3763,7 @@
 
   <footer class="widget-footer">
     <span>Source: Sample data for prototype only · Not production rates</span>
-    <span>v1.62</span>
+    <span>v1.64</span>
   </footer>
 
   <!-- ===== Mobile Bottom Nav (≤840px only) ===== -->
