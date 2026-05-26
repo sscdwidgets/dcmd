@@ -90,11 +90,20 @@
     display: block;
   }
   .logo-text { line-height: 1.15; }
+  /* Wordmark is now a PNG — sized so width matches the attribution below */
+  img.logo-name {
+    display: block;
+    width: 213px;
+    height: auto;
+    margin-bottom: 2px;
+  }
+  /* (Text-based wordmark styles below kept inert in case the markup ever
+     reverts to a styled <div>.) */
   .logo-name {
     font-size: 18px;
     font-weight: 700;
     color: var(--navy);
-    letter-spacing: -0.005em;
+    letter-spacing: normal;
   }
   .logo-name .accent { color: var(--navy); font-weight: 500; }
   .logo-text .subtitle {
@@ -124,10 +133,6 @@
     color: var(--navy);
     font-weight: 600;
   }
-  @media (max-width: 720px) {
-    .partner-attribution { display: none; }
-  }
-
   /* ---------- Sidebar toggle button ---------- */
   .sidebar-toggle {
     background: var(--white);
@@ -261,6 +266,41 @@
     border-color: var(--blue);
     box-shadow: 0 0 0 3px var(--blue-soft);
   }
+
+  /* State scope dropdown — appears between geo tabs and search on MSA/County tabs */
+  .state-scope {
+    padding: 10px 14px 4px;
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .state-scope label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+  .state-scope-select {
+    flex: 1;
+    padding: 7px 10px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--gray-900);
+    background: var(--white);
+    cursor: pointer;
+    transition: border-color .12s ease;
+  }
+  .state-scope-select:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-soft);
+  }
+  .state-scope-select:hover { border-color: var(--gray-400); }
 
   .state-list {
     flex: 1;
@@ -1270,7 +1310,7 @@
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
 
-  /* ---------- Tier Construction Chart ---------- */
+  /* ---------- Range View Chart ---------- */
   .construction-section {
     background: var(--white);
     border: 1px solid var(--gray-200);
@@ -1284,6 +1324,50 @@
     margin-top: 14px;
   }
   .construction-grid.single { grid-template-columns: 1fr; }
+
+  /* Group selector strip above the construction panel */
+  .construction-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 0 14px;
+    border-bottom: 1px solid var(--gray-200);
+    margin: 0 0 14px;
+    flex-wrap: wrap;
+  }
+  .construction-controls-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .construction-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .construction-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 11px;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gray-700);
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all .12s ease;
+  }
+  .construction-chip:hover { border-color: var(--blue); color: var(--blue); }
+  .construction-chip.active {
+    background: var(--navy); color: var(--white); border-color: var(--navy);
+  }
+  .construction-chip .product-group-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .construction-row[data-product] { cursor: pointer; }
 
   .construction-panel {
     border: 1px solid var(--gray-200);
@@ -1326,21 +1410,23 @@
 
   .construction-row {
     display: grid;
-    grid-template-columns: 52px 1fr 48px;
+    grid-template-columns: minmax(180px, 220px) 1fr 60px;
     gap: 10px;
     align-items: center;
-    padding: 3px 0;
-    font-size: 11px;
+    padding: 4px 0;
+    font-size: 12.5px;
   }
   .construction-panel.single .construction-row {
-    grid-template-columns: 80px 1fr 70px;
+    grid-template-columns: minmax(200px, 240px) 1fr 70px;
     font-size: 13px;
     padding: 6px 0;
   }
   .tier-label {
     color: var(--gray-700);
-    font-variant-numeric: tabular-nums;
-    text-align: right;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .range-track {
@@ -1484,6 +1570,9 @@
   table.rates tbody tr.product-header td:not(:first-child) {
     background: var(--gray-100);
   }
+  table.rates tbody tr.product-header .product-header-label {
+    display: inline-block;
+  }
 
   .rate-cell { font-weight: 500; color: var(--navy); }
   .rate-cell.high { color: var(--up); font-weight: 700; }
@@ -1621,7 +1710,7 @@
   }
   .chart-svg .bubble:hover { stroke-width: 2; opacity: 1; }
 
-  /* ---------- Profitability Heatmap ---------- */
+  /* ---------- Profitability — Horizontal Spread Bars ---------- */
   .heatmap-section {
     background: var(--white);
     border: 1px solid var(--gray-200);
@@ -1629,87 +1718,125 @@
     padding: 18px 20px;
   }
   .heatmap-grid-wrap {
-    overflow-x: auto;
     margin-top: 14px;
   }
   .heatmap-grid {
-    display: grid;
-    grid-template-columns: 150px repeat(6, minmax(92px, 1fr));
-    gap: 1px;
-    background: var(--gray-200);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    min-width: 700px;
+    display: block;
   }
-  .hm-cell {
-    background: var(--white);
-    padding: 8px 10px;
+  /* Sort chips bar above the list */
+  .spread-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 0 14px;
+    border-bottom: 1px solid var(--gray-200);
+    margin-bottom: 8px;
+    flex-wrap: wrap;
   }
-  .hm-corner {
-    background: var(--gray-50);
-  }
-  .hm-col-header {
-    background: var(--navy);
-    color: var(--white);
-    font-size: 10.5px;
-    font-weight: 500;
+  .spread-controls-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-600);
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 6px;
   }
-  .hm-row-header {
-    background: var(--gray-50);
-    color: var(--gray-900);
+  .spread-sort-chips { display: flex; gap: 6px; }
+  .spread-sort-chip {
+    padding: 5px 11px;
+    font-family: var(--font);
     font-size: 12px;
     font-weight: 500;
+    color: var(--gray-700);
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all .12s ease;
+  }
+  .spread-sort-chip:hover { border-color: var(--blue); color: var(--blue); }
+  .spread-sort-chip.active {
+    background: var(--navy); color: var(--white); border-color: var(--navy);
+  }
+  .spread-scale-note {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--gray-500);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .spread-list { display: flex; flex-direction: column; gap: 2px; }
+  .spread-group-header {
     display: flex;
     align-items: center;
-    padding-left: 12px;
+    gap: 7px;
+    padding: 10px 0 4px;
+    margin-top: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
-  .hm-row-header .product-group-dot {
+  .spread-group-header:first-child { margin-top: 0; padding-top: 4px; }
+  .spread-group-header .product-group-dot {
     display: inline-block;
     width: 8px; height: 8px;
     border-radius: 50%;
-    margin-right: 8px;
-    flex-shrink: 0;
   }
-  .hm-data {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+
+  .spread-row {
+    display: grid;
+    grid-template-columns: minmax(180px, 1.4fr) 56px minmax(220px, 2.4fr) 78px;
+    gap: 10px;
     align-items: center;
-    text-align: center;
+    padding: 4px 0;
     cursor: default;
-    padding: 6px 4px;
+  }
+  .spread-row:hover { background: var(--gray-50); border-radius: 3px; }
+  .spread-row-label {
+    font-size: 12.5px;
+    color: var(--gray-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .spread-row-rate {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--gray-900);
     font-variant-numeric: tabular-nums;
-    transition: transform .12s ease, box-shadow .12s ease;
+    text-align: right;
+  }
+  .spread-row-track {
     position: relative;
-    min-height: 48px;
-  }
-  .hm-data:hover {
-    transform: scale(1.06);
-    z-index: 1;
-    box-shadow: 0 2px 8px rgba(0,45,114,0.18);
+    height: 18px;
+    background: var(--gray-100);
     border-radius: 3px;
+    overflow: hidden;
   }
-  .hm-data .hm-rate {
-    font-size: 13px;
-    font-weight: 700;
-    color: #1a1a1a;
-    line-height: 1.1;
+  .spread-row-axis {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: var(--gray-400);
   }
-  .hm-data .hm-spread {
-    font-size: 10px;
-    color: rgba(0,0,0,0.6);
-    margin-top: 2px;
-    font-weight: 500;
+  .spread-row-bar {
+    position: absolute;
+    top: 3px; bottom: 3px;
+    border-radius: 2px;
+    transition: left .18s ease, width .18s ease, background .18s ease;
   }
-  .hm-data.no-lens .hm-rate { color: var(--navy); }
+  .spread-row-bps {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-900);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .spread-row-bps.pos  { color: #c44d3d; }
+  .spread-row-bps.neg  { color: #4a8d68; }
+  .spread-row-bps.zero { color: var(--gray-600); }
 
   .heatmap-gradient-bar {
     display: flex;
@@ -1796,17 +1923,1537 @@
   }
   .widget-footer a { color: var(--blue); text-decoration: none; }
 
-  /* ---------- Responsive (basic) ---------- */
+  .th-short { display: none; }
+
+  /* ---------- PWA Preview button + modal ---------- */
+  .preview-btn {
+    background: transparent;
+    border: 1px solid var(--gray-300);
+    color: var(--gray-500);
+    width: 34px; height: 34px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s ease;
+  }
+  .preview-btn:hover {
+    color: var(--navy);
+    border-color: var(--navy);
+    background: var(--navy-50);
+  }
+  .preview-btn svg {
+    width: 16px; height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Demo "stage" inside the preview modal body */
+  .pwa-preview-body { padding: 0 !important; }
+  .pwa-preview-stage {
+    position: relative;
+    padding: 40px 32px 40px;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,191,63,0.08), transparent 55%),
+      linear-gradient(180deg, #0a1f47 0%, #001538 100%);
+    overflow: hidden;
+  }
+  .pwa-window {
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow:
+      0 16px 40px rgba(0, 0, 0, 0.4),
+      0 2px 6px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .pwa-window-chrome {
+    background: linear-gradient(180deg, #f6f6f6 0%, #e8e8e8 100%);
+    border-bottom: 1px solid #d1d1d1;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .pwa-traffic-lights { display: flex; gap: 6px; }
+  .pwa-traffic-lights .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .pwa-traffic-lights .dot.red    { background: #ff5f57; }
+  .pwa-traffic-lights .dot.yellow { background: #febc2e; }
+  .pwa-traffic-lights .dot.green  { background: #28c840; }
+  .pwa-window-title {
+    flex: 1;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #555;
+    letter-spacing: 0.02em;
+    margin-right: 50px;
+  }
+  .pwa-window-content { padding: 14px 16px 16px; background: var(--white); }
+  .pwa-mock-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 12px;
+  }
+  .pwa-mock-header ion-icon { font-size: 22px; color: var(--navy); }
+  .pwa-mock-header .accent { font-weight: 500; }
+  .pwa-mock-chip {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 5px;
+    padding: 7px 10px;
+    font-size: 11px;
+    color: var(--navy);
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pwa-mock-chip .geo {
+    font-size: 9px;
+    color: var(--gray-500);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .pwa-mock-heatmap {
+    display: grid;
+    grid-template-columns: 76px repeat(5, 1fr);
+    gap: 2px;
+    background: var(--gray-200);
+    border: 1px solid var(--gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .pwa-mock-heatmap .hcell {
+    background: var(--white);
+    padding: 6px 4px;
+    font-size: 9px;
+    text-align: center;
+    color: var(--gray-700);
+    font-weight: 600;
+    min-height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pwa-mock-heatmap .hcell.row-label {
+    text-align: left;
+    padding-left: 8px;
+    color: var(--gray-900);
+    background: var(--gray-50);
+    font-weight: 500;
+    justify-content: flex-start;
+    font-size: 9.5px;
+  }
+  .pwa-mock-heatmap .hcell.header {
+    background: var(--navy);
+    color: var(--white);
+    font-size: 8.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 500;
+    padding: 5px 4px;
+    min-height: 18px;
+  }
+  .pwa-mock-heatmap .hcell.g  { background: #b8e0c5; color: #1f5a3a; }
+  .pwa-mock-heatmap .hcell.g2 { background: #7bc99c; color: #134628; }
+  .pwa-mock-heatmap .hcell.o  { background: #fde2b3; color: #6b3f00; }
+  .pwa-mock-heatmap .hcell.o2 { background: #f0a868; color: #5a2900; }
+  .pwa-mock-heatmap .hcell.r  { background: #f7c4bd; color: #6a1b15; }
+  .pwa-mock-heatmap .hcell.r2 { background: #e89289; color: #5a0e0a; }
+
+  /* Push notification toast — animates in over the window */
+  .pwa-notification {
+    position: absolute;
+    top: 36px;
+    right: 32px;
+    width: 290px;
+    background: rgba(255, 255, 255, 0.96);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.35),
+      0 1px 2px rgba(0, 0, 0, 0.2);
+    padding: 12px 13px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    opacity: 0;
+    transform: translateX(120%);
+  }
+  .pwa-preview-overlay.open .pwa-notification {
+    animation: notifSlideIn .55s cubic-bezier(.32, .72, 0, 1) .9s forwards;
+  }
+  @keyframes notifSlideIn {
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .pwa-notif-icon {
+    width: 32px; height: 32px;
+    background: var(--navy);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .pwa-notif-icon ion-icon { font-size: 18px; color: var(--gold); }
+  .pwa-notif-body { flex: 1; min-width: 0; }
+  .pwa-notif-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+  }
+  .pwa-notif-app {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .pwa-notif-time { font-size: 10.5px; color: rgba(0, 0, 0, 0.45); }
+  .pwa-notif-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 2px;
+    line-height: 1.3;
+  }
+  .pwa-notif-text { font-size: 11.5px; color: rgba(0, 0, 0, 0.65); line-height: 1.35; }
+
+  /* Download CTA */
+  .pwa-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: var(--gold);
+    color: var(--navy);
+    border: none;
+    padding: 11px 26px;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 14px rgba(255, 191, 63, 0.35);
+    transition: transform .15s ease, box-shadow .15s ease, background .25s ease, color .25s ease;
+  }
+  .pwa-download-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255, 191, 63, 0.5);
+  }
+  .pwa-download-btn:active { transform: translateY(0); }
+  .pwa-download-btn svg {
+    width: 16px; height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Compact variant when the button lives in the modal header */
+  .pwa-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .settings-header .pwa-download-btn {
+    padding: 7px 14px;
+    font-size: 12.5px;
+    gap: 7px;
+    box-shadow: 0 2px 8px rgba(255, 191, 63, 0.28);
+  }
+  .settings-header .pwa-download-btn svg { width: 13px; height: 13px; }
+  /* Confirmation state after click */
+  .pwa-download-btn.done {
+    background: #2da563;
+    color: var(--white);
+    pointer-events: none;
+    box-shadow: 0 4px 14px rgba(45, 165, 99, 0.35);
+  }
+  .pwa-download-btn.done svg {
+    animation: checkPop .35s cubic-bezier(.34, 1.56, .64, 1);
+  }
+  @keyframes checkPop {
+    0%   { transform: scale(0); }
+    60%  { transform: scale(1.25); }
+    100% { transform: scale(1); }
+  }
+
+  /* ---------- Notification Center ---------- */
+  .notif-btn {
+    position: relative;
+    background: transparent;
+    border: 1px solid var(--gray-300);
+    color: var(--gray-500);
+    width: 34px; height: 34px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .15s ease;
+  }
+  .notif-btn:hover {
+    color: var(--navy);
+    border-color: var(--navy);
+    background: var(--navy-50);
+  }
+  .notif-btn.has-unread { color: var(--navy); border-color: var(--navy); }
+  .notif-btn svg {
+    width: 16px; height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .notif-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--white);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .notif-btn:not(.has-unread) .notif-badge { display: none; }
+
+  /* Subtle pulse on the bell when there are unread items */
+  .notif-btn.has-unread .notif-badge {
+    animation: badgePulse 2.4s ease-in-out infinite;
+  }
+  @keyframes badgePulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.12); }
+  }
+
+  /* Notification panel — desktop dropdown */
+  .notif-panel {
+    position: fixed;
+    top: 64px;
+    right: 24px;
+    width: 380px;
+    max-height: calc(100vh - 84px);
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    box-shadow:
+      0 16px 40px rgba(0, 21, 56, 0.18),
+      0 4px 12px rgba(0, 21, 56, 0.08);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+  }
+  .notif-panel.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .notif-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--gray-200);
+    background: var(--white);
+  }
+  .notif-panel-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .notif-mark-read {
+    background: none;
+    border: none;
+    color: var(--blue);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font);
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: background .12s ease;
+  }
+  .notif-mark-read:hover { background: var(--navy-50); }
+  .notif-mark-read[disabled] {
+    color: var(--gray-400);
+    cursor: not-allowed;
+  }
+  .notif-mark-read[disabled]:hover { background: transparent; }
+  .notif-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 0 8px;
+  }
+  .notif-group-label {
+    padding: 12px 16px 4px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .notif-item {
+    display: flex;
+    gap: 11px;
+    padding: 11px 16px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background .12s ease;
+    align-items: flex-start;
+  }
+  .notif-item:hover { background: var(--gray-50); }
+  .notif-item.unread { background: rgba(255, 191, 63, 0.06); border-left-color: var(--gold); }
+  .notif-item.unread:hover { background: rgba(255, 191, 63, 0.10); }
+  .notif-icon {
+    width: 32px; height: 32px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .notif-icon svg {
+    width: 16px; height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Type-specific icon colors */
+  .notif-icon.opportunity { background: #e3f5ec; color: #2da563; }
+  .notif-icon.position    { background: #fdf0e3; color: #d97706; }
+  .notif-icon.curve       { background: #e3eef8; color: var(--blue); }
+  .notif-icon.maturity    { background: #fef5d5; color: #b45309; }
+  .notif-icon.bestrate    { background: #fff4d6; color: #a16207; }
+  .notif-icon.brokered    { background: #e7e9f0; color: var(--navy); }
+  .notif-icon.system      { background: var(--gray-100); color: var(--gray-500); }
+
+  .notif-body { flex: 1; min-width: 0; }
+  .notif-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--navy);
+    line-height: 1.3;
+    margin-bottom: 2px;
+  }
+  .notif-text {
+    font-size: 12px;
+    color: var(--gray-700);
+    line-height: 1.4;
+    margin-bottom: 4px;
+  }
+  .notif-time {
+    font-size: 10.5px;
+    color: var(--gray-500);
+    font-weight: 500;
+  }
+
+  .notif-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--gray-500);
+    font-size: 13px;
+  }
+  .notif-empty svg {
+    width: 36px; height: 36px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    margin: 0 auto 10px;
+    display: block;
+    opacity: 0.4;
+  }
+
+  .notif-panel-footer {
+    border-top: 1px solid var(--gray-200);
+    padding: 10px 16px;
+    background: var(--gray-50);
+  }
+  .notif-settings-link {
+    background: none;
+    border: none;
+    color: var(--blue);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font);
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .notif-settings-link:hover { color: var(--navy); }
+  .notif-settings-link svg {
+    width: 13px; height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+  }
+
+  /* Notification overlay backdrop (click-out to close) */
+  .notif-backdrop {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    z-index: 199;
+    display: none;
+  }
+  .notif-backdrop.open { display: block; }
+
+  /* ---------- My Rates — header button + modal + inline columns ---------- */
+  .myrates-btn {
+    background: transparent;
+    border: 1px solid var(--gray-300);
+    color: var(--gray-700);
+    padding: 7px 11px 7px 9px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font);
+    font-size: 12.5px;
+    font-weight: 600;
+    transition: all .15s ease;
+  }
+  .myrates-btn:hover {
+    color: var(--navy);
+    border-color: var(--navy);
+    background: var(--navy-50);
+  }
+  .myrates-btn.active {
+    color: var(--navy);
+    border-color: var(--navy);
+    background: var(--navy-50);
+  }
+  .myrates-btn svg {
+    width: 14px; height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .myrates-btn .myrates-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 10.5px;
+    font-weight: 700;
+    border-radius: 9px;
+    margin-left: 2px;
+    line-height: 1;
+  }
+  .myrates-btn:not(.active) .myrates-count { display: none; }
+
+  /* My Rates modal — inherits .settings-overlay / .settings-modal patterns */
+  .myrates-intro {
+    font-size: 13px;
+    color: var(--gray-700);
+    line-height: 1.55;
+    margin: 0 0 16px;
+  }
+  .myrates-intro strong { color: var(--navy); }
+  .myrates-grid-wrap {
+    border: 1px solid var(--gray-200);
+    border-radius: 6px;
+    overflow: auto;
+    max-height: 60vh;
+  }
+  table.myrates-grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  table.myrates-grid thead th {
+    background: var(--gray-50);
+    color: var(--navy);
+    font-weight: 700;
+    text-align: center;
+    padding: 9px 6px;
+    border-bottom: 1px solid var(--gray-200);
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    font-size: 11.5px;
+    letter-spacing: 0.01em;
+  }
+  table.myrates-grid thead th:first-child {
+    text-align: left;
+    padding-left: 12px;
+    z-index: 3;
+    left: 0;
+    background: var(--gray-50);
+  }
+  table.myrates-grid tbody td {
+    padding: 6px 5px;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  table.myrates-grid tbody td:first-child {
+    background: var(--white);
+    color: var(--navy);
+    font-weight: 600;
+    padding: 6px 12px;
+    border-right: 1px solid var(--gray-200);
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+  table.myrates-grid tbody tr.group-divider td {
+    background: var(--gray-50);
+    color: var(--navy);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 10.5px;
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .myrates-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .myrates-input {
+    width: 100%;
+    padding: 5px 16px 5px 7px;
+    border: 1px solid var(--gray-200);
+    border-radius: 4px;
+    font-family: var(--font);
+    font-size: 12px;
+    color: var(--navy);
+    text-align: right;
+    background: var(--white);
+    transition: border-color .12s ease, background .12s ease;
+    -moz-appearance: textfield;
+  }
+  .myrates-input::-webkit-outer-spin-button,
+  .myrates-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .myrates-input:focus {
+    outline: none;
+    border-color: var(--navy);
+    background: var(--white);
+  }
+  .myrates-input.has-value {
+    border-color: var(--gold);
+    background: rgba(255, 191, 63, 0.05);
+  }
+  .myrates-input-suffix {
+    position: absolute;
+    right: 6px;
+    font-size: 10.5px;
+    color: var(--gray-500);
+    pointer-events: none;
+  }
+
+  .myrates-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--gray-200);
+  }
+  .myrates-clear {
+    background: none;
+    border: none;
+    color: var(--gray-500);
+    font-family: var(--font);
+    font-size: 12.5px;
+    cursor: pointer;
+    padding: 6px 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .myrates-clear:hover { color: #b91c1c; }
+  .myrates-save-group {
+    display: flex;
+    gap: 8px;
+  }
+  .myrates-save {
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    padding: 8px 18px;
+    border-radius: 5px;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .12s ease;
+  }
+  .myrates-save:hover { background: #001538; }
+  .myrates-cancel {
+    background: var(--white);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .myrates-cancel:hover { background: var(--gray-50); }
+
+  /* Inline display in rates table when myRates is active */
+  .yourrate-cell {
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .yourrate-cell.empty { color: var(--gray-400); font-weight: 400; }
+
+  .position-cell {
+    white-space: nowrap;
+    line-height: 1;
+  }
+  .pos-bar {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    width: 64px;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(90deg,
+      #d4e7f7 0%,
+      var(--gray-200) 50%,
+      #fde2b3 100%);
+    margin-right: 7px;
+  }
+  .pos-marker {
+    position: absolute;
+    top: -3px;
+    width: 3px;
+    height: 12px;
+    background: var(--navy);
+    border-radius: 1px;
+    margin-left: -1.5px;
+    box-shadow: 0 0 0 1.5px var(--white);
+  }
+  .pos-text {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .pos-text.above-avg { color: #b45309; }
+  .pos-text.below-avg { color: #1e6dbd; }
+  .pos-text.at-avg    { color: var(--gray-500); }
+  .pos-cell-empty { color: var(--gray-400); font-size: 11px; }
+
+  /* Hide the two myrates columns unless the table has has-myrates class */
+  table.rates .myrates-col { display: none; }
+  table.rates.has-myrates .myrates-col { display: table-cell; }
+
+  /* ---------- "Above Market" attention treatment ---------- */
+  /* Highlights rows where the user's rate exceeds the regional average
+     by more than ABOVE_MARKET_THRESHOLD_BPS. Concentrated emphasis on
+     the Your Rate cell + a left accent on the first column. */
+  table.rates tr.above-market td:first-child {
+    box-shadow: inset 3px 0 0 #f59e0b;
+  }
+  table.rates tr.above-market .yourrate-cell {
+    background: rgba(245, 158, 11, 0.10);
+    color: #b45309;
+    font-weight: 700;
+    position: relative;
+    padding-left: 24px;
+  }
+  table.rates tr.above-market .yourrate-cell::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 13px;
+    height: 13px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23b45309' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M8 1.5 L14.5 13.5 L1.5 13.5 Z'/><line x1='8' y1='6' x2='8' y2='9.5'/><circle cx='8' cy='11.5' r='0.5' fill='%23b45309' stroke='none'/></svg>");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  table.rates tr.above-market .position-cell .pos-text.above-avg {
+    font-weight: 700;
+  }
+
+  /* ---------- "Below Market" attention treatment ---------- */
+  /* Mirrors the above-market styling but in brand blue — informational
+     rather than warning. Flags potential attrition risk on rates priced
+     more than BELOW_MARKET_THRESHOLD_BPS under the regional average. */
+  table.rates tr.below-market td:first-child {
+    box-shadow: inset 3px 0 0 var(--blue);
+  }
+  table.rates tr.below-market .yourrate-cell {
+    background: rgba(9, 96, 187, 0.08);
+    color: #1e4d8c;
+    font-weight: 700;
+    position: relative;
+    padding-left: 24px;
+  }
+  table.rates tr.below-market .yourrate-cell::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 13px;
+    height: 13px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%231e4d8c' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><line x1='8' y1='2.5' x2='8' y2='13.5'/><polyline points='3,9 8,13.5 13,9'/></svg>");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  table.rates tr.below-market .position-cell .pos-text.below-avg {
+    font-weight: 700;
+  }
+
+  /* Stack the two banners vertically when both are present */
+  .attention-banners {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0 0 12px;
+  }
+  .attention-banners:empty { display: none; }
+
+  /* Banner — shared base, modifier classes for above/below variants */
+  .above-market-banner {
+    margin: 0;
+    padding: 10px 14px;
+    background: rgba(245, 158, 11, 0.10);
+    border: 1px solid rgba(245, 158, 11, 0.30);
+    border-left: 3px solid #f59e0b;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--navy);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .above-market-banner.below-variant {
+    background: rgba(9, 96, 187, 0.07);
+    border-color: rgba(9, 96, 187, 0.28);
+    border-left-color: var(--blue);
+  }
+  .above-market-banner .amb-icon {
+    flex-shrink: 0;
+    width: 18px; height: 18px;
+    fill: none;
+    stroke: #b45309;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .above-market-banner.below-variant .amb-icon {
+    stroke: #1e4d8c;
+  }
+  .above-market-banner-text { flex: 1; }
+  .above-market-banner-text strong {
+    color: #b45309;
+    font-weight: 700;
+  }
+  .above-market-banner.below-variant .above-market-banner-text strong {
+    color: #1e4d8c;
+  }
+  .above-market-banner-text .amb-detail {
+    font-size: 11.5px;
+    color: var(--gray-600);
+    margin-left: 6px;
+    font-weight: 400;
+  }
+  .above-market-banner-action {
+    background: var(--white);
+    border: 1px solid #f59e0b;
+    color: #b45309;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .12s ease, color .12s ease;
+  }
+  .above-market-banner.below-variant .above-market-banner-action {
+    border-color: var(--blue);
+    color: #1e4d8c;
+  }
+  .above-market-banner-action:hover {
+    background: rgba(245, 158, 11, 0.15);
+  }
+  .above-market-banner.below-variant .above-market-banner-action:hover {
+    background: rgba(9, 96, 187, 0.10);
+  }
+  .above-market-banner-action.active {
+    background: #f59e0b;
+    color: var(--white);
+  }
+  .above-market-banner.below-variant .above-market-banner-action.active {
+    background: var(--blue);
+    color: var(--white);
+  }
+
+  /* ---------- Attention toggles inside the My Rates modal ---------- */
+  .myrates-attention {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+    padding: 12px 14px;
+    margin: 0 0 14px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 6px;
+  }
+  .myrates-attention-label {
+    font-size: 11px;
+    color: var(--gray-600);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-right: 4px;
+  }
+  .myrates-attention label.toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    color: var(--navy);
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+  }
+  .myrates-attention label.toggle input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+    width: 14px;
+    height: 14px;
+    accent-color: var(--navy);
+  }
+  .myrates-attention .attn-swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 2px;
+    vertical-align: middle;
+  }
+  .myrates-attention .attn-swatch.above { background: #f59e0b; }
+  .myrates-attention .attn-swatch.below { background: var(--blue); }
+
+  /* =====================================================================
+     MOBILE DESIGN  (≤840px)
+     New mobile chrome with top bar, drawer, location chip, bottom nav.
+     All four content tabs stay accessible via the bottom navigation.
+     ===================================================================== */
+
+  /* Mobile-only chrome elements — hidden by default on desktop */
+  .mobile-top-bar,
+  .mobile-drawer-overlay,
+  .mobile-loc-chip,
+  .mobile-bottom-nav,
+  .m-scroll-hint {
+    display: none;
+  }
+
+  /* Sidebar close X for mobile location overlay */
+  .sidebar-close-x {
+    display: none;
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--gray-700);
+    font-size: 30px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 6px;
+    z-index: 2;
+  }
+
   @media (max-width: 840px) {
-    .container, .container.sidebar-open { grid-template-columns: 1fr; }
-    .container.sidebar-open .sidebar { border-right: none; border-bottom: 1px solid var(--gray-200); max-height: 360px; }
-    .state-list { max-height: 240px; }
-    .main { padding: 18px; }
-    .main-header { flex-direction: column; align-items: stretch; }
-    .stats { justify-content: space-between; }
-    .stat { text-align: left; }
-    table.rates { font-size: 12px; }
-    table.rates thead th, table.rates tbody td { padding: 7px 8px; }
+    /* --- Hide desktop chrome --- */
+    .widget-header { display: none; }
+    .main-header   { display: none; }
+    .content-tabs  { display: none; }
+    .widget-footer { display: none; }
+
+    /* --- Show mobile chrome --- */
+    .mobile-top-bar    { display: flex; }
+    .mobile-loc-chip   { display: flex; }
+    .mobile-bottom-nav { display: flex; }
+
+    /* --- Scroll-hint chip: shown above scrollable tables/grids --- */
+    .m-scroll-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--gray-700);
+      padding: 5px 11px 5px 9px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 14px;
+      margin: 0 0 10px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      transition: opacity .25s ease, max-height .25s ease, margin .25s ease, padding .25s ease, border-width .25s ease;
+      overflow: hidden;
+      max-height: 32px;
+    }
+    .m-scroll-hint svg {
+      width: 13px; height: 13px;
+      stroke: var(--navy);
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      animation: scrollHintBounce 1.5s ease-in-out infinite;
+    }
+    @keyframes scrollHintBounce {
+      0%, 100% { transform: translateX(0); opacity: 0.55; }
+      50%      { transform: translateX(4px); opacity: 1; }
+    }
+    .m-scroll-hint.dismissed {
+      opacity: 0;
+      max-height: 0;
+      margin: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-width: 0;
+      pointer-events: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .m-scroll-hint svg { animation: none; }
+    }
+
+    /* --- Container: single column, no min-height --- */
+    .container, .container.sidebar-open {
+      grid-template-columns: 1fr;
+      min-height: 0;
+    }
+
+    /* --- Main: bottom padding for the sticky nav --- */
+    .main {
+      padding: 14px 14px calc(74px + env(safe-area-inset-bottom));
+    }
+
+    /* Mobile: above-market banner compresses */
+    .above-market-banner {
+      padding: 9px 11px;
+      font-size: 12px;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .above-market-banner .amb-icon {
+      width: 16px; height: 16px;
+    }
+    .above-market-banner-text .amb-detail {
+      display: block;
+      margin-left: 0;
+      margin-top: 1px;
+    }
+    .above-market-banner-action {
+      padding: 4px 9px;
+      font-size: 11px;
+    }
+    table.rates tr.above-market .yourrate-cell {
+      padding-left: 20px;
+    }
+    table.rates tr.above-market .yourrate-cell::before {
+      left: 5px;
+      width: 11px;
+      height: 11px;
+    }
+
+    /* --- Lens indicator: compact on mobile --- */
+    .lens-indicator {
+      padding: 8px 12px;
+      font-size: 11px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .lens-indicator-legend { display: none; }
+    .lens-adjust {
+      font-size: 11px;
+      padding: 4px 8px;
+    }
+
+    /* ===== Mobile Top Bar ===== */
+    .mobile-top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 10px 12px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    /* Mobile: bell button inside the top bar with badge */
+    .m-icon-btn .m-notif-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      background: var(--gold);
+      color: var(--navy);
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid var(--white);
+      line-height: 1;
+      pointer-events: none;
+    }
+    .m-icon-btn:not(.has-unread) .m-notif-badge { display: none; }
+    /* Mobile: notification panel becomes a fullscreen overlay */
+    .notif-panel {
+      position: fixed !important;
+      top: 60px !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: auto !important;
+      max-height: none !important;
+      border-radius: 0 !important;
+      border: none !important;
+      border-top: 1px solid var(--gray-200) !important;
+      box-shadow: none !important;
+      transform: translateY(0) !important;
+      transition: opacity .2s ease !important;
+    }
+    .notif-panel:not(.open) {
+      transform: translateY(0) !important;
+      opacity: 0 !important;
+    }
+    .m-icon-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--navy);
+      flex-shrink: 0;
+      padding: 0;
+    }
+    .m-icon-btn:active { background: var(--gray-100); }
+    .m-icon-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .m-brand {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -0.005em;
+      flex: 1;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .m-brand .accent { font-weight: 500; }
+
+    /* ===== Mobile Location Chip ===== */
+    .mobile-loc-chip {
+      width: 100%;
+      background: var(--white);
+      border: none;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 14px 16px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      font-family: var(--font);
+      text-align: left;
+    }
+    .mobile-loc-chip:active { background: var(--gray-50); }
+    .m-loc-text { flex: 1; min-width: 0; }
+    .m-loc-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .m-loc-geo {
+      font-size: 11px;
+      color: var(--gray-500);
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .m-loc-chip-chev {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: var(--gray-500);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    /* ===== Mobile Bottom Nav ===== */
+    .mobile-bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 80;
+      background: var(--white);
+      border-top: 1px solid var(--gray-200);
+      padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+      box-shadow: 0 -2px 12px rgba(0, 21, 56, 0.06);
+    }
+    .m-nav-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 8px 4px 6px;
+      font-family: var(--font);
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--gray-500);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.02em;
+      transition: color .12s ease;
+    }
+    .m-nav-tab svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.6;
+    }
+    .m-nav-tab.active {
+      color: var(--navy);
+      font-weight: 700;
+    }
+    .m-nav-tab.active svg { stroke-width: 2; }
+    .m-nav-tab:active { background: var(--gray-100); }
+
+    /* ===== Mobile Drawer (hamburger menu) ===== */
+    .mobile-drawer-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0, 21, 56, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .22s ease;
+    }
+    .mobile-drawer-overlay.open {
+      display: block;
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .mobile-drawer-panel {
+      position: absolute;
+      top: 0; bottom: 0; left: 0;
+      width: 86%;
+      max-width: 320px;
+      background: var(--white);
+      transform: translateX(-100%);
+      transition: transform .28s cubic-bezier(.32,.72,0,1);
+      display: flex;
+      flex-direction: column;
+    }
+    .mobile-drawer-overlay.open .mobile-drawer-panel {
+      transform: translateX(0);
+    }
+    .m-drawer-header {
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid var(--gray-200);
+      position: relative;
+    }
+    /* Wordmark inside the drawer is a PNG, sized to match attribution width */
+    img.m-drawer-brand {
+      display: block;
+      width: 213px;
+      height: auto;
+      margin-bottom: 2px;
+    }
+    .m-drawer-brand {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: normal;  /* set dynamically by JS to match attribution width */
+    }
+    .m-drawer-brand .accent { font-weight: 500; }
+    .m-drawer-sub {
+      font-size: 10.5px;
+      color: var(--gray-500);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .m-drawer-sub .partner-dot {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--gold);
+    }
+    .m-drawer-sub strong { color: var(--navy); font-weight: 600; }
+    .m-drawer-close {
+      position: absolute;
+      top: 12px; right: 12px;
+      width: 36px; height: 36px;
+      border: none;
+      background: transparent;
+      color: var(--gray-500);
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+    }
+    .m-drawer-close:active { background: var(--gray-100); }
+    .m-drawer-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+    .m-drawer-item {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 14px 18px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gray-900);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+    }
+    .m-drawer-item:active { background: var(--gray-50); }
+    .m-drawer-item svg {
+      width: 20px; height: 20px;
+      stroke: var(--navy);
+      fill: none;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+    .m-drawer-footer {
+      padding: 12px 18px;
+      border-top: 1px solid var(--gray-200);
+      font-size: 11px;
+      color: var(--gray-500);
+    }
+
+    /* ===== Sidebar becomes a full-screen location picker on mobile ===== */
+    .sidebar {
+      display: none;
+    }
+    .container.sidebar-open .sidebar {
+      display: flex;
+      position: fixed;
+      inset: 0;
+      z-index: 250;
+      background: var(--white);
+      border: none;
+      flex-direction: column;
+      padding-top: 56px;
+    }
+    .container.sidebar-open .sidebar::before {
+      content: "Choose a location";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 56px 0 18px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+      border-bottom: 1px solid var(--gray-200);
+      background: var(--white);
+    }
+    .container.sidebar-open .sidebar-close-x {
+      display: flex !important;
+    }
+    .geo-tabs { padding: 14px 14px 0; }
+    .sidebar-search { padding: 12px 14px; }
+    .state-list {
+      flex: 1;
+      max-height: none !important;
+      overflow-y: auto;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* ===== Tab content adjustments ===== */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Rates table: horizontal scroll on the wrapper, sticky first column */
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+    }
+    table.rates {
+      font-size: 11.5px;
+      min-width: 500px;
+    }
+    table.rates thead th,
+    table.rates tbody td {
+      padding: 6px 7px;
+    }
+    table.rates .sort-icon { font-size: 9px; opacity: 0.6; }
+    /* Swap to short labels on mobile */
+    .th-long  { display: none; }
+    .th-short { display: inline; }
+    /* Sticky Product · Tier column — stays visible during horizontal scroll */
+    table.rates thead th:first-child,
+    table.rates tbody td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: var(--white);
+      box-shadow: 1px 0 0 var(--gray-200);
+    }
+    table.rates thead th:first-child {
+      background: var(--navy);
+      color: var(--white);
+    }
+    /* Group header rows (product family dividers) — keep their styling on sticky cell */
+    table.rates tr.product-header td:first-child {
+      background: var(--gray-50);
+    }
+    /* Hover row: keep sticky cell background in sync */
+    table.rates tbody tr:hover td:first-child {
+      background: var(--gray-50);
+    }
+    /* Group header LABEL stays visible during horizontal scroll —
+       the TD spans full width but the inner label "follows" the visible left edge */
+    table.rates tbody tr.product-header .product-header-label {
+      position: sticky;
+      left: 7px;
+      display: inline-block;
+    }
+    table.rates tbody tr.product-header td {
+      padding: 7px 7px;
+    }
+
+    /* Heatmap (now horizontal spread bars) — collapse grid for narrow screens */
+    .heatmap-section { padding: 12px; }
+    .heatmap-grid-wrap {
+      overflow-x: visible;
+    }
+    .spread-row {
+      grid-template-columns: minmax(120px, 1.4fr) 48px 1fr 64px;
+      gap: 8px;
+    }
+    .spread-row-label { font-size: 11.5px; }
+    .spread-row-rate { font-size: 11.5px; }
+    .spread-row-bps { font-size: 11px; }
+    .spread-row-track { height: 14px; }
+    .spread-controls { gap: 6px; }
+    .spread-scale-note { display: none; }
+
+    /* Range View: stack chips, narrow label column */
+    .construction-grid { grid-template-columns: 1fr !important; }
+    .construction-panel { padding: 14px; }
+    .construction-row,
+    .construction-panel.single .construction-row {
+      grid-template-columns: minmax(140px, 180px) 1fr 56px;
+      font-size: 11.5px;
+    }
+
+    /* COF chart: stat cards 2×2 */
+    .cof-stats { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
+
+    /* ===== Modals: tighten for mobile ===== */
+    .settings-modal { max-width: 96vw !important; max-height: 92vh; }
+    .settings-body { padding: 16px; }
+    .settings-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+    }
+    .settings-row .field { width: 100%; }
+    .settings-row .toggle { width: 100%; }
+
+    .finder-modal { max-width: 96vw !important; }
+    .finder-filters { flex-wrap: wrap; gap: 6px; }
+    .finder-results-wrap { overflow-x: auto; }
   }
 </style>
 </head>
@@ -1814,21 +3461,75 @@
 
 <div class="widget">
 
+  <!-- ===== Mobile Top Bar (≤840px only) ===== -->
+  <header class="mobile-top-bar">
+    <button class="m-icon-btn" id="mDrawerOpen" aria-label="Open menu">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="m-brand"><span class="accent">Deposit</span> Command</div>
+    <button class="m-icon-btn has-unread" id="mNotifsOpen" aria-label="Open notifications" style="position:relative;">
+      <svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="m-notif-badge" id="mNotifBadge">5</span>
+    </button>
+    <button class="m-icon-btn" id="mSettingsOpen" aria-label="Open settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </header>
+
+  <!-- ===== Mobile Drawer ===== -->
+  <div class="mobile-drawer-overlay" id="mDrawerOverlay" aria-hidden="true">
+    <aside class="mobile-drawer-panel" role="dialog" aria-label="Menu">
+      <div class="m-drawer-header">
+        <img class="m-drawer-brand" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAA7CAYAAADrXzu8AAAaC0lEQVR4nO2debSVVdnAf4AoToCzpjlkw4e5kz41hBwwNUGcEtPScjZyyHI7lOjXKhVzyJ0TfZ8ZampaqTgCiiBDOGeoOxRRBNFEogQccEDg++M5d3G5vPuc/U7nHO59fmvdte467z77fc6+57772c8IiqIoiqIoiqIoiqIoiqK0Xzo1WgBF6RAYuwPwK6A/0AWYCPwU76Y1UCpFURRldcfYk4Abao7zbiWdr3NZ8iiKUsHYHYEngYOB7sC6wCDgCYz9ciNFUxRFUTomazRaAEXpAFwGrJ/w+vqVawfWV5x2hLFrAr2A/wI2AHogno13gAXAP4GpePdhw2RUFEVpQlQBVJTy2SvjNSUJY7cFBgOHAbsCXWu8YwnGvgA8CozAu5fLFVBRFKX5WVUBNHZ5yjmWAu8D7wHzgZeB6cDjwGS8+zinjIqi1MLYfYFHEq+1iftYbTG2N3AecDjpwle6AjtXfs7B2EnAxXg3rnAZFUVRVhOKsAB2QdwuPYCtgK+2urYYYx8Brgcewru0yqWitAcmAQdUuaZUw9j1EFf5KRSTuLYXsBfG/hmwePdWAXMqiqKsVpSdBLIOcAgwGpiBsYeXfD9FaUZ+hljJ2/I+YtFSQhi7E/AP4FSKr1pwJOAxdo+C51UURWl66pkF/HngTowdj7Fb1/G+itJYvPNAX+BBROn7ABgD9KtcU5Iwdj/gr8A2Jd5lQ+ARjP1uifdQFEVpOhqRBPIN4G8YeyTeTWjA/RWl/nj3D+CgRoux2mBsX+B+oFsd7rYWcBvGLsK70XW4n6IoSsNJowBeADyf8HoX5BS9IbA50A/YBVizylybAA9j7CF4NyaFDIqitHcky/c+6qP8tdAZuB1j+2iWsKIoHYE0CuBT0Vlzxq6NFLr9KaIMJtEVuAtj98W7J1LIoShK+2YEckhMw7+RWMG5wHLgM0hCWo8Uc/QA7sDYXfBuWcr7x2NsZ2A3YCDQG6lhuBFSF/JjYBEwC/k8k4AxeLewJFliEvNOxrvft3rPVsDRiDdnB2BjxBCwEHgVeAa4F5gYlfhn7FrIfnEIsl9sBayN1HKcD0wDxgKj8e7tqM+VFl2HWrJtBnwHSaDaCfms6yDhLK8DfwdGAffj3Set3pepQ0VK2bL87dZGSkkdgDwntkQOnO8A84Bnkc8zBu8WZ5YtLeF1fg+YCTyNfKfGFZFUu+qihxdzv0xlE4w9GLgRecAlMQcwePdu6rnTybED0olhV+SfdVPkgfspKx64Himl8RDeJQXtFyVL/BobuwVS72wfYEfEyro2Eks2D3gOaSt2N97NL0fgGhi7IfKP1B8wSMxWd+SAsQh4G9nMnkQeELPqLF8XZP32Q/7+n0Ms1t2Ad5GCwdOBp4AH8e7vBd+/nBIt6Us2FXv/MjD2BEQBjOUhpMXeY3i3tM1cXYEBwP8gf/dYjsW7W1KMj8PYnsAPgR8hCmosS4A7gStL+G7Gb57GdgeGIdnYXSLeNw04D+8eCNy7E3AS8HNE2anFx0hFiWF496+I8fHoOiQj8fq/AI4h7rPORT7HCLxb3pQKoMh0GbIH1OJt5PPcuMrzpUjSr/PLSCvR+yrvz7TO5SuAMue2iNa6U2DETXh3Qqa5q9+3M5Lpdw4rl6epxWJEab0C7+aUIFftNTZ2S+Bi5IRZq9AtiCJ7G3Bh3RQsydA8FziCdNbkycjaPliKXC1Il4jTgbOBLVK88ylgKN49WpAcqgDGIArbTOCzEaM/QhS1v0TM2xkYClwUKcmbwOcLrWFq7LHAr5ETfVaWI8+lc/HunYLkits85aB5H+kU1xZuBoa0sQxtCvwJ2DvDfPOBQ/Hu8QzvTUbXYVWMPRr4X5K7GNViFHAUsjc0hwIII4G/IMaAtIwCjijFGphvnW8GhiCKY5P2AvZuNrA/0pYpieMK74lqbC9gCnA76ZQ/EJPr6cCLGPuTygmtfogVZDpwHHHKH4gCdhwwDWNPL0ewCsauj7HXImb/o0ifTLQn8ADGPoKx2xcuH4CxX0Tku5J0yh9AH2Acxg6vWA+V+vA94pW/gVHKH4B3y/DuYuQgEMNWhOs2psPYbhj7R+RBnUf5AzmwnwhMxdiv5BUtBb0R12MWpQfkuXQvxspzwthtkENWFqUHJDzgUYytd1JVbzrKOhh7PmJQyKKUgLiyRyMJVs3AOogSl0X5A/k84zC22Ljk/Ot8HHAXGXW5+pWB8W4e4nP/NOFqJ+D8wu5l7EDEV94350zrAr9B4oLqE5BurENcYOtlnGFt4FqMHVGK8mLsdsATiIKc9/uzL/Asxn4zt1ytMfZLSCeaPIeKTkjtuVsqFiSlfE6OHHce3k1MPbt3VyKbUgxHpZ6/LRLTNaaQuVZma+AxjP1awfOGOA3ps5yHgcDlFffpWGDbnPOtBdxa2gEymY6xDsaeinif8vJ1pAZqM/BLJO42D30RK34xFLfOBwFnZXljfTc2754C/hi4+m2MzfvPBcYOQMpHZFWgkjgSUQLLXq+hwJkFzXUCMSbhNIgr/zHyKVZt6QGMxtgDC5lN3Ih3EY45TctRiCKolImxmxP3gP4bcHWOO51ZeX+tn1dz3KOF25C42DJYD3iwciBbXfgxooB/saD5ehDeT5qZ5l0HY3dGjB5FERPTWA96FjTPaRjbP/csxa9zpu9SI+oAXgJ8n1WVzzWQ7KebM88sbr+/UP1zTUcCxz0S/L8O4iLcFQkY7x5436HAhUg5nLJIcgV8CowHJiCJKp8iLog+iOZfLcvxeIx9Fu+G55bM2PWRdavmTv0AebA9jrj7lyFJK1+ryBpS8LsAf8bY3fFuak5Jj0WSZZJYjnyGcUjy0TJkLfsjCUIhd/tFGHtL6YlK6Wnt+tmJ8Glydag/OJC4Th+/yZX95t0M4CeZ3x+LsScjPYvLZBPgDxjbv9Ss5eLojFiFiqRPpZLE6tTXuTnXQUKdfkv1Em6KxL1PzPzuJlrn+iuA3s3A2MeB3ROuDiKrAiiLegNhX/pM4HS8e6jKHOsCP0DMxUnz/BRjRxaeiRfmT4i7a3bCteuQHqlnIErp2oE5LsPYBwpIZnHAlwLXlgCXA78OlKsYXkm7PwXJdEpa23UQd+vOKwVJp+fowOvvAQfi3eSEa9dVYlDvRzKE29IT+W7ekUOu4mmdRGPsR1HjmpedI8YsRqy7zY2xGyOxp/VgDySD9Hd1ul8zYpFDXUcn7zoMRg7rSnUGYOwX8O6VjO9vmnVuVGzTpMDrvXPMORhJLkhiPLBTVeUPwLsP8O43FTmSMmnXAC7NIWMsS4ET8e67AeVP8O59vLsEsQa+GRi1LmK5zI6xuyKbTBILgL3x7oKqtcq8+xDvHLLRvxYYtSOi0OYhlPBzWUD5E7ybhgT+hzI/988pl1IdEzHm6ZyHg3pxFvFB3fORA+ceSLvM3kgs5NMp7nd+JfShbD5FspAPQGoXfqny+40kx3bH8CZSL7YPcvjqjXz+NIfsvSvxlvWiva7Dj1KMXQL8HvEu7ICsw4HkW4N6sBw5yB8M9ELkPhgxtsR6Fjoh8etZaZp1boQLGKQMSFLSx+cwdl28+yDDnOcGXn8JOAjvPoyeybvXkD6kLyCWqdbsh7G98e65DDLGcgbe3Rg92juPsfsjdfaSNp6jMHYo3r2VUZ7/Cby+DDgM7x6Lnsm7VypJH8+Q7BI+B2OHp/p7rcy6gddfiJDtZYwdhdRdbEuzxLK0V2L6/dbL8p4dKT30w8jRUipj1dCC5zF2BGLRuYLarvGtgW8h4S9lsRAYlFByZAYwBmNvQnpdpym8/TBweELN1ZbP74hz13dDLCp/TXHvrCykPa6DZCSHDChtmY6Un2nbMedlYBTGXomUyvl8ajnK5UNgcEL3sZeRqhR/ROptxiR89kNKt6Sjyda5URbANwKvdyZ9yY6W2L9QodfTMikT3s0kHGz+ndTzxTMG736b+l3evYicIJPoCnw7kzQSnD8ocHV4xmzMmYSTXTZFTmRZ+U/g9VBHmrZcBZyX8HNbDpmU2sRsmP8uXYr87ENcwPlTwLeCcaXeLa9kLcfGHJcdbzikar0576aQLlnqTaSuWnLBfYnztIj3JoZQjdmiaa/rMCBy3BvAnglKyQpkL9oTKaLcTJyVoPytQEJlQoaktmQtw9RU69woBTC0SUO6k1MLoSD3l/BuQob5Wrgz8HoxNcKSOS/He28g7F7NmghwKMnfkyXkc4ffipyakxicY95nAq+fW7HqVse7v+LdpQk/N+eQSalNTNb+wrKFKIBY19CpeLckYtyvEC9GLWp/t7Mzg/CzsDV3EJ89fV3NpCpRfmLLZBSV9V+N9rwOsSXTTiGm45R3c5GyOc3CP4mrivF/QIynLKaLSBJNtc6NUgAXVLmWpXxLn8DreZQ/CP8T96q4eormb3j3fOZ3e9fSDSSJWAtYW0LZapNyuJSpZC2GShfkyZALtfDqBjyMsbdVYhqV5iJGGWqWorLV6B0xZmp0Ipls/tdHjOxZcS+VwSNRmdcyZmzknA9HjpuCVBeoRdYNOQ3teR16RYx5Be9GpZjzHmB2NnEK5+HK/lgdOZTF/O3axTo3KgawmpKXJfYrVJfu1EqxxaJZA9gO8cUXSXK7sHSMR3oXtqUHxm6Jd6FuLCFCpu4i4m0mBl7/DMZujHdZXH53IQ/VpKSNTkiW8NEY+zqS9TsKUWbDWbRKPXiXcCZ7C/XY5PPyhYgxU1LOGU5eWpkvAq+nnDuGmSWMjRvn3acYO4faG2fbWO0yaM/rsHXEmFg3tCC9gMcRTiCsJzFW9DRj28U6N8oCWK0lUpZaa5tlFSQHPUuY88UC5phe5dqmGeYLtT3KmgLfmmoKdPpYUGg5fQ9G6v1VYxskG+shYAHGjsXYMzBWkz0aQ7WwkBa2LVuIAugZMSZtSaZYpS5L+EwM76UYG/f89q7oOevRrrM9r0Oo/m1rQuFF1SiioHoRpNErFpYlBE22zo1SAKspbLX93quStY9eHso4cRbR4L2aez3LOoW+sAszzNWWarJm38wki/xgpOh4jGWvGxJDdTUwB2MnYGyeRBQlPTGn7n6lS5GfmOdCcsB/mNjNq8juR0rHIibzNY2y2kKzFM9PUyi9zKLqTbXOjVIAQw/yuXgXYwloBspwGRZxiq3m1l9awPwx94ml2vcve7cHkFgO785H3GJXAf+KfGcnpDPIfRg7udJXWCkfHzFm+zr3fs3C4ogxaRW1GKsBpFcsFaWFmO9tlkN57He3o9BU69yoGMCklmcAWRMg3qW6W7kMyihJUUSMU9Hu9dDa5u/bXH2ORQXMD969AZyJsWcDeyHtBgcBMYrEHsBjGHsQ3j1RiDxKiNiY0tPJ0y9b+nnHPSyrFTYPs4jalva0yRrbRo5bmHJeRWnhXWofTLL0m222WoCNpqnWuf4KoLGbIRtxElnb2MwlWUm5lfKKo84uYc5QMksaqnVUCHULqcZbJK9tEU3oqwU0p01WqY53S4FHKz8/rliSBiGu4r0I/y9sBIzF2K/iXbPEs7RHJiMhAbUOFidh7NVVO+RU5xTguohxMwi3PqzGq9QuGp7UBrMa/SPHhcoqKUotZhGO925hX4ztHN13Wtqz5umY0R5pqnVuhAXwbMLZfln7fHqSFZ+lq0kf1Bb2A36Wc45Qy7K38K5azF0IT3ImcNpNLInQl/b1jLLGI8WorwGuwdhNgO8jbeiSrDPrIfGER5QqU0dGshxHAifWGLkecCvG9q8o9fEYuzVwUeToUImiWjxPbYWtd6Xn9bM1ZxOLZUxnkQUF9PtWOi7TqV1+a2skwS6mFiJId5ptc8jUHmmqda5vDKBYXU4JXJ2Id1lLGITcc/tjbJeMczaC/8bYUC/b2hi7DlLmJIn4dm0rE6p6vwfGZskqFqR3aUjW2LIXxeDd/Eqf4l7AA4FRh2BsrTIlSj4ccbGfuwN3pep7Kt/VUcSFLiwHbo+ee2UejRw3HGNjDuA/J660TGw9OUVJIjYE41qMrWXBaukgFWNp72g01TrXzwJo7PpI37pQr9YLc8x+P3BtwutbIFabO1LPKIpjb5ITM+bgXWxSQVouAQZmfO85hCvBZ7WE3ot8wdquw1pIf8qhGec9lXBNpGxue2P3JtkCuhS4oGYRV+8+xNgzSe6asibSiHtqJtmU2nj3Isbei5xoa3EoMAVjT8O7p6uONHYQUkx5y0hJ/pTD3T8WScaoFefTB7gbY49ObAMmlr+hJNf0TCLWWqAoSYxFDj61EhE3AyZj7CF4Ny1xhLG9kD05Wymv9k1TrXN9FEBjN0I29VCM29hcLdu8m4Ox45E+nG1xGDsB79L2yxtKWCntTXxWaVoGVDa14aneZWxfwsrYQmBkJmm8ewtjHyJZKT0bYx9InSBhbG9E0U1iFrVr+IXoRbgf8t1ATPeFuVWuNXNGW1i5TRNP0ngs8E3CB8XW7AI8ibETkIPK80hfzGXIQ7EP0rd75xT3/5jshxrw7iOMHQH8OGL0wcAMjL0OKf76L6SOYD9gCNXjeVszC9kIFCUb3s3F2LGEQ4hasz3wHMbeiuwrryLPn+2Bw4BjkP7zSluabJ3LdwEbuwdiNflGYMRCasf9xPCrwOubA+OizKktGHsA4ZP3pFzt2uK4GmOPjx5t7G6I6zLUnu76YLPxOELKWldgJMbGb7DG7oIoeKF6aRdFtexJppp17vLIcIBqzbrLjUvMR7W/7+pT3FqSO9IoYJ2QZ8s1wCSkuPgrSBjBFaRT/gAuyZFg0sLlxHc02gIYBjyJFID9O2Jxj1X+IN//jKK0cE2KsWsAxyP7zktIbNsoZC9X5a86TbPO5SiAxnbF2AMw9lHkQfzZwMilwPF4lyU7dWW8G49YeZL4MvACxh5XiT1Lxtj1MfaXyGInWUeXIhaKsukC3Iixt2JsaO3A2O4YeyGyxiHX7zzCynEc3k0hHBS/OWKqPhdjw0Uuje1ZWdsphAuBTwRuzi4oTxPusrAPcE8l4SMZY7+ONANPYjHp2gnVm2pFxL9bNymKwLtrCPd0LpP7iU8SCSM9si/IPU8c48n3P6MognejkUOUUiZNtM5pXMB9Aht8F8RtsQGyse+GuF5qBcwvB07Gu3tTyFCL04C+JKdZbwTcBAyruDSfQWr5rYnEBn0FiT2q5nq6PLqJezF8Dziy0udvIuLqWYpYDfoBB1LbLXkq3hVRU+8MJPg+KUt2HeAy4ByMHY0oYvMq1z5bkXUg1dd2HnBsVLP1EN4txdhhSLxXEgcBr2HsXUhyy3zkFLUdkpG8L+HYjDsrjcKbldeQCvJJNeguxtjtkADklb8LzZslfxJyuPhmne43Ffheru/fylyFyB7j6snKXOC4AmVWlNOQvVET3sqlKdY5jQJ4cYH3/QA4Ee/+XOCc4N28SsD3ZMLFWD8DnFD5ScNIyj/Vj0Jq07WmK6I8ZUkMGYZ32WL/2uLdOxg7AMkmDhWs3hiJSzgm5eyLgAEFlbG4ASn2fEDg+nrAcZWfWBYDv8gjVOmI8jsBiStryxpITNmQhGv16KGaHu+WYOyBwAikRE+ZjAGOyBkmsTLeLcPYw5Gs4F0Lm3cFC4D9C/GeKEoL3k3D2B8CfyhoxjcIewA7LsWv82wylIJpRCu454DdClf+WvDuOaSw71sFzno7cFQdAumvIpzEkJbL8K5YhdW76YgVcFaBs74G9Kv83fIj1pDvUFwpmWWIlWV2QfOVyZWNFqBQpJ3fMUhCxQcl3GEpsmYHFar8tSBzfoNwaaGszECeoTHt8xQlHd7dglR4yMtE4NIC5mmfFLfOk5C449TUUwGcixQ03Rnv/lHqnbybigR/35NzpsXAuXh3NN59nF+wCLy7HDicFS7UtLwLfB/v8haUTsa7l5Dsy1tzzrQc+B3yfXgxt1yt8e49xP02nHw9hRcCh+Hd6lFiw7vJyCGifSExgQbJ9C3K3fkEsAvenZ26oHQaRAk8FPgRGRu2t2IpcDUit3b9UMrDu6uRYsQLM84wEglR+qQokdol+dd5FBLalCk8qWwFcAnS3u1IYBu8u75u5Si8exvvDkO6a6QtMfMhEoS+A95dUbhstfDubmAH4PfE/wN9giQw9MK728oSDRB3sFhmdgdGk25TXoJYVL+Kd0My9lutjXcf493pSEzow6ST8WPElbwD3t1XhnglchZwHvIZ2g/ezcK7byGxujeR7YH5CVKOaj/g64VZnWvh3TK8uw4p6DwM+E/KGT5CngU74t1PKgccRSkXCR9q2Ydis8znAMfg3WC8K8Nq3/5Ysc43EL/Oc4EfIN6LzM+DIuoALkPcM+8jdaxeQVKVn0S6ezT2S+DdOKQMzLbISbwvsCMSYN4d2RQWIgv6LGIZuKegxInsePcOcDLG/hw5IezDCrnXRtb7bSR4fQJwV+U99ZTxMWBQpcTOoYhCaJAkle6IxWIR8DrwAuISGFWa0pcs41NIbcVtkNjAPZF6gVsi8YDLEMvMHKTt3STk79/MJV/CyAHrUoy9EYlz7I/8TTYkXHpn9UG8Bydg7BBgb+Q79xWkSPcGQI/KyAWVn38iwdZPAlPq/j/SGikef0ElG35PJEFkJ6Tn8AZIktRHyPNoJvJ9HI/USdXNVKk/3s1F9qELEEPO3kgd3E2Abkji2Wxk73wAeb5rSaK0yDr/ILDOLfv9HKRM1CjgPrzLbV1tzgDw9o6xIWvUfhWFVVEURVEUpTQakQSiKIqiKIqiNBBVABVFURRFUToYqgAqiqIoiqJ0MFQBVBRFURRF6WCoAqgoiqIoitLBUAVQURRFURSlg6EKoKIoiqIoSgdDFUBFURRFUZQOhiqAiqIoiqIoHQxVABVFURRFUToYqgAqiqIoiqJ0MFQBVBRFURRF6WCoAqgoiqIoiqIoiqIoiqIoiqIoiqIoitJu+H+xst3rpIn5DwAAAABJRU5ErkJggg==" alt="Deposit Command" width="213" height="20" />
+        <div class="m-drawer-sub">
+          <strong>SouthState Correspondent</strong> + <strong>S&amp;P Global</strong>
+        </div>
+        <button class="m-drawer-close" id="mDrawerClose" aria-label="Close menu">×</button>
+      </div>
+      <nav class="m-drawer-nav">
+        <button class="m-drawer-item" data-m-action="locations">
+          <svg viewBox="0 0 24 24"><path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+          Choose a location
+        </button>
+        <button class="m-drawer-item" data-m-action="finder">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16" y2="16"/></svg>
+          Best Rates Finder
+        </button>
+        <button class="m-drawer-item" data-m-action="brokered">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6"/><line x1="5" y1="10" x2="5" y2="20"/><line x1="9" y1="10" x2="9" y2="20"/><line x1="15" y1="10" x2="15" y2="20"/><line x1="19" y1="10" x2="19" y2="20"/><line x1="3" y1="21" x2="21" y2="21"/></svg>
+          Brokered CDs
+        </button>
+        <button class="m-drawer-item" data-m-action="myRates">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/><circle cx="7" cy="6" r="1.6" fill="currentColor" stroke="none"/><circle cx="14" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="10" cy="18" r="1.6" fill="currentColor" stroke="none"/></svg>
+          My rates
+        </button>
+        <button class="m-drawer-item" data-m-action="settings">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </button>
+        <button class="m-drawer-item" data-m-action="pwaPreview">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="1.5"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="17" x2="12" y2="20"/></svg>
+          Preview as an app
+        </button>
+      </nav>
+      <div class="m-drawer-footer">v1.57</div>
+    </aside>
+  </div>
+
   <header class="widget-header">
     <div class="logo">
       <div class="logo-mark">
         <ion-icon name="wallet"></ion-icon>
       </div>
       <div class="logo-text">
-        <div class="logo-name"><span class="accent">Deposit</span> Command</div>
+        <img class="logo-name" src="data:image/png;base64,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" alt="Deposit Command" width="213" height="20" />
         <div class="partner-attribution">
-          <span class="partner-dot"></span>
-          Data by <strong>S&amp;P Global Market Intelligence</strong>
+          <strong>SouthState Correspondent</strong> + <strong>S&amp;P Global</strong>
         </div>
       </div>
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
-      <button class="finder-btn" id="openFinder" title="Find the most profitable rates across your visible locations">
+      <button class="finder-btn" id="openFinder" title="Find the most profitable rates across your visible locations" aria-label="Best Rates Finder">
         <svg viewBox="0 0 16 16">
           <path d="M2.5 13.5l8-8 1.5 1.5-8 8-1.5-1.5z"/>
           <path d="M11 5l1-1 1.5 1.5-1 1L11 5z"/>
@@ -1836,9 +3537,9 @@
           <circle cx="14.8" cy="5" r="0.5"/>
           <circle cx="11.5" cy="2" r="0.5"/>
         </svg>
-        Best Rates
+        <span class="btn-label">Best Rates</span>
       </button>
-      <button class="broker-btn" id="openBrokered" title="Learn about Brokered CD funding solutions">
+      <button class="broker-btn" id="openBrokered" title="Learn about Brokered CD funding solutions" aria-label="Brokered CDs">
         <svg viewBox="0 0 16 16">
           <path d="M8 0.5L1 3.5v1.2h14V3.5L8 0.5z"/>
           <rect x="2.5" y="5.5" width="1.6" height="6.5"/>
@@ -1847,7 +3548,31 @@
           <rect x="11.9" y="5.5" width="1.6" height="6.5"/>
           <rect x="1" y="13" width="14" height="1.6"/>
         </svg>
-        Brokered CDs
+        <span class="btn-label">Brokered CDs</span>
+      </button>
+      <button class="myrates-btn" id="openMyRates" title="Enter your bank's rates to see your competitive position" aria-label="My Rates">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 6h18M3 12h18M3 18h18"/>
+          <circle cx="7" cy="6" r="1.6" fill="currentColor" stroke="none"/>
+          <circle cx="14" cy="12" r="1.6" fill="currentColor" stroke="none"/>
+          <circle cx="10" cy="18" r="1.6" fill="currentColor" stroke="none"/>
+        </svg>
+        My Rates
+        <span class="myrates-count" id="myratesCount">0</span>
+      </button>
+      <button class="notif-btn has-unread" id="openNotifs" title="Notifications" aria-label="Open notifications">
+        <svg viewBox="0 0 24 24">
+          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+        </svg>
+        <span class="notif-badge" id="notifBadge">5</span>
+      </button>
+      <button class="preview-btn" id="openPwaPreview" title="Preview as an installed app" aria-label="Preview as an installed app">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="4" width="18" height="13" rx="1.5"/>
+          <line x1="9" y1="20" x2="15" y2="20"/>
+          <line x1="12" y1="17" x2="12" y2="20"/>
+        </svg>
       </button>
       <button class="settings-btn" id="openSettings" title="Settings" aria-label="Open settings">
         <svg viewBox="0 0 24 24">
@@ -1860,13 +3585,21 @@
 
   <div class="container">
 
-    <!-- ===== Sidebar ===== -->
+    <!-- ===== Sidebar (desktop) / Location picker overlay (mobile) ===== -->
     <aside class="sidebar">
+      <button class="sidebar-close-x" id="sidebarCloseX" aria-label="Close locations">×</button>
       <div class="geo-tabs" role="tablist">
         <button class="geo-tab active" data-geo="state">State</button>
         <button class="geo-tab" data-geo="msa">MSA</button>
         <button class="geo-tab" data-geo="county">County</button>
-        <button class="geo-tab" data-geo="city">City</button>
+      </div>
+
+      <!-- State scope dropdown — visible only on MSA/County tabs.
+           Limits the list of MSAs/Counties to those within the chosen state.
+           Options populated from MSA_COUNTY_STATES in JS. -->
+      <div class="state-scope" id="stateScope" style="display:none;">
+        <label for="stateScopeSelect">State</label>
+        <select id="stateScopeSelect" class="state-scope-select"></select>
       </div>
 
       <div class="sidebar-search">
@@ -1878,6 +3611,15 @@
 
     <!-- ===== Main ===== -->
     <main class="main">
+      <!-- Mobile-only location chip (taps to open the location picker overlay) -->
+      <button class="mobile-loc-chip" id="mobileLocChip" aria-label="Change location">
+        <div class="m-loc-text">
+          <div class="m-loc-name" id="mLocName">Choose a location</div>
+          <div class="m-loc-geo"  id="mLocGeo">Tap to browse</div>
+        </div>
+        <svg class="m-loc-chip-chev" viewBox="0 0 12 12"><polyline points="3,5 6,8 9,5"/></svg>
+      </button>
+
       <div class="main-header">
         <div class="main-header-left">
           <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle locations sidebar" aria-expanded="false" title="Show locations">
@@ -1924,12 +3666,12 @@
           Rates Table
         </button>
         <button class="content-tab" data-panel="chart" role="tab" aria-selected="false">
-          <svg class="tab-icon" viewBox="0 0 16 16"><rect x="2" y="2" width="4" height="4" rx="0.5"/><rect x="7" y="2" width="4" height="4" rx="0.5"/><rect x="12" y="2" width="2" height="4" rx="0.5"/><rect x="2" y="7" width="4" height="4" rx="0.5"/><rect x="7" y="7" width="4" height="4" rx="0.5"/><rect x="12" y="7" width="2" height="4" rx="0.5"/><rect x="2" y="12" width="4" height="2" rx="0.5"/><rect x="7" y="12" width="4" height="2" rx="0.5"/></svg>
-          Heatmap
+          <svg class="tab-icon" viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14" stroke-width="1"/><rect x="5" y="3" width="4" height="1.6" rx="0.5"/><rect x="3" y="6" width="5" height="1.6" rx="0.5"/><rect x="8" y="9" width="6" height="1.6" rx="0.5"/><rect x="4" y="12" width="4" height="1.6" rx="0.5"/></svg>
+          Spread View
         </button>
         <button class="content-tab" data-panel="construction" role="tab" aria-selected="false">
           <svg class="tab-icon" viewBox="0 0 16 16"><line x1="3" y1="4" x2="11" y2="4"/><circle cx="6" cy="4" r="1.5" fill="currentColor"/><line x1="3" y1="8" x2="13" y2="8"/><circle cx="9" cy="8" r="1.5" fill="currentColor"/><line x1="3" y1="12" x2="10" y2="12"/><circle cx="5" cy="12" r="1.5" fill="currentColor"/></svg>
-          Tier Construction
+          Range View
         </button>
         <button class="content-tab" data-panel="cof" role="tab" aria-selected="false">
           <svg class="tab-icon" viewBox="0 0 16 16"><polyline points="2,12 5,9 8,11 11,5 14,7"/><line x1="2" y1="14" x2="14" y2="14"/></svg>
@@ -1942,22 +3684,29 @@
           <span id="sortStatusText"></span>
           <button id="resetSort">Reset to default order</button>
         </div>
+        <div class="attention-banners" id="attentionBanners"></div>
+        <div class="m-scroll-hint" data-hint-for="table">
+          <svg viewBox="0 0 16 16"><polyline points="3,4 6,8 3,12"/><polyline points="9,4 12,8 9,12"/></svg>
+          Swipe to see all columns
+        </div>
         <div class="table-wrap">
           <table class="rates">
             <thead>
               <tr>
-                <th class="sortable" data-sort="product">Product · Tier <span class="sort-icon">↕</span></th>
-                <th class="sortable num" data-sort="avg">Avg Rate <span class="sort-icon">↕</span></th>
-                <th class="sortable num" data-sort="high">High Rate <span class="sort-icon">↕</span></th>
-                <th class="sortable num" data-sort="low">Low Rate <span class="sort-icon">↕</span></th>
-                <th class="sortable num" data-sort="m1">1M Trend <span class="sort-icon">↕</span></th>
-                <th class="sortable num" data-sort="m3">3M Trend <span class="sort-icon">↕</span></th>
-                <th class="sortable num" data-sort="m6">6M Trend <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-sort="product">Product <span class="sort-icon">↕</span></th>
+                <th class="myrates-col num"><span class="th-long">Your Rate</span><span class="th-short">Yours</span></th>
+                <th class="myrates-col"><span class="th-long">Position</span><span class="th-short">Pos</span></th>
+                <th class="sortable num" data-sort="avg"><span class="th-long">Avg Rate</span><span class="th-short">Avg</span> <span class="sort-icon">↕</span></th>
+                <th class="sortable num" data-sort="high"><span class="th-long">High Rate</span><span class="th-short">High</span> <span class="sort-icon">↕</span></th>
+                <th class="sortable num" data-sort="low"><span class="th-long">Low Rate</span><span class="th-short">Low</span> <span class="sort-icon">↕</span></th>
+                <th class="sortable num" data-sort="w1"><span class="th-long">1W Trend</span><span class="th-short">1W</span> <span class="sort-icon">↕</span></th>
+                <th class="sortable num" data-sort="m3"><span class="th-long">3M Trend</span><span class="th-short">3M</span> <span class="sort-icon">↕</span></th>
+                <th class="sortable num" data-sort="m6"><span class="th-long">6M Trend</span><span class="th-short">6M</span> <span class="sort-icon">↕</span></th>
               </tr>
             </thead>
             <tbody id="ratesBody">
               <tr><td colspan="7" style="text-align:center; padding:32px; color:var(--gray-500);">
-                Browse states, MSAs, counties, or cities to view deposit rates.
+                Browse states, MSAs, or counties to view deposit rates.
               </td></tr>
             </tbody>
           </table>
@@ -1968,14 +3717,18 @@
         <section class="heatmap-section">
           <div class="chart-header">
             <div>
-              <h3>Profitability Heatmap</h3>
-              <div class="chart-sub">Each cell scored by spread vs your projected COF. All products and tiers shown regardless of product filter.</div>
+              <h3>Profitability Spread</h3>
+              <div class="chart-sub">Each product scored by spread vs your projected COF. All products shown regardless of product filter.</div>
             </div>
             <div class="heatmap-gradient-bar">
               <span>More profitable</span>
               <span class="grad"></span>
               <span>Less profitable</span>
             </div>
+          </div>
+          <div class="m-scroll-hint" data-hint-for="heatmap">
+            <svg viewBox="0 0 16 16"><polyline points="3,4 6,8 3,12"/><polyline points="9,4 12,8 9,12"/></svg>
+            Swipe to see all tiers
           </div>
           <div class="heatmap-grid-wrap">
             <div class="heatmap-grid" id="heatmapGrid"></div>
@@ -1986,8 +3739,8 @@
         <section class="construction-section">
           <div class="chart-header">
             <div>
-              <h3>Tier Construction · Low → Avg → High</h3>
-              <div class="chart-sub">How rates are constructed across balance tiers for each product. Click a panel to drill in.</div>
+              <h3>Range View · Low → Avg → High</h3>
+              <div class="chart-sub">Pick a group to see how rates sit across its products on a shared rate axis. Low–High shows the regional range; the dot marks the average.</div>
             </div>
             <div class="construction-legend">
               <span class="lg-marker"><span class="lg-bar"></span>Low–High range</span>
@@ -2024,8 +3777,28 @@
 
   <footer class="widget-footer">
     <span>Source: Sample data for prototype only · Not production rates</span>
-    <span>v1.26</span>
+    <span>v1.57</span>
   </footer>
+
+  <!-- ===== Mobile Bottom Nav (≤840px only) ===== -->
+  <nav class="mobile-bottom-nav" role="tablist" aria-label="Content sections">
+    <button class="m-nav-tab active" data-m-panel="table" aria-label="Rates Table">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="3" y1="16" x2="21" y2="16"/><line x1="10" y1="4" x2="10" y2="20"/></svg>
+      <span>Rates</span>
+    </button>
+    <button class="m-nav-tab" data-m-panel="chart" aria-label="Spread View">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="3" x2="12" y2="21" stroke-width="1.5"/><rect x="8" y="5" width="5" height="2.5" rx="0.5"/><rect x="4" y="9" width="8" height="2.5" rx="0.5"/><rect x="12" y="13" width="9" height="2.5" rx="0.5"/><rect x="6" y="17" width="6" height="2.5" rx="0.5"/></svg>
+      <span>Spread</span>
+    </button>
+    <button class="m-nav-tab" data-m-panel="construction" aria-label="Range View">
+      <svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="17" y2="18"/></svg>
+      <span>Range</span>
+    </button>
+    <button class="m-nav-tab" data-m-panel="cof" aria-label="Cost of Funds">
+      <svg viewBox="0 0 24 24"><polyline points="3,17 8,11 13,14 21,5"/><polyline points="15,5 21,5 21,11"/></svg>
+      <span>COF</span>
+    </button>
+  </nav>
 
 </div>
 
@@ -2161,7 +3934,6 @@
               <option value="state">State</option>
               <option value="msa">MSA</option>
               <option value="county">County</option>
-              <option value="city">City</option>
             </select>
           </label>
           <label class="field">
@@ -2206,7 +3978,6 @@
           <button class="finder-chip" data-value="state">States</button>
           <button class="finder-chip" data-value="msa">MSAs</button>
           <button class="finder-chip" data-value="county">Counties</button>
-          <button class="finder-chip" data-value="city">Cities</button>
         </div>
       </div>
       <div class="finder-control-group">
@@ -2294,6 +4065,168 @@
   </div>
 </div>
 
+<!-- ===== My Rates Modal ===== -->
+<div class="settings-overlay" id="myRatesOverlay" role="dialog" aria-labelledby="myRatesTitle" aria-modal="true">
+  <div class="settings-modal" style="max-width: 920px;">
+    <div class="settings-header">
+      <h2 id="myRatesTitle">My Rate Sheet</h2>
+      <button class="settings-close" id="closeMyRates" aria-label="Close">×</button>
+    </div>
+    <div class="settings-body">
+      <p class="myrates-intro">
+        Enter your bank's current deposit rates below to see where you stand against the regional market. <strong>This is optional</strong> — fill in any subset, or leave it blank. When at least one rate is entered, the rates table will show your <strong>Your Rate</strong> and <strong>Position</strong> columns inline.
+      </p>
+      <div class="myrates-attention">
+        <span class="myrates-attention-label">Highlight rows that are:</span>
+        <label class="toggle">
+          <input type="checkbox" id="myRatesHighlightAbove" />
+          <span class="attn-swatch above"></span>
+          Above market (&gt; 10 bps)
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="myRatesHighlightBelow" />
+          <span class="attn-swatch below"></span>
+          Below market (&gt; 10 bps)
+        </label>
+      </div>
+      <div class="myrates-grid-wrap" id="myRatesGridWrap">
+        <!-- Grid table generated by JS -->
+      </div>
+      <div class="myrates-actions">
+        <button class="myrates-clear" id="myRatesClearAll">Clear all entries</button>
+        <div class="myrates-save-group">
+          <button class="myrates-cancel" id="myRatesCancel">Cancel</button>
+          <button class="myrates-save" id="myRatesSave">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PWA Preview Modal ===== -->
+<div class="settings-overlay pwa-preview-overlay" id="pwaPreviewOverlay" role="dialog" aria-labelledby="pwaPreviewTitle" aria-modal="true">
+  <div class="settings-modal pwa-preview-modal" style="max-width: 740px;">
+    <div class="settings-header">
+      <h2 id="pwaPreviewTitle">Preview as an installed app</h2>
+      <div class="pwa-header-actions">
+        <button class="pwa-download-btn" id="pwaDownloadBtn" type="button">
+          <svg viewBox="0 0 16 16" id="pwaDownloadIcon">
+            <line x1="8" y1="2" x2="8" y2="11"/>
+            <polyline points="4,7 8,11 12,7"/>
+            <line x1="2" y1="14" x2="14" y2="14"/>
+          </svg>
+          <span id="pwaDownloadLabel">Download Now</span>
+        </button>
+        <button class="settings-close" id="closePwaPreview" aria-label="Close">×</button>
+      </div>
+    </div>
+    <div class="settings-body pwa-preview-body">
+      <div class="pwa-preview-stage">
+        <div class="pwa-window">
+          <div class="pwa-window-chrome">
+            <div class="pwa-traffic-lights">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <div class="pwa-window-title">Deposit Command</div>
+          </div>
+          <div class="pwa-window-content">
+            <div class="pwa-mock-header">
+              <ion-icon name="wallet"></ion-icon>
+              <span><span class="accent">Deposit</span> Command</span>
+            </div>
+            <div class="pwa-mock-chip">
+              <span>Hillsborough County</span>
+              <span class="geo">County · FL</span>
+            </div>
+            <div class="pwa-mock-heatmap">
+              <div class="hcell header"></div>
+              <div class="hcell header">$10K</div>
+              <div class="hcell header">$25K</div>
+              <div class="hcell header">$50K</div>
+              <div class="hcell header">$100K</div>
+              <div class="hcell header">$250K</div>
+
+              <div class="hcell row-label">Checking</div>
+              <div class="hcell g2">0.25</div>
+              <div class="hcell g2">0.45</div>
+              <div class="hcell g">0.85</div>
+              <div class="hcell g">1.10</div>
+              <div class="hcell g">1.35</div>
+
+              <div class="hcell row-label">Savings</div>
+              <div class="hcell g2">0.50</div>
+              <div class="hcell g">1.20</div>
+              <div class="hcell g">1.65</div>
+              <div class="hcell o">2.10</div>
+              <div class="hcell o">2.35</div>
+
+              <div class="hcell row-label">Money Market</div>
+              <div class="hcell g">1.45</div>
+              <div class="hcell o">2.55</div>
+              <div class="hcell o">3.10</div>
+              <div class="hcell o2">3.65</div>
+              <div class="hcell o2">3.90</div>
+
+              <div class="hcell row-label">CD · 12 Month</div>
+              <div class="hcell o">3.20</div>
+              <div class="hcell o2">3.45</div>
+              <div class="hcell o2">3.65</div>
+              <div class="hcell r">3.80</div>
+              <div class="hcell r">3.95</div>
+
+              <div class="hcell row-label">CD · 36 Month</div>
+              <div class="hcell o2">3.55</div>
+              <div class="hcell r">3.75</div>
+              <div class="hcell r">3.90</div>
+              <div class="hcell r2">4.05</div>
+              <div class="hcell r2">4.20</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pwa-notification">
+          <div class="pwa-notif-icon">
+            <ion-icon name="wallet"></ion-icon>
+          </div>
+          <div class="pwa-notif-body">
+            <div class="pwa-notif-row">
+              <span class="pwa-notif-app">Deposit Command</span>
+              <span class="pwa-notif-time">now</span>
+            </div>
+            <div class="pwa-notif-title">Rate movement in your footprint</div>
+            <div class="pwa-notif-text">12-mo CDs in Hillsborough County moved +20 bps. 3 new acquisition opportunities.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Notification Center ===== -->
+<div class="notif-backdrop" id="notifBackdrop" aria-hidden="true"></div>
+<aside class="notif-panel" id="notifPanel" role="dialog" aria-label="Notifications" aria-modal="false">
+  <div class="notif-panel-header">
+    <h3 class="notif-panel-title">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--navy)">
+        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+      </svg>
+      Notifications
+    </h3>
+    <button class="notif-mark-read" id="notifMarkAll">Mark all read</button>
+  </div>
+  <div class="notif-list" id="notifList"></div>
+  <div class="notif-panel-footer">
+    <button class="notif-settings-link" id="notifSettingsLink">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Notification preferences
+    </button>
+  </div>
+</aside>
+
 <script>
 /* =====================================================================
    Data definitions
@@ -2362,9 +4295,20 @@ const CITIES = [
 const GEO_CONFIG = {
   state:  { list: STATES,   label: "State",  placeholder: "Search states…",   countRange: [60, 380] },
   msa:    { list: MSAS,     label: "MSA",    placeholder: "Search MSAs…",     countRange: [25, 110] },
-  county: { list: COUNTIES, label: "County", placeholder: "Search counties…", countRange: [10, 60]  },
-  city:   { list: CITIES,   label: "City",   placeholder: "Search cities…",   countRange: [4, 28]   }
+  county: { list: COUNTIES, label: "County", placeholder: "Search counties…", countRange: [10, 60]  }
 };
+
+// Lookup helper: state name → two-letter abbreviation (for filtering MSAs/Counties)
+const _stateAbbrByName = Object.fromEntries(STATES.map(([n, a]) => [n, a]));
+function stateAbbr(name) { return _stateAbbrByName[name] || null; }
+
+// The 10 states selectable in the MSA/County scope dropdown.
+// Currently anchored to SouthState Correspondent's footprint + adjacent markets.
+// To change: edit this list. The dropdown rebuilds from it on every render.
+const MSA_COUNTY_STATES = [
+  "Alabama", "Florida", "Georgia", "Kentucky", "Mississippi",
+  "North Carolina", "South Carolina", "Tennessee", "Texas", "Virginia"
+];
 
 /* =====================================================================
    Yield Curve Curve  ·  HARDCODED SNAPSHOT
@@ -2418,18 +4362,24 @@ function getProjectedCOF(months, currentCOF, betaPct) {
   return getProjectedCOFAt(months, currentCOF, betaPct, lag);
 }
 
-/* Product family classification — drives per-family benchmarks. */
+/* Product family classification — drives per-family benchmarks.
+   Returns 'liquid' | 'shortCd' | 'longCd' | null. */
 function getProductFamily(productKey) {
-  if (productKey === 'checking' || productKey === 'savings' || productKey === 'mm') return 'liquid';
-  if (productKey === 'cd03' || productKey === 'cd06' || productKey === 'cd12') return 'shortCd';
-  return 'longCd';  // cd18, cd24, cd36, cd48, cd60
+  const p = ALL_PRODUCTS.find(p => p.key === productKey);
+  return p ? p.family : null;
+}
+
+/* Product tenor in months (1 for liquid). Returns null for unknown keys. */
+function getProductTenor(productKey) {
+  const p = ALL_PRODUCTS.find(p => p.key === productKey);
+  return p ? p.tenor : null;
 }
 
 /* The actual benchmark a market rate is scored against, per product.
    - Liquid: projected COF (the bank's blended funding cost)
    - CDs: projected COF + family premium, OR matched-tenor yield curve + spread (override) */
 function getProductBenchmark(productKey) {
-  const months = PRODUCT_TENORS[productKey];
+  const months = getProductTenor(productKey);
   if (months == null) return null;
   const family = getProductFamily(productKey);
   if (family === 'liquid') {
@@ -2445,14 +4395,6 @@ function getProductBenchmark(productKey) {
   return getProjectedCOF(months, state.lens.cof, state.lens.beta) + premium;
 }
 
-/* Map each deposit product to its effective tenor (months) for COF lookup.
-   Liquid accounts have no contractual maturity — anchor to 1M short end. */
-const PRODUCT_TENORS = {
-  checking: 1, savings: 1, mm: 1,
-  cd03: 3, cd06: 6, cd12: 12,
-  cd18: 18, cd24: 24, cd36: 36, cd48: 48, cd60: 60
-};
-
 /* Profitability bucket. spread = market rate - projected COF (in %).
    Thresholds are user-customizable in Settings (state.lens.greenMax / orangeMax). */
 function getProfitabilityClass(marketRate, productKey) {
@@ -2465,58 +4407,83 @@ function getProfitabilityClass(marketRate, productKey) {
   return 'profit-red';
 }
 
+/* =====================================================================
+   Product menu — flat list of 37 products across 5 categories.
+   Each product carries its own tenor (months), family (drives benchmark
+   selection in the Profitability Lens), and base rate. Balance tier is
+   baked into the product label rather than a separate dimension.
+   ===================================================================== */
 const PRODUCT_GROUPS = [
-  { label: "Liquid Accounts", color: "#0960BB", products: [
-    { key: "checking", label: "Interest Checking", base: 0.20 },
-    { key: "savings",  label: "Savings",           base: 0.45 },
-    { key: "mm",       label: "Money Market",      base: 0.95 }
+  { label: "Time Deposit", color: "#0960BB", products: [
+    { key: "td_1m",  label: "1 Mo CD - $10k",  tenor: 1,  family: 'shortCd', base: 2.45 },
+    { key: "td_3m",  label: "3 Mo CD - $10k",  tenor: 3,  family: 'shortCd', base: 2.75 },
+    { key: "td_6m",  label: "6 Mo CD - $10k",  tenor: 6,  family: 'shortCd', base: 3.05 },
+    { key: "td_9m",  label: "9 Mo CD - $10k",  tenor: 9,  family: 'shortCd', base: 3.25 },
+    { key: "td_12m", label: "1 Yr CD - $10k",  tenor: 12, family: 'shortCd', base: 3.45 },
+    { key: "td_18m", label: "18 Mo CD - $10k", tenor: 18, family: 'longCd',  base: 3.35 },
+    { key: "td_24m", label: "2 Yr CD - $10k",  tenor: 24, family: 'longCd',  base: 3.25 },
+    { key: "td_30m", label: "30 Mo CD - $10k", tenor: 30, family: 'longCd',  base: 3.20 },
+    { key: "td_36m", label: "3 Yr CD - $10k",  tenor: 36, family: 'longCd',  base: 3.15 },
+    { key: "td_48m", label: "4 Yr CD - $10k",  tenor: 48, family: 'longCd',  base: 3.10 },
+    { key: "td_60m", label: "5 Yr CD - $10k",  tenor: 60, family: 'longCd',  base: 3.10 }
   ]},
-  { label: "Short-Term CDs", color: "#FFBF3F", products: [
-    { key: "cd03", label: "CD · 3 Month",  base: 2.65 },
-    { key: "cd06", label: "CD · 6 Month",  base: 3.05 },
-    { key: "cd12", label: "CD · 12 Month", base: 3.45 }
+  { label: "Jumbo Time Deposit", color: "#FFBF3F", products: [
+    { key: "jtd_1m",  label: "1 Mo CD - $100k",  tenor: 1,  family: 'shortCd', base: 2.55 },
+    { key: "jtd_3m",  label: "3 Mo CD - $100k",  tenor: 3,  family: 'shortCd', base: 2.85 },
+    { key: "jtd_6m",  label: "6 Mo CD - $100k",  tenor: 6,  family: 'shortCd', base: 3.15 },
+    { key: "jtd_9m",  label: "9 Mo CD - $100k",  tenor: 9,  family: 'shortCd', base: 3.35 },
+    { key: "jtd_12m", label: "1 Yr CD - $100k",  tenor: 12, family: 'shortCd', base: 3.55 },
+    { key: "jtd_18m", label: "18 Mo CD - $100k", tenor: 18, family: 'longCd',  base: 3.45 },
+    { key: "jtd_24m", label: "2 Yr CD - $100k",  tenor: 24, family: 'longCd',  base: 3.35 },
+    { key: "jtd_30m", label: "30 Mo CD - $100k", tenor: 30, family: 'longCd',  base: 3.30 },
+    { key: "jtd_36m", label: "3 Yr CD - $100k",  tenor: 36, family: 'longCd',  base: 3.25 },
+    { key: "jtd_48m", label: "4 Yr CD - $100k",  tenor: 48, family: 'longCd',  base: 3.20 },
+    { key: "jtd_60m", label: "5 Yr CD - $100k",  tenor: 60, family: 'longCd',  base: 3.20 }
   ]},
-  { label: "Long-Term CDs", color: "#002D72", products: [
-    { key: "cd18", label: "CD · 18 Month", base: 3.30 },
-    { key: "cd24", label: "CD · 24 Month", base: 3.25 },
-    { key: "cd36", label: "CD · 36 Month", base: 3.15 },
-    { key: "cd48", label: "CD · 48 Month", base: 3.10 },
-    { key: "cd60", label: "CD · 60 Month", base: 3.10 }
+  { label: "Checking", color: "#0960BB", products: [
+    { key: "ic_25",   label: "Interest Checking - $2.5k", tenor: 1, family: 'liquid', base: 0.20 }
+  ]},
+  { label: "Money Market", color: "#0960BB", products: [
+    { key: "mm_25",    label: "Money Market - $2.5k",  tenor: 1, family: 'liquid', base: 0.50 },
+    { key: "mm_10k",   label: "Money Market - $10k",   tenor: 1, family: 'liquid', base: 0.75 },
+    { key: "mm_25k",   label: "Money Market - $25k",   tenor: 1, family: 'liquid', base: 1.00 },
+    { key: "mm_50k",   label: "Money Market - $50k",   tenor: 1, family: 'liquid', base: 1.25 },
+    { key: "mm_100k",  label: "Money Market - $100k",  tenor: 1, family: 'liquid', base: 1.50 },
+    { key: "mm_250k",  label: "Money Market - $250k",  tenor: 1, family: 'liquid', base: 1.75 },
+    { key: "pmm_10k",  label: "Premium MMKT - $10k",   tenor: 1, family: 'liquid', base: 0.95 },
+    { key: "pmm_25k",  label: "Premium MMKT - $25k",   tenor: 1, family: 'liquid', base: 1.20 },
+    { key: "pmm_50k",  label: "Premium MMKT - $50k",   tenor: 1, family: 'liquid', base: 1.45 },
+    { key: "pmm_100k", label: "Premium MMKT - $100k",  tenor: 1, family: 'liquid', base: 1.70 },
+    { key: "pmm_250k", label: "Premium MMKT - $250k",  tenor: 1, family: 'liquid', base: 1.95 }
+  ]},
+  { label: "Savings", color: "#0960BB", products: [
+    { key: "sav_25",    label: "Regular Savings - $2.5k",   tenor: 1,  family: 'liquid',  base: 0.45 },
+    { key: "ira_l_10k", label: "Liquid IRA Account - $10k", tenor: 1,  family: 'liquid',  base: 0.65 },
+    { key: "ira_1y",    label: "1 Yr Fixed IRA - $10k",     tenor: 12, family: 'shortCd', base: 3.40 }
   ]}
 ];
+
 const ALL_PRODUCTS = PRODUCT_GROUPS.flatMap(g =>
   g.products.map(p => ({ ...p, group: g.label, color: g.color }))
 );
 
-const TIERS = [
-  { key: "u10",   label: "< $10K",    multiplier: 0.92, size: 5  },
-  { key: "t10",   label: "$10K+",     multiplier: 0.97, size: 7  },
-  { key: "t25",   label: "$25K+",     multiplier: 1.00, size: 9  },
-  { key: "t50",   label: "$50K+",     multiplier: 1.04, size: 11 },
-  { key: "t100",  label: "$100K+",    multiplier: 1.08, size: 14 },
-  { key: "t250",  label: "$250K+",    multiplier: 1.12, size: 17 }
-];
-
-// Natural-order indexes used as sort tie-breakers and for the "product" sort
+// Natural-order index used as the default product sort
 const PRODUCT_ORDER = {};
 ALL_PRODUCTS.forEach((p, i) => { PRODUCT_ORDER[p.key] = i; });
-const TIER_ORDER = {};
-TIERS.forEach((t, i) => { TIER_ORDER[t.key] = i; });
 
-// Sort key extractors. "product" is composite natural order.
+// Sort key extractors. "product" is natural product-menu order.
 const SORT_KEYS = {
-  product: r => PRODUCT_ORDER[r.productKey] * 100 + TIER_ORDER[r.tierKey],
+  product: r => PRODUCT_ORDER[r.productKey],
   avg:     r => r.avg,
   high:    r => r.high,
   low:     r => r.low,
-  m1:      r => r.m1,
+  w1:      r => r.w1,
   m3:      r => r.m3,
   m6:      r => r.m6
 };
 const SORT_COLUMN_LABELS = {
-  product: 'Product · Tier',
-  avg: 'Avg Rate', high: 'High Rate', low: 'Low Rate',
-  m1: '1M Trend', m3: '3M Trend', m6: '6M Trend'
+  product: 'Product', avg: 'Avg Rate', high: 'High Rate', low: 'Low Rate',
+  w1: '1W Trend', m3: '3M Trend', m6: '6M Trend'
 };
 
 function sortRows(rows, column, direction) {
@@ -2527,6 +4494,53 @@ function sortRows(rows, column, direction) {
     return direction === 'asc' ? cmp : -cmp;
   });
   return sorted;
+}
+
+/* ---------- My Rates helpers ----------
+   When state.myRates has any entries, the rates table sprouts two extra
+   columns. These helpers are tolerant — every row may or may not have a
+   personal rate. The key is just productKey now (no tier dimension). */
+function myRateKey(productKey) { return productKey; }
+function getMyRate(productKey) {
+  const v = state.myRates[productKey];
+  return (typeof v === 'number' && !isNaN(v)) ? v : null;
+}
+function hasAnyMyRates() {
+  for (const k in state.myRates) {
+    if (typeof state.myRates[k] === 'number' && !isNaN(state.myRates[k])) return true;
+  }
+  return false;
+}
+/* Estimate percentile from the row's avg / high / low.
+   Below avg: linear from low (0) to avg (50). Above avg: avg (50) to high (100).
+   Clamped 0..100. */
+function estimatePercentile(rate, avg, high, low) {
+  if (rate <= low) return 0;
+  if (rate >= high) return 100;
+  if (rate < avg) return Math.round(((rate - low) / (avg - low)) * 50);
+  return Math.round(50 + ((rate - avg) / (high - avg)) * 50);
+}
+
+/* "Above/Below market" thresholds and detection.
+   Each direction is independent — both can be toggled on/off via
+   state.attention. Symmetric default of 10 bps keeps the math simple. */
+const ABOVE_MARKET_THRESHOLD_BPS = 10;
+const BELOW_MARKET_THRESHOLD_BPS = 10;
+
+function rowAboveMarketBps(row) {
+  const myr = getMyRate(row.productKey);
+  if (myr === null) return null;
+  return Math.round((myr - row.avg) * 100);
+}
+function isRowAboveMarket(row) {
+  if (!state.attention.highlightAbove) return false;
+  const bps = rowAboveMarketBps(row);
+  return bps !== null && bps > ABOVE_MARKET_THRESHOLD_BPS;
+}
+function isRowBelowMarket(row) {
+  if (!state.attention.highlightBelow) return false;
+  const bps = rowAboveMarketBps(row);
+  return bps !== null && bps < -BELOW_MARKET_THRESHOLD_BPS;
 }
 
 /* =====================================================================
@@ -2547,27 +4561,23 @@ function generateLocationData(locationName, geo = 'state') {
   const rows = [];
   for (const group of PRODUCT_GROUPS) {
     for (const p of group.products) {
-      for (const tier of TIERS) {
-        const noise = (rng() - 0.5) * 0.25;
-        const avg = Math.max(0.02, (p.base + stateBias + noise) * tier.multiplier);
-        const high = avg * (1.8 + rng() * 0.9);
-        const low  = avg * (0.20 + rng() * 0.25);
-        // Trend bps — current environment, mildly negative bias
-        const m1 = Math.round((rng() - 0.55) * 18);
-        const m3 = Math.round((rng() - 0.55) * 38) + Math.round(m1 * 0.5);
-        const m6 = Math.round((rng() - 0.55) * 70) + Math.round(m3 * 0.5);
+      const noise = (rng() - 0.5) * 0.25;
+      const avg = Math.max(0.02, p.base + stateBias + noise);
+      const high = avg * (1.8 + rng() * 0.9);
+      const low  = avg * (0.20 + rng() * 0.25);
+      // Trend bps — current environment, mildly negative bias.
+      // 1W trend has a tighter range than 3M/6M (less time for the rate to move).
+      const w1 = Math.round((rng() - 0.55) * 6);
+      const m3 = Math.round((rng() - 0.55) * 38);
+      const m6 = Math.round((rng() - 0.55) * 70) + Math.round(m3 * 0.5);
 
-        rows.push({
-          group: group.label,
-          groupColor: group.color,
-          productKey: p.key,
-          productLabel: p.label,
-          tierKey: tier.key,
-          tierLabel: tier.label,
-          tierSize: tier.size,
-          avg, high, low, m1, m3, m6
-        });
-      }
+      rows.push({
+        group: group.label,
+        groupColor: group.color,
+        productKey: p.key,
+        productLabel: p.label,
+        avg, high, low, w1, m3, m6
+      });
     }
   }
   return { instCount, instPct, rows };
@@ -2579,6 +4589,10 @@ function generateLocationData(locationName, geo = 'state') {
 const state = {
   geo: 'state',                  // 'state' | 'msa' | 'county'
   selectedState: null,           // currently selected location name (any geo)
+  // Parent US state scoping MSA/County tabs. Set when user picks a state on
+  // the State tab; persists across geo switches. MSA/County tabs require this
+  // to be non-null (otherwise they display a "choose a state first" prompt).
+  contextState: null,
   expandedStates: new Set(),     // expanded location names (any geo)
   selectedProduct: null,         // e.g. "cd12" — filters table + chart to this product
   data: null,
@@ -2609,9 +4623,22 @@ const state = {
   visibleLocations: {
     state:  new Set(),
     msa:    new Set(),
-    county: new Set(),
-    city:   new Set()
-  }
+    county: new Set()
+  },
+  // OPTIONAL: user's own deposit rates, keyed by `${productKey}:${tierKey}`.
+  // Empty = feature off (widget behaves as before). One+ entries = feature on,
+  // rates table sprouts Your Rate + Position columns inline.
+  myRates: {},
+  // Attention highlighting toggles — independently control above/below treatment.
+  // When both are off, no extra emphasis is applied beyond the Position column.
+  attention: {
+    highlightAbove: true,
+    highlightBelow: true
+  },
+  // Session-only filters — when true, the rates table filters to flagged rows.
+  // Not persisted; each load shows the full picture first.
+  filterAboveMarket: false,
+  filterBelowMarket: false
 };
 
 /* =====================================================================
@@ -2628,15 +4655,33 @@ function loadSettings() {
     if (s.benchmarks) Object.assign(state.benchmarks, s.benchmarks);
     if (typeof s.sidebarOpen === 'boolean') state.sidebarOpen = s.sidebarOpen;
     if (s.defaults && typeof s.defaults === 'object') {
-      state.defaults.geo      = s.defaults.geo || null;
-      state.defaults.location = s.defaults.location || null;
+      // Migration: legacy 'city' default is no longer supported — silently drop
+      const validGeo = (s.defaults.geo === 'state' || s.defaults.geo === 'msa' || s.defaults.geo === 'county');
+      state.defaults.geo      = validGeo ? s.defaults.geo : null;
+      state.defaults.location = validGeo ? (s.defaults.location || null) : null;
     }
     if (s.visibleLocations) {
-      ['state','msa','county','city'].forEach(g => {
+      ['state','msa','county'].forEach(g => {
         if (Array.isArray(s.visibleLocations[g])) {
           state.visibleLocations[g] = new Set(s.visibleLocations[g]);
         }
       });
+    }
+    if (s.myRates && typeof s.myRates === 'object') {
+      // Migration: legacy keys had the form `${productKey}:${tierKey}`. The new
+      // model has no tier dimension; we drop any colon-suffixed keys silently.
+      const validKeys = new Set(ALL_PRODUCTS.map(p => p.key));
+      const cleaned = {};
+      for (const k in s.myRates) {
+        if (validKeys.has(k) && typeof s.myRates[k] === 'number' && !isNaN(s.myRates[k])) {
+          cleaned[k] = s.myRates[k];
+        }
+      }
+      state.myRates = cleaned;
+    }
+    if (s.attention && typeof s.attention === 'object') {
+      if (typeof s.attention.highlightAbove === 'boolean') state.attention.highlightAbove = s.attention.highlightAbove;
+      if (typeof s.attention.highlightBelow === 'boolean') state.attention.highlightBelow = s.attention.highlightBelow;
     }
   } catch (e) { /* ignore */ }
 }
@@ -2651,9 +4696,10 @@ function saveSettings() {
       visibleLocations: {
         state:  Array.from(state.visibleLocations.state),
         msa:    Array.from(state.visibleLocations.msa),
-        county: Array.from(state.visibleLocations.county),
-        city:   Array.from(state.visibleLocations.city)
-      }
+        county: Array.from(state.visibleLocations.county)
+      },
+      myRates: state.myRates,
+      attention: state.attention
     }));
   } catch (e) { /* ignore */ }
 }
@@ -2670,14 +4716,28 @@ function renderSidebar(filterText="") {
   const allItems = GEO_CONFIG[state.geo].list;
   const visibleSet = state.visibleLocations[state.geo];
   const useFilter = visibleSet && visibleSet.size > 0;
-  const items = allItems.filter(([name]) => !useFilter || visibleSet.has(name));
+
+  // Scope MSA/County items to the parent state context (set via dropdown)
+  const needsContext = (state.geo === 'msa' || state.geo === 'county');
+  let scopedItems = allItems;
+  if (needsContext && state.contextState) {
+    const abbr = stateAbbr(state.contextState);
+    scopedItems = allItems.filter(([, a]) => a === abbr);
+  }
+
+  const items = scopedItems.filter(([name]) => !useFilter || visibleSet.has(name));
 
   if (items.length === 0) {
     const msg = document.createElement('div');
     msg.className = 'sidebar-empty';
-    msg.innerHTML = `No ${GEO_CONFIG[state.geo].label.toLowerCase()}s visible.<br/><button id="emptyOpenSettings">Open settings</button> to choose locations.`;
-    list.appendChild(msg);
-    el('emptyOpenSettings').addEventListener('click', openSettings);
+    if (needsContext && state.contextState && scopedItems.length === 0) {
+      msg.innerHTML = `No ${GEO_CONFIG[state.geo].label}s available for <strong>${state.contextState}</strong>.<br/>Pick a different state from the dropdown above.`;
+      list.appendChild(msg);
+    } else {
+      msg.innerHTML = `No ${GEO_CONFIG[state.geo].label.toLowerCase()}s visible.<br/><button id="emptyOpenSettings">Open settings</button> to choose locations.`;
+      list.appendChild(msg);
+      el('emptyOpenSettings').addEventListener('click', openSettings);
+    }
     return;
   }
 
@@ -2715,7 +4775,7 @@ function renderSidebar(filterText="") {
         sub.appendChild(gh);
 
         for (const p of group.products) {
-          const r = data.rows.find(r => r.productKey === p.key && r.tierKey === 't25');
+          const r = data.rows.find(r => r.productKey === p.key);
           const si = document.createElement('div');
           si.className = 'sub-item';
           if (state.selectedState === name && state.selectedProduct === p.key) si.classList.add('selected');
@@ -2741,7 +4801,7 @@ function renderMain() {
     el('filterTag').innerHTML = '';
     el('instPct').textContent = '—';
     el('ratesBody').innerHTML = `<tr><td colspan="7" style="text-align:center; padding:36px 24px; color:var(--gray-500);">
-      Browse states, MSAs, counties, or cities to view deposit rates.<br/>
+      Browse states, MSAs, or counties to view deposit rates.<br/>
       <button id="emptyStateOpenSidebar" style="margin-top:14px; background:var(--navy); color:var(--white); border:none; padding:9px 18px; border-radius:4px; font-family:var(--font); font-size:13px; font-weight:500; cursor:pointer;">Find a location</button>
     </td></tr>`;
     // Wire the inline button — opens the sidebar
@@ -2750,11 +4810,19 @@ function renderMain() {
     el('heatmapGrid').innerHTML = '';
     el('constructionGrid').innerHTML = '';
     renderCOF();
+    if (typeof updateMobileLocChip === 'function') updateMobileLocChip();
     return;
   }
 
   breadcrumb.style.display = '';
   breadcrumb.textContent = geoLabel;
+  // Safety net: if selectedState is set but data is missing, regenerate it
+  // rather than crashing on data.instPct below. This shouldn't normally fire
+  // — the caller sites that change selectedState are responsible for
+  // generating data — but defends against any path we miss.
+  if (!state.data) {
+    state.data = generateLocationData(state.selectedState, state.geo);
+  }
   const data = state.data;
   el('locationName').textContent = state.selectedState;
 
@@ -2772,6 +4840,7 @@ function renderMain() {
   renderHeatmap();
   renderConstruction();
   renderCOF();
+  if (typeof updateMobileLocChip === 'function') updateMobileLocChip();
   postResize();
 }
 
@@ -2779,13 +4848,43 @@ function buildRateRow(r) {
   const profClass = getProfitabilityClass(r.avg, r.productKey);
   const tr = document.createElement('tr');
   tr.setAttribute('data-product', r.productKey);
-  tr.setAttribute('data-tier', r.tierKey);
+
+  // Optional My Rates cells — always rendered with .myrates-col so CSS controls visibility
+  const myr = getMyRate(r.productKey);
+  let yourRateCell, posCell;
+  if (myr !== null) {
+    yourRateCell = `<td class="myrates-col rate-cell yourrate-cell">${myr.toFixed(2)}%</td>`;
+    const pct = Math.max(0, Math.min(100, ((myr - r.low) / (r.high - r.low)) * 100));
+    const bps = Math.round((myr - r.avg) * 100);
+    const absBps = Math.abs(bps);
+    const posClass = bps > 5 ? 'above-avg' : (bps < -5 ? 'below-avg' : 'at-avg');
+    const sign = bps > 0 ? '+' : (bps < 0 ? '−' : '');
+    const text = (absBps < 1) ? 'at avg' : `${sign}${absBps}bp`;
+    posCell = `<td class="myrates-col position-cell">
+      <span class="pos-bar"><span class="pos-marker" style="left:${pct}%;"></span></span>
+      <span class="pos-text ${posClass}">${text}</span>
+    </td>`;
+    // Flag the row when your rate is meaningfully off-market (in either direction).
+    // Each direction is gated by its own toggle in state.attention so the user
+    // can enable / disable independently.
+    if (state.attention.highlightAbove && bps > ABOVE_MARKET_THRESHOLD_BPS) {
+      tr.classList.add('above-market');
+    } else if (state.attention.highlightBelow && bps < -BELOW_MARKET_THRESHOLD_BPS) {
+      tr.classList.add('below-market');
+    }
+  } else {
+    yourRateCell = `<td class="myrates-col yourrate-cell empty">—</td>`;
+    posCell      = `<td class="myrates-col"><span class="pos-cell-empty">—</span></td>`;
+  }
+
   tr.innerHTML = `
-    <td>${r.productLabel} · <span style="color:var(--gray-500);">${r.tierLabel}</span></td>
+    <td>${r.productLabel}</td>
+    ${yourRateCell}
+    ${posCell}
     <td class="rate-cell ${profClass}">${r.avg.toFixed(2)}%</td>
     <td class="rate-cell high">${r.high.toFixed(2)}%</td>
     <td class="rate-cell low">${r.low.toFixed(2)}%</td>
-    <td>${trendCell(r.m1)}</td>
+    <td>${trendCell(r.w1)}</td>
     <td>${trendCell(r.m3)}</td>
     <td>${trendCell(r.m6)}</td>
   `;
@@ -2796,10 +4895,80 @@ function buildRateRow(r) {
 // Only animate on a fresh load (location/geo change), not on sort/filter/lens tweaks.
 let _lastRenderedLocation = null;
 
+/* Render zero, one, or two "attention" banners above the rates table.
+   Above-market and below-market are independent — visibility per direction
+   depends on its toggle (state.attention.*) AND on whether any flagged rows
+   exist after the user's selected location is loaded. */
+function renderAttentionBanners(aboveCount, belowCount) {
+  const wrap = el('attentionBanners');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  if (!hasAnyMyRates()) return;
+
+  if (state.attention.highlightAbove && aboveCount > 0) {
+    const filtering = state.filterAboveMarket;
+    const plural = aboveCount === 1 ? 'rate' : 'rates';
+    const div = document.createElement('div');
+    div.className = 'above-market-banner';
+    div.innerHTML = `
+      <svg class="amb-icon" viewBox="0 0 24 24">
+        <path d="M12 2 L22 20 L2 20 Z"/>
+        <line x1="12" y1="9" x2="12" y2="14"/>
+        <circle cx="12" cy="17.5" r="0.6" fill="#b45309" stroke="none"/>
+      </svg>
+      <div class="above-market-banner-text">
+        <strong>${aboveCount}</strong> ${plural} priced above market average
+        <span class="amb-detail">by more than ${ABOVE_MARKET_THRESHOLD_BPS} bps</span>
+      </div>
+      <button class="above-market-banner-action ${filtering ? 'active' : ''}" type="button" data-dir="above">
+        ${filtering ? 'Show all rates' : 'Show only these'}
+      </button>
+    `;
+    div.querySelector('button').addEventListener('click', () => {
+      state.filterAboveMarket = !state.filterAboveMarket;
+      if (state.filterAboveMarket) state.filterBelowMarket = false;   // mutually exclusive filters
+      renderTable();
+    });
+    wrap.appendChild(div);
+  }
+
+  if (state.attention.highlightBelow && belowCount > 0) {
+    const filtering = state.filterBelowMarket;
+    const plural = belowCount === 1 ? 'rate' : 'rates';
+    const div = document.createElement('div');
+    div.className = 'above-market-banner below-variant';
+    div.innerHTML = `
+      <svg class="amb-icon" viewBox="0 0 24 24">
+        <line x1="12" y1="4" x2="12" y2="19"/>
+        <polyline points="6,13 12,19 18,13"/>
+      </svg>
+      <div class="above-market-banner-text">
+        <strong>${belowCount}</strong> ${plural} priced below market average
+        <span class="amb-detail">by more than ${BELOW_MARKET_THRESHOLD_BPS} bps — possible attrition risk</span>
+      </div>
+      <button class="above-market-banner-action ${filtering ? 'active' : ''}" type="button" data-dir="below">
+        ${filtering ? 'Show all rates' : 'Show only these'}
+      </button>
+    `;
+    div.querySelector('button').addEventListener('click', () => {
+      state.filterBelowMarket = !state.filterBelowMarket;
+      if (state.filterBelowMarket) state.filterAboveMarket = false;
+      renderTable();
+    });
+    wrap.appendChild(div);
+  }
+}
+
 function renderTable() {
   const data = state.data;
   const tbody = el('ratesBody');
   tbody.innerHTML = '';
+
+  // Toggle the My Rates columns on/off based on whether any rates are entered
+  const table = document.querySelector('table.rates');
+  const myRatesActive = hasAnyMyRates();
+  if (table) table.classList.toggle('has-myrates', myRatesActive);
+  const colCount = myRatesActive ? 9 : 7;
 
   // Toggle the load animation only when the underlying location actually changed
   const animateNew = state.selectedState !== _lastRenderedLocation;
@@ -2808,6 +4977,23 @@ function renderTable() {
 
   const filterProduct = state.selectedProduct;
   let rows = data.rows.filter(r => !filterProduct || r.productKey === filterProduct);
+
+  // Count flagged rows in each direction BEFORE applying the filter
+  const aboveMarketRows = rows.filter(isRowAboveMarket);
+  const belowMarketRows = rows.filter(isRowBelowMarket);
+  const aboveCount = aboveMarketRows.length;
+  const belowCount = belowMarketRows.length;
+
+  // Apply the active filter if any (filters are mutually exclusive)
+  if (state.filterAboveMarket && aboveCount > 0) {
+    rows = aboveMarketRows;
+  } else if (state.filterBelowMarket && belowCount > 0) {
+    rows = belowMarketRows;
+  }
+
+  // Update banner(s)
+  renderAttentionBanners(aboveCount, belowCount);
+
   let rowIdx = 0;
 
   if (state.tableSort.column) {
@@ -2826,7 +5012,7 @@ function renderTable() {
       const gh = document.createElement('tr');
       gh.className = 'product-header';
       gh.style.setProperty('--row-i', rowIdx++);
-      gh.innerHTML = `<td colspan="7">${group.label}</td>`;
+      gh.innerHTML = `<td colspan="${colCount}"><span class="product-header-label">${group.label}</span></td>`;
       tbody.appendChild(gh);
       groupRows.forEach(r => {
         const tr = buildRateRow(r);
@@ -2874,8 +5060,10 @@ function trendCell(bps) {
 }
 
 /* =====================================================================
-   Profitability Heatmap — 11 products × 6 tiers, colored by spread
-   vs projected COF. Continuous gradient respects user's lens thresholds.
+   Profitability — horizontal spread bars per product, vs projected COF.
+   Each row shows the spread (in bps) as a centered bar that extends
+   left (green / below benchmark) or right (red / above benchmark).
+   Sortable by group order (default), worst spread first, or best first.
    ===================================================================== */
 function hexToRgb(h) {
   const v = h.replace('#', '');
@@ -2888,20 +5076,23 @@ function lerpColor(c1, c2, t) {
 function heatmapColor(spread) {
   const { greenMax, orangeMax } = state.lens;
   if (spread <= greenMax) {
-    // Green band — deeper saturation the further below greenMax (capped at 200 bps below)
     const t = Math.min(1, Math.max(0, (greenMax - spread) / 2));
     return lerpColor('#e8f4ed', '#5fa380', t);
   } else if (spread <= orangeMax) {
-    // Orange band — deeper closer to orangeMax
     const range = Math.max(0.01, orangeMax - greenMax);
     const t = (spread - greenMax) / range;
     return lerpColor('#fff3e0', '#f0a868', t);
   } else {
-    // Red band — deeper the further above orangeMax (capped at 150 bps above)
     const t = Math.min(1, (spread - orangeMax) / 1.5);
     return lerpColor('#fceae8', '#e89289', t);
   }
 }
+
+// Sort modes for the spread view. 'group' = natural product-menu order with
+// section headers; 'worst' = highest spread first (least profitable); 'best'
+// = lowest spread first (most profitable for the bank).
+const SPREAD_SORT_MODES = ['group', 'worst', 'best'];
+const SPREAD_SORT_LABELS = { group: 'By group', worst: 'Worst spread', best: 'Best spread' };
 
 function renderHeatmap() {
   const data = state.data;
@@ -2909,100 +5100,158 @@ function renderHeatmap() {
   if (!data) { grid.innerHTML = ''; return; }
 
   const lensOn = state.lens.enabled;
-  let html = '';
+  const sortMode = state.spreadSort || 'group';
 
-  // Corner + tier column headers
-  html += '<div class="hm-cell hm-corner"></div>';
-  TIERS.forEach(tier => {
-    html += `<div class="hm-cell hm-col-header">${tier.label}</div>`;
+  // Compute spreads for every row in one pass
+  const enriched = data.rows.map(r => {
+    const benchmark = getProductBenchmark(r.productKey);
+    const spread = r.avg - (benchmark || 0);
+    return { r, benchmark, spread, spreadBps: Math.round(spread * 100) };
   });
 
-  // One row per product
-  ALL_PRODUCTS.forEach(p => {
-    html += `<div class="hm-cell hm-row-header">
-      <span class="product-group-dot" style="background:${p.color};"></span>
-      ${p.label}
-    </div>`;
+  // Max absolute spread sets the bar scale (cap at 200 bps so outliers don't
+  // squash everyone else; anything beyond saturates visually)
+  const maxAbsBps = Math.min(200, Math.max(40, ...enriched.map(e => Math.abs(e.spreadBps))));
 
-    TIERS.forEach(tier => {
-      const r = data.rows.find(r => r.productKey === p.key && r.tierKey === tier.key);
-      const benchmark = getProductBenchmark(p.key);
-      const spread = r.avg - benchmark;
-      const spreadBps = Math.round(spread * 100);
-      const bg = lensOn ? heatmapColor(spread) : '';
-      const title = `${p.label} · ${tier.label}\nRate: ${r.avg.toFixed(2)}%\nBenchmark: ${benchmark.toFixed(2)}%\nSpread: ${spread >= 0 ? '+' : ''}${spreadBps} bps`;
-      const cellClass = lensOn ? 'hm-data' : 'hm-data no-lens';
-      const styleAttr = bg ? ` style="background:${bg};"` : '';
-      html += `<div class="${cellClass}"${styleAttr} title="${title}">
-        <div class="hm-rate">${r.avg.toFixed(2)}%</div>
-        ${lensOn ? `<div class="hm-spread">${spread >= 0 ? '+' : ''}${spreadBps} bps</div>` : ''}
+  // Sort
+  let order;
+  if (sortMode === 'worst') {
+    order = enriched.slice().sort((a, b) => b.spread - a.spread);
+  } else if (sortMode === 'best') {
+    order = enriched.slice().sort((a, b) => a.spread - b.spread);
+  } else {
+    order = enriched.slice().sort((a, b) => PRODUCT_ORDER[a.r.productKey] - PRODUCT_ORDER[b.r.productKey]);
+  }
+
+  // Build HTML
+  let html = `
+    <div class="spread-controls">
+      <span class="spread-controls-label">Sort:</span>
+      <div class="spread-sort-chips" role="tablist">
+        ${SPREAD_SORT_MODES.map(m =>
+          `<button class="spread-sort-chip ${m === sortMode ? 'active' : ''}" data-mode="${m}">${SPREAD_SORT_LABELS[m]}</button>`
+        ).join('')}
+      </div>
+      <span class="spread-scale-note">Scale: ±${maxAbsBps} bps</span>
+    </div>
+    <div class="spread-list">
+  `;
+
+  let lastGroup = null;
+  order.forEach(({ r, benchmark, spread, spreadBps }) => {
+    // Group header — only shown in 'group' sort mode
+    if (sortMode === 'group' && r.group !== lastGroup) {
+      lastGroup = r.group;
+      const groupColor = (PRODUCT_GROUPS.find(g => g.label === r.group) || {}).color || '#999';
+      html += `<div class="spread-group-header">
+        <span class="product-group-dot" style="background:${groupColor};"></span>
+        ${r.group}
       </div>`;
+    }
+
+    // Bar geometry: center is 50%, extends left or right by |spread| / maxAbsBps
+    const halfWidth = Math.min(50, (Math.abs(spreadBps) / maxAbsBps) * 50);
+    const barLeft = spread >= 0 ? 50 : (50 - halfWidth);
+    const barColor = lensOn ? heatmapColor(spread) : 'var(--gray-300)';
+    const signStr = spreadBps >= 0 ? '+' : '';
+    const bpsClass = spreadBps > 0 ? 'pos' : (spreadBps < 0 ? 'neg' : 'zero');
+
+    const benchStr = benchmark != null ? benchmark.toFixed(2) + '%' : '—';
+    const title = `${r.productLabel}\nRate: ${r.avg.toFixed(2)}%\nBenchmark: ${benchStr}\nSpread: ${signStr}${spreadBps} bps`;
+
+    html += `<div class="spread-row" data-product="${r.productKey}" title="${title}">
+      <div class="spread-row-label">${r.productLabel}</div>
+      <div class="spread-row-rate">${r.avg.toFixed(2)}%</div>
+      <div class="spread-row-track">
+        <div class="spread-row-axis"></div>
+        <div class="spread-row-bar" style="left:${barLeft}%; width:${halfWidth}%; background:${barColor};"></div>
+      </div>
+      <div class="spread-row-bps ${bpsClass}">${signStr}${spreadBps} bps</div>
+    </div>`;
+  });
+
+  html += `</div>`;
+  grid.innerHTML = html;
+
+  // Wire sort chips
+  grid.querySelectorAll('.spread-sort-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      state.spreadSort = chip.dataset.mode;
+      renderHeatmap();
     });
   });
-
-  grid.innerHTML = html;
 }
 
 
 /* =====================================================================
-   Tier Construction chart — Low / Avg / High range bars per tier,
-   grouped into a small-multiples grid (one panel per product).
-   When a product is filtered, switches to a single full-width panel.
+   Range View — pick a group, see Low / Avg / High range bars
+   for every product in that group on one shared rate axis. Useful for
+   reading the shape of the bank's pricing curve within a family.
    ===================================================================== */
 function renderConstruction() {
   const grid = el('constructionGrid');
   const data = state.data;
   if (!data) { grid.innerHTML = ''; return; }
 
-  const visibleProducts = state.selectedProduct
-    ? ALL_PRODUCTS.filter(p => p.key === state.selectedProduct)
-    : ALL_PRODUCTS;
-  const single = visibleProducts.length === 1;
+  // Default the selected group on first visit
+  if (!state.constructionGroup) {
+    state.constructionGroup = PRODUCT_GROUPS[0].label;
+  }
+  const activeGroupLabel = state.constructionGroup;
+  const activeGroup = PRODUCT_GROUPS.find(g => g.label === activeGroupLabel) || PRODUCT_GROUPS[0];
+  const groupProducts = activeGroup.products;
 
-  // Shared X scale across all panels — based on the global max across this location
-  const allHighs = data.rows.map(r => r.high);
-  const globalMax = Math.max(...allHighs) * 1.08;
-  const xMax = Math.max(1, Math.ceil(globalMax * 2) / 2); // round up to nearest 0.5%
+  // X axis: scale to the highest "high" within the active group, with headroom
+  const groupRows = groupProducts
+    .map(p => data.rows.find(r => r.productKey === p.key))
+    .filter(Boolean);
+  const groupMax = groupRows.length ? Math.max(...groupRows.map(r => r.high)) : 5;
+  const xMax = Math.max(0.5, Math.ceil(groupMax * 1.08 * 2) / 2);
 
-  grid.classList.toggle('single', single);
-  grid.innerHTML = '';
-
-  for (const p of visibleProducts) {
-    const panel = document.createElement('div');
-    panel.className = 'construction-panel' + (single ? ' single' : '');
-
-    let html = `
+  // Build HTML — chip selector + range-bar list
+  let html = `
+    <div class="construction-controls">
+      <span class="construction-controls-label">Group:</span>
+      <div class="construction-chips" role="tablist">
+        ${PRODUCT_GROUPS.map(g =>
+          `<button class="construction-chip ${g.label === activeGroupLabel ? 'active' : ''}" data-group="${g.label}">
+            <span class="product-group-dot" style="background:${g.color};"></span>${g.label}
+          </button>`
+        ).join('')}
+      </div>
+    </div>
+    <div class="construction-panel single">
       <div class="construction-panel-head">
-        <span class="construction-panel-title">${p.label}</span>
-        <span class="construction-panel-group">${p.group}</span>
+        <span class="construction-panel-title">${activeGroup.label}</span>
+        <span class="construction-panel-group">${groupRows.length} product${groupRows.length === 1 ? '' : 's'}</span>
+      </div>
+  `;
+
+  for (const p of groupProducts) {
+    const r = data.rows.find(r => r.productKey === p.key);
+    if (!r) continue;
+    const lowPct  = (r.low  / xMax) * 100;
+    const highPct = (r.high / xMax) * 100;
+    const avgPct  = (r.avg  / xMax) * 100;
+    const widthPct = Math.max(0.5, highPct - lowPct);
+    const profClass = getProfitabilityClass(r.avg, p.key);
+
+    html += `
+      <div class="construction-row ${profClass}" data-product="${p.key}" title="${p.label} — Low ${r.low.toFixed(2)}% · Avg ${r.avg.toFixed(2)}% · High ${r.high.toFixed(2)}%">
+        <span class="tier-label">${p.label}</span>
+        <div class="range-track">
+          <div class="range-bar" style="left:${lowPct}%; width:${widthPct}%; background:${activeGroup.color};"></div>
+          <div class="range-marker-low"  style="left:${lowPct}%;  background:${activeGroup.color};"></div>
+          <div class="range-marker-high" style="left:${highPct}%; background:${activeGroup.color};"></div>
+          <div class="range-dot" style="left:${avgPct}%; background:${activeGroup.color};"></div>
+        </div>
+        <span class="tier-avg">${r.avg.toFixed(2)}%</span>
       </div>
     `;
+  }
 
-    for (const tier of TIERS) {
-      const r = data.rows.find(r => r.productKey === p.key && r.tierKey === tier.key);
-      if (!r) continue;
-      const lowPct  = (r.low  / xMax) * 100;
-      const highPct = (r.high / xMax) * 100;
-      const avgPct  = (r.avg  / xMax) * 100;
-      const widthPct = Math.max(0.5, highPct - lowPct);
-      const profClass = getProfitabilityClass(r.avg, p.key);
-
-      html += `
-        <div class="construction-row ${profClass}" title="${p.label} · ${tier.label} — Low ${r.low.toFixed(2)}% · Avg ${r.avg.toFixed(2)}% · High ${r.high.toFixed(2)}%">
-          <span class="tier-label">${tier.label}</span>
-          <div class="range-track">
-            <div class="range-bar" style="left:${lowPct}%; width:${widthPct}%; background:${p.color};"></div>
-            <div class="range-marker-low"  style="left:${lowPct}%;  background:${p.color};"></div>
-            <div class="range-marker-high" style="left:${highPct}%; background:${p.color};"></div>
-            <div class="range-dot" style="left:${avgPct}%; background:${p.color};"></div>
-          </div>
-          <span class="tier-avg">${r.avg.toFixed(2)}%</span>
-        </div>
-      `;
-    }
-
-    // Axis labels under the bars
-    html += `
+  // Axis labels under the bars
+  html += `
       <div class="construction-row construction-axis-row">
         <span></span>
         <div class="construction-axis">
@@ -3012,16 +5261,26 @@ function renderConstruction() {
         </div>
         <span></span>
       </div>
-    `;
+    </div>
+  `;
 
-    panel.innerHTML = html;
-    // Click to filter/unfilter to this product
-    panel.addEventListener('click', () => {
-      if (state.selectedState) onProductClick(state.selectedState, p.key);
+  grid.classList.add('single');
+  grid.innerHTML = html;
+
+  // Wire group chips
+  grid.querySelectorAll('.construction-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      state.constructionGroup = chip.dataset.group;
+      renderConstruction();
     });
+  });
 
-    grid.appendChild(panel);
-  }
+  // Click a product row → filter the rates table to that product
+  grid.querySelectorAll('.construction-row[data-product]').forEach(row => {
+    row.addEventListener('click', () => {
+      if (state.selectedState) onProductClick(state.selectedState, row.dataset.product);
+    });
+  });
 }
 
 /* =====================================================================
@@ -3202,8 +5461,16 @@ function onLocationClick(name) {
     state.data = generateLocationData(name, state.geo);
   }
 
+  // Picking a US state on the State tab sets the parent context that scopes
+  // the MSA/County tabs. Picking an MSA/County never changes the context.
+  if (state.geo === 'state') {
+    state.contextState = name;
+  }
+
   renderSidebar(el('stateSearch').value);
   renderMain();
+  // On mobile, close the bottom sheet after a pick so the user sees the rates immediately
+  if (isMobile()) setSidebarOpen(false);
 }
 
 function onProductClick(locationName, productKey) {
@@ -3214,15 +5481,34 @@ function onProductClick(locationName, productKey) {
   state.selectedProduct = (state.selectedProduct === productKey) ? null : productKey;
   renderSidebar(el('stateSearch').value);
   renderMain();
+  if (isMobile()) setSidebarOpen(false);
 }
 
 function onGeoChange(newGeo) {
   if (state.geo === newGeo) return;
   state.geo = newGeo;
-  state.selectedState = null;
   state.selectedProduct = null;
   state.expandedStates.clear();
   state.data = null;
+
+  // When returning to State tab, surface the current context as the selected
+  // row so the user sees where they are. When moving to MSA/County, ensure
+  // contextState is set to one of the dropdown's 10 options (default Florida
+  // if the prior context isn't in the supported list).
+  if (newGeo === 'state') {
+    state.selectedState = state.contextState;
+    if (state.contextState) {
+      state.expandedStates.add(state.contextState);
+      // Regenerate data — clearing it earlier would otherwise leave the
+      // renderer dereferencing null when selectedState is restored.
+      state.data = generateLocationData(state.contextState, 'state');
+    }
+  } else {
+    state.selectedState = null;
+    if (!state.contextState || !MSA_COUNTY_STATES.includes(state.contextState)) {
+      state.contextState = MSA_COUNTY_STATES.includes('Florida') ? 'Florida' : MSA_COUNTY_STATES[0];
+    }
+  }
 
   // Update active tab visual + search placeholder + clear search
   document.querySelectorAll('.geo-tab').forEach(t => {
@@ -3232,6 +5518,42 @@ function onGeoChange(newGeo) {
   search.value = '';
   search.placeholder = GEO_CONFIG[newGeo].placeholder;
 
+  // Show/hide the state-scope dropdown
+  updateStateScopeUI();
+
+  renderSidebar();
+  renderMain();
+}
+
+/* Builds the state-scope dropdown options and shows/hides it based on geo. */
+function updateStateScopeUI() {
+  const wrap = el('stateScope');
+  const sel  = el('stateScopeSelect');
+  if (!wrap || !sel) return;
+
+  if (state.geo === 'msa' || state.geo === 'county') {
+    // Rebuild options (idempotent — keeps things simple)
+    sel.innerHTML = MSA_COUNTY_STATES
+      .map(n => `<option value="${n}">${n}</option>`).join('');
+    if (state.contextState && MSA_COUNTY_STATES.includes(state.contextState)) {
+      sel.value = state.contextState;
+    } else {
+      sel.value = MSA_COUNTY_STATES[0];
+      state.contextState = sel.value;
+    }
+    wrap.style.display = '';
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+function onStateScopeChange() {
+  const sel = el('stateScopeSelect');
+  state.contextState = sel.value || null;
+  state.selectedState = null;
+  state.selectedProduct = null;
+  state.expandedStates.clear();
+  state.data = null;
   renderSidebar();
   renderMain();
 }
@@ -3239,6 +5561,9 @@ function onGeoChange(newGeo) {
 document.querySelectorAll('.geo-tab').forEach(tab => {
   tab.addEventListener('click', () => onGeoChange(tab.dataset.geo));
 });
+
+// State-scope dropdown — drives MSA/County filtering
+el('stateScopeSelect').addEventListener('change', onStateScopeChange);
 
 document.querySelectorAll('.content-tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -3251,6 +5576,10 @@ document.querySelectorAll('.content-tab').forEach(tab => {
     document.querySelectorAll('.tab-panel').forEach(p => {
       p.classList.toggle('active', p.id === 'panel-' + target);
     });
+    // Keep mobile bottom nav in sync with the desktop tab system
+    document.querySelectorAll('.m-nav-tab').forEach(t =>
+      t.classList.toggle('active', t.getAttribute('data-m-panel') === target)
+    );
     // Re-render chart on activation in case layout changed while hidden
     if (target === 'chart' && state.data) renderHeatmap();
     if (target === 'construction' && state.data) renderConstruction();
@@ -3350,11 +5679,10 @@ function onLensChange() {
 const LOC_GROUPS = [
   { geo: 'state',  label: 'States' },
   { geo: 'msa',    label: 'MSAs' },
-  { geo: 'county', label: 'Counties' },
-  { geo: 'city',   label: 'Cities' }
+  { geo: 'county', label: 'Counties' }
 ];
 // Expansion state for each filter group inside the modal
-const locGroupExpanded = { state: true, msa: false, county: false, city: false };
+const locGroupExpanded = { state: true, msa: false, county: false };
 
 function renderLocationFilters() {
   const container = el('locFilters');
@@ -3510,12 +5838,12 @@ function openSettings() {
 }
 function closeSettings() {
   el('settingsOverlay').classList.remove('open');
-  document.body.style.overflow = '';
+  if (!shouldKeepScrollLock()) document.body.style.overflow = '';
 }
 function resetSettingsToDefaults() {
   state.lens = { enabled: true, cof: 1.85, beta: 50, greenMax: 0, orangeMax: 0.75, lagEnabled: false, lag: 6 };
   state.benchmarks = { shortCdPremium: 1.00, longCdPremium: 1.50, cdCurveMode: false, cdCurveSpread: 0.50 };
-  state.visibleLocations = { state: new Set(), msa: new Set(), county: new Set(), city: new Set() };
+  state.visibleLocations = { state: new Set(), msa: new Set(), county: new Set() };
   state.defaults = { geo: null, location: null };
   syncSettingsInputs();
   renderLocationFilters();
@@ -3610,6 +5938,20 @@ function applyDefaultLocation() {
   state.selectedState = location;
   state.expandedStates.add(location);
   state.data = generateLocationData(location, geo);
+
+  // Default-set the parent state context: if the default is itself a state,
+  // it is the context; if it's an MSA/County, derive the parent state from
+  // the abbreviation in the second tuple slot.
+  if (geo === 'state') {
+    state.contextState = location;
+  } else {
+    const item = GEO_CONFIG[geo].list.find(([n]) => n === location);
+    if (item) {
+      const parentAbbr = item[1];
+      const parentEntry = STATES.find(([, a]) => a === parentAbbr);
+      if (parentEntry) state.contextState = parentEntry[0];
+    }
+  }
   return true;
 }
 
@@ -3638,11 +5980,140 @@ function setSidebarOpen(open) {
   btn.classList.toggle('active', state.sidebarOpen);
   btn.setAttribute('aria-expanded', state.sidebarOpen ? 'true' : 'false');
   btn.title = state.sidebarOpen ? 'Hide locations' : 'Show locations';
+  // Body scroll-lock when the mobile location overlay is open
+  if (isMobile() && state.sidebarOpen) {
+    document.body.style.overflow = 'hidden';
+  } else if (!shouldKeepScrollLock()) {
+    document.body.style.overflow = '';
+  }
   saveSettings();
   postResize();
 }
 function toggleSidebar() { setSidebarOpen(!state.sidebarOpen); }
+function isMobile() {
+  return window.matchMedia('(max-width: 840px)').matches;
+}
+function anyModalOpen() {
+  return el('settingsOverlay').classList.contains('open') ||
+         el('finderOverlay').classList.contains('open') ||
+         el('brokeredOverlay').classList.contains('open') ||
+         el('mDrawerOverlay').classList.contains('open') ||
+         el('pwaPreviewOverlay').classList.contains('open') ||
+         el('myRatesOverlay').classList.contains('open');
+}
+function shouldKeepScrollLock() {
+  return anyModalOpen() || (isMobile() && state.sidebarOpen);
+}
 el('sidebarToggle').addEventListener('click', toggleSidebar);
+el('sidebarCloseX').addEventListener('click', () => setSidebarOpen(false));
+
+/* ===================================================================
+   Mobile chrome wiring — top bar, drawer, location chip, bottom nav
+   =================================================================== */
+
+/* --- Mobile drawer (hamburger menu) --- */
+function openMobileDrawer() {
+  el('mDrawerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMobileDrawer() {
+  el('mDrawerOverlay').classList.remove('open');
+  if (!shouldKeepScrollLock()) document.body.style.overflow = '';
+}
+el('mDrawerOpen').addEventListener('click', openMobileDrawer);
+el('mDrawerClose').addEventListener('click', closeMobileDrawer);
+el('mDrawerOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'mDrawerOverlay') closeMobileDrawer();
+});
+
+/* Drawer menu items → trigger the corresponding action */
+document.querySelectorAll('.m-drawer-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const action = btn.getAttribute('data-m-action');
+    closeMobileDrawer();
+    // Brief delay so the drawer close animation feels natural before the next overlay opens
+    setTimeout(() => {
+      if (action === 'locations') setSidebarOpen(true);
+      else if (action === 'finder') openFinder();
+      else if (action === 'brokered') openBrokered();
+      else if (action === 'myRates') openMyRates();
+      else if (action === 'settings') openSettings();
+      else if (action === 'pwaPreview') openPwaPreview();
+    }, 120);
+  });
+});
+
+/* --- Mobile top-bar settings shortcut --- */
+el('mSettingsOpen').addEventListener('click', openSettings);
+
+/* --- Mobile location chip → opens the location picker overlay --- */
+el('mobileLocChip').addEventListener('click', () => setSidebarOpen(true));
+
+/* --- Mobile bottom nav → switches the same tab system used on desktop --- */
+document.querySelectorAll('.m-nav-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.getAttribute('data-m-panel');
+    // Click the corresponding desktop tab — reuses all existing render logic
+    const desktopTab = document.querySelector(`.content-tab[data-panel="${target}"]`);
+    if (desktopTab) desktopTab.click();
+    // Update mobile nav active state
+    document.querySelectorAll('.m-nav-tab').forEach(t =>
+      t.classList.toggle('active', t === btn)
+    );
+  });
+});
+
+/* --- Sync the mobile location chip text whenever state changes --- */
+function updateMobileLocChip() {
+  const nameEl = el('mLocName');
+  const geoEl  = el('mLocGeo');
+  if (!nameEl || !geoEl) return;
+  if (state.selectedState) {
+    nameEl.textContent = state.selectedState;
+    geoEl.textContent = GEO_CONFIG[state.geo].label + (state.geo === 'state' ? '' : ' · ' + GEO_CONFIG[state.geo].label);
+    // Simpler: just show the geo label
+    geoEl.textContent = GEO_CONFIG[state.geo].label.toUpperCase();
+  } else {
+    nameEl.textContent = 'Choose a location';
+    geoEl.textContent = 'Tap to browse';
+  }
+}
+
+/* --- Mobile scroll-hint chips on scrollable tables/grids ---
+   Hint only shows when there's actual horizontal overflow; dismisses on first scroll. */
+function setupScrollHint(scrollSelector, hintSelector) {
+  const scrollEl = document.querySelector(scrollSelector);
+  const hintEl   = document.querySelector(hintSelector);
+  if (!scrollEl || !hintEl) return;
+
+  let dismissed = false;
+  const dismiss = () => {
+    if (dismissed) return;
+    dismissed = true;
+    hintEl.classList.add('dismissed');
+  };
+
+  // Hide hint if content fits without scrolling
+  const refresh = () => {
+    if (dismissed) return;
+    const needsHint = scrollEl.scrollWidth > scrollEl.clientWidth + 4;
+    if (!needsHint) hintEl.classList.add('dismissed');
+    else hintEl.classList.remove('dismissed');
+  };
+
+  // Dismiss on first scroll (passive listener for performance)
+  scrollEl.addEventListener('scroll', dismiss, { passive: true, once: true });
+
+  // Re-check overflow when window resizes or content may have changed
+  window.addEventListener('resize', refresh, { passive: true });
+
+  // Initial check (deferred so layout has settled)
+  setTimeout(refresh, 120);
+  // Re-check again later in case fonts/content shifted things
+  setTimeout(refresh, 600);
+}
+setupScrollHint('.table-wrap', '.m-scroll-hint[data-hint-for="table"]');
+setupScrollHint('.heatmap-grid-wrap', '.m-scroll-hint[data-hint-for="heatmap"]');
 
 /* ---------- Sortable table headers ---------- */
 function onSortColumnClick(col) {
@@ -3675,14 +6146,14 @@ el('resetSort').addEventListener('click', onResetSort);
    ===================================================================== */
 state.finder = {
   productFamily: 'all',  // 'all' | 'liquid' | 'cd'
-  geoScope:      'all',  // 'all' | 'state' | 'msa' | 'county' | 'city'
+  geoScope:      'all',  // 'all' | 'state' | 'msa' | 'county'
   limit:         25
 };
 
 function scanForBestRates() {
   const { productFamily, geoScope, limit } = state.finder;
   const results = [];
-  const geos = geoScope === 'all' ? ['state','msa','county','city'] : [geoScope];
+  const geos = geoScope === 'all' ? ['state','msa','county'] : [geoScope];
   let locationsScanned = 0;
 
   geos.forEach(geo => {
@@ -3697,9 +6168,10 @@ function scanForBestRates() {
       locationsScanned++;
       const data = generateLocationData(name, geo);
       data.rows.forEach(row => {
-        // Product family filter
-        if (productFamily === 'liquid' && !['checking','savings','mm'].includes(row.productKey)) return;
-        if (productFamily === 'cd' && !row.productKey.startsWith('cd')) return;
+        // Product family filter — uses the row's product family directly
+        const fam = getProductFamily(row.productKey);
+        if (productFamily === 'liquid' && fam !== 'liquid') return;
+        if (productFamily === 'cd' && fam === 'liquid') return;
 
         const benchmark = getProductBenchmark(row.productKey);
         const spread = row.avg - benchmark;
@@ -3713,8 +6185,6 @@ function scanForBestRates() {
           productLabel: row.productLabel,
           productGroup: row.group,
           productColor: row.groupColor,
-          tierKey:      row.tierKey,
-          tierLabel:    row.tierLabel,
           rate:         row.avg,
           benchmark,
           spread,
@@ -3761,8 +6231,7 @@ function renderFinderResults() {
     <tr class="finder-row"
         data-geo="${r.geo}"
         data-loc="${escapeAttr(r.locationName)}"
-        data-product="${r.productKey}"
-        data-tier="${r.tierKey}">
+        data-product="${r.productKey}">
       <td class="num finder-rank">${i + 1}</td>
       <td class="finder-loc">
         <strong>${r.locationName}</strong>
@@ -3770,7 +6239,7 @@ function renderFinderResults() {
       </td>
       <td>
         <span class="finder-product-group" style="background:${r.productColor};"></span>
-        ${r.productLabel} · <span style="color:var(--gray-500);">${r.tierLabel}</span>
+        ${r.productLabel}
       </td>
       <td class="num finder-rate">${r.rate.toFixed(2)}%</td>
       <td class="num finder-cof">${r.benchmark.toFixed(2)}%</td>
@@ -3782,12 +6251,12 @@ function renderFinderResults() {
   // Wire click → navigation
   tbody.querySelectorAll('.finder-row').forEach(row => {
     row.addEventListener('click', () => {
-      navigateFromFinder(row.dataset.geo, row.dataset.loc, row.dataset.product, row.dataset.tier);
+      navigateFromFinder(row.dataset.geo, row.dataset.loc, row.dataset.product);
     });
   });
 }
 
-function navigateFromFinder(geo, locationName, productKey, tierKey) {
+function navigateFromFinder(geo, locationName, productKey) {
   // Switch geo if needed (inline so we don't trigger onGeoChange's reset)
   if (state.geo !== geo) {
     state.geo = geo;
@@ -3798,6 +6267,7 @@ function navigateFromFinder(geo, locationName, productKey, tierKey) {
     search.value = '';
     search.placeholder = GEO_CONFIG[geo].placeholder;
     state.expandedStates.clear();
+    updateStateScopeUI();
   }
   // Set location + product
   state.selectedState = locationName;
@@ -3818,13 +6288,13 @@ function navigateFromFinder(geo, locationName, productKey, tierKey) {
   renderSidebar();
   renderMain();
   closeFinder();
-  highlightTableRow(productKey, tierKey);
+  highlightTableRow(productKey);
 }
 
-function highlightTableRow(productKey, tierKey) {
+function highlightTableRow(productKey) {
   // Wait a frame for the table to render, then highlight + scroll
   setTimeout(() => {
-    const row = document.querySelector(`#ratesBody tr[data-product="${productKey}"][data-tier="${tierKey}"]`);
+    const row = document.querySelector(`#ratesBody tr[data-product="${productKey}"]`);
     if (!row) return;
     row.classList.add('highlight-pulse');
     row.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -3847,10 +6317,7 @@ function openFinder() {
 }
 function closeFinder() {
   el('finderOverlay').classList.remove('open');
-  // Only release scroll lock if settings modal isn't also open
-  if (!el('settingsOverlay').classList.contains('open')) {
-    document.body.style.overflow = '';
-  }
+  if (!shouldKeepScrollLock()) document.body.style.overflow = '';
 }
 
 el('openFinder').addEventListener('click', openFinder);
@@ -3867,17 +6334,384 @@ function openBrokered() {
 }
 function closeBrokered() {
   el('brokeredOverlay').classList.remove('open');
-  // Only release scroll lock if no other modal is open
-  if (!el('settingsOverlay').classList.contains('open') &&
-      !el('finderOverlay').classList.contains('open')) {
-    document.body.style.overflow = '';
-  }
+  if (!shouldKeepScrollLock()) document.body.style.overflow = '';
 }
 el('openBrokered').addEventListener('click', openBrokered);
 el('closeBrokered').addEventListener('click', closeBrokered);
 el('brokeredOverlay').addEventListener('click', (e) => {
   if (e.target.id === 'brokeredOverlay') closeBrokered();
 });
+
+/* ---------- PWA Preview modal ---------- */
+function openPwaPreview() {
+  const overlay = el('pwaPreviewOverlay');
+  // Remove + force reflow to restart the notification slide-in animation each open
+  overlay.classList.remove('open');
+  void overlay.offsetWidth;
+  overlay.classList.add('open');
+  // Reset the Download button to its default state every time the modal opens
+  const btn = el('pwaDownloadBtn');
+  const label = el('pwaDownloadLabel');
+  const icon = el('pwaDownloadIcon');
+  if (btn && label && icon) {
+    btn.classList.remove('done');
+    label.textContent = 'Download Now';
+    icon.innerHTML = '<line x1="8" y1="2" x2="8" y2="11"/><polyline points="4,7 8,11 12,7"/><line x1="2" y1="14" x2="14" y2="14"/>';
+  }
+  document.body.style.overflow = 'hidden';
+}
+function closePwaPreview() {
+  el('pwaPreviewOverlay').classList.remove('open');
+  if (!shouldKeepScrollLock()) document.body.style.overflow = '';
+}
+el('openPwaPreview').addEventListener('click', openPwaPreview);
+el('closePwaPreview').addEventListener('click', closePwaPreview);
+el('pwaPreviewOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'pwaPreviewOverlay') closePwaPreview();
+});
+
+/* Download Now → confirmation state (no actual install yet — this is a concept demo) */
+el('pwaDownloadBtn').addEventListener('click', () => {
+  const btn = el('pwaDownloadBtn');
+  const label = el('pwaDownloadLabel');
+  const icon = el('pwaDownloadIcon');
+  btn.classList.add('done');
+  label.textContent = "We'll notify you when available";
+  // Swap the icon to a checkmark
+  icon.innerHTML = '<polyline points="3,8 7,12 13,4"/>';
+});
+
+/* =====================================================================
+   My Rates — optional personal rate sheet + competitive positioning
+   When state.myRates is non-empty the rates table sprouts two extra
+   columns inline. Feature is fully optional: empty = widget unchanged.
+   ===================================================================== */
+
+// Render the grid editor inside the modal. Working copy keeps unsaved edits
+// from corrupting state.myRates until the user clicks Save.
+let _myRatesDraft = {};
+
+function renderMyRatesGrid() {
+  _myRatesDraft = { ...state.myRates };
+  const wrap = el('myRatesGridWrap');
+  let html = `<table class="myrates-grid">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th class="rate-col">Your Rate</th>
+      </tr>
+    </thead>
+    <tbody>`;
+  for (const group of PRODUCT_GROUPS) {
+    html += `<tr class="group-divider"><td colspan="2">${group.label}</td></tr>`;
+    for (const p of group.products) {
+      const v = _myRatesDraft[p.key];
+      const hasV = (typeof v === 'number' && !isNaN(v));
+      html += `<tr>
+        <td>${p.label}</td>
+        <td class="rate-col">
+          <div class="myrates-input-wrap">
+            <input type="number" class="myrates-input ${hasV ? 'has-value' : ''}"
+                   data-prod="${p.key}"
+                   step="0.01" min="0" max="20"
+                   value="${hasV ? v.toFixed(2) : ''}"
+                   placeholder="—" />
+            <span class="myrates-input-suffix">%</span>
+          </div>
+        </td>
+      </tr>`;
+    }
+  }
+  html += `</tbody></table>`;
+  wrap.innerHTML = html;
+
+  // Wire input handlers — write to draft, toggle has-value styling
+  wrap.querySelectorAll('.myrates-input').forEach(input => {
+    input.addEventListener('input', () => {
+      const prod = input.dataset.prod;
+      const raw = input.value.trim();
+      if (raw === '') {
+        delete _myRatesDraft[prod];
+        input.classList.remove('has-value');
+      } else {
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= 0 && num <= 20) {
+          _myRatesDraft[prod] = num;
+          input.classList.add('has-value');
+        }
+      }
+    });
+  });
+}
+
+function updateMyRatesBtnState() {
+  const btn = el('openMyRates');
+  const countEl = el('myratesCount');
+  let count = 0;
+  for (const k in state.myRates) {
+    if (typeof state.myRates[k] === 'number' && !isNaN(state.myRates[k])) count++;
+  }
+  if (count > 0) {
+    btn.classList.add('active');
+    countEl.textContent = count;
+  } else {
+    btn.classList.remove('active');
+  }
+}
+
+function openMyRates() {
+  renderMyRatesGrid();
+  // Sync attention toggles to current state
+  el('myRatesHighlightAbove').checked = state.attention.highlightAbove;
+  el('myRatesHighlightBelow').checked = state.attention.highlightBelow;
+  el('myRatesOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMyRates() {
+  el('myRatesOverlay').classList.remove('open');
+  if (!shouldKeepScrollLock()) document.body.style.overflow = '';
+}
+
+el('openMyRates').addEventListener('click', openMyRates);
+el('closeMyRates').addEventListener('click', closeMyRates);
+el('myRatesCancel').addEventListener('click', closeMyRates);
+el('myRatesOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'myRatesOverlay') closeMyRates();
+});
+
+el('myRatesSave').addEventListener('click', () => {
+  state.myRates = { ..._myRatesDraft };
+  saveSettings();
+  updateMyRatesBtnState();
+  renderMain();              // re-renders the table with new columns
+  closeMyRates();
+});
+
+el('myRatesClearAll').addEventListener('click', () => {
+  if (!Object.keys(_myRatesDraft).length && !hasAnyMyRates()) {
+    closeMyRates();
+    return;
+  }
+  if (confirm("Clear all your saved rates? This won't affect market data.")) {
+    _myRatesDraft = {};
+    state.myRates = {};
+    state.filterAboveMarket = false;     // reset the attention filter as well
+    state.filterBelowMarket = false;
+    saveSettings();
+    updateMyRatesBtnState();
+    renderMain();
+    closeMyRates();
+  }
+});
+
+/* Attention toggles — apply immediately on change (display preference, not
+   buffered through the save draft) and persist. */
+el('myRatesHighlightAbove').addEventListener('change', (e) => {
+  state.attention.highlightAbove = e.target.checked;
+  if (!e.target.checked) state.filterAboveMarket = false;
+  saveSettings();
+  renderTable();
+});
+el('myRatesHighlightBelow').addEventListener('change', (e) => {
+  state.attention.highlightBelow = e.target.checked;
+  if (!e.target.checked) state.filterBelowMarket = false;
+  saveSettings();
+  renderTable();
+});
+
+
+/* =====================================================================
+   Notification Center
+   In-app aggregator that mirrors what would arrive as PWA push notifications.
+   Same content, two surfaces:
+     - PWA push: delivered to the OS when the user isn't in the app
+     - This center: visible history when they are
+   ===================================================================== */
+
+const NOTIF_ICONS = {
+  opportunity: '<polyline points="3,17 9,11 13,15 21,7"/><polyline points="14,7 21,7 21,14"/>',
+  position:    '<path d="M12 2 L22 20 L2 20 Z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17" r="0.5" fill="currentColor" stroke="none"/>',
+  curve:       '<path d="M3 17c3 0 3-10 6-10s3 10 6 10 3-10 6-10"/>',
+  maturity:    '<rect x="3" y="5" width="18" height="16" rx="1.5"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/>',
+  bestrate:    '<path d="M12 2 L14.5 8.5 L21 9.5 L16 14 L17.5 21 L12 17.5 L6.5 21 L8 14 L3 9.5 L9.5 8.5 Z"/>',
+  brokered:    '<rect x="2" y="6" width="20" height="12" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="12" cy="14" r="1.5"/>',
+  system:      '<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>'
+};
+
+// Sample notifications — varied to demonstrate the breadth of triggers.
+// Timestamps anchored relative to load so the relative times always read fresh.
+const NOW = Date.now();
+const MIN = 60 * 1000, HR = 60 * MIN, DAY = 24 * HR;
+const NOTIFICATIONS = [
+  {
+    id: 'n1', type: 'opportunity', read: false,
+    title: 'Rate movement in your footprint',
+    text: '12-month CDs in Hillsborough County moved +20 bps. 3 new acquisition opportunities at current pricing.',
+    ts: NOW - 8 * MIN
+  },
+  {
+    id: 'n2', type: 'position', read: false,
+    title: 'Your rate moved above market',
+    text: 'Your Money Market $50K+ tier is now 18 bps above the regional median for the second straight week.',
+    ts: NOW - 2 * HR
+  },
+  {
+    id: 'n3', type: 'curve', read: false,
+    title: 'Yield curve shift detected',
+    text: '5Y Treasury yield dropped 14 bps overnight. Long-tenor CD pricing assumptions may need review.',
+    ts: NOW - 5 * HR
+  },
+  {
+    id: 'n4', type: 'bestrate', read: false,
+    title: 'New high-rate competitor in your MSA',
+    text: 'A bank entered Tampa-St. Pete-Clearwater at 4.35% on 12-month CDs — the new market high.',
+    ts: NOW - 9 * HR
+  },
+  {
+    id: 'n5', type: 'maturity', read: false,
+    title: 'Upcoming CD maturities',
+    text: '$2.4M in CDs maturing in the next 30 days. Weighted average current rate: 4.15%.',
+    ts: NOW - 1 * DAY - 4 * HR
+  },
+  {
+    id: 'n6', type: 'brokered', read: true,
+    title: 'Brokered curve compresses',
+    text: 'Brokered CD spread tightened to +18 bps over Treasury — competitive vs retail in the 12M tenor.',
+    ts: NOW - 2 * DAY - 6 * HR
+  },
+  {
+    id: 'n7', type: 'system', read: true,
+    title: 'Q2 2026 rate data available',
+    text: 'Fresh deposit rate data has loaded across all markets. Latest refresh: May 23, 2026.',
+    ts: NOW - 3 * DAY
+  }
+];
+
+function notifFormatTime(ts) {
+  const d = NOW - ts;
+  if (d < HR)     return Math.max(1, Math.floor(d / MIN)) + ' min ago';
+  if (d < DAY)    return Math.floor(d / HR) + ' hr ago';
+  if (d < 2*DAY)  return 'Yesterday';
+  if (d < 7*DAY)  return Math.floor(d / DAY) + ' days ago';
+  return new Date(ts).toLocaleDateString();
+}
+
+function notifGroup(ts) {
+  const d = NOW - ts;
+  if (d < DAY)    return 'Today';
+  if (d < 2*DAY)  return 'Yesterday';
+  return 'Earlier';
+}
+
+function notifUnreadCount() {
+  return NOTIFICATIONS.filter(n => !n.read).length;
+}
+
+function refreshNotifBadge() {
+  const count = notifUnreadCount();
+  const desktopBtn  = el('openNotifs');
+  const mobileBtn   = el('mNotifsOpen');
+  const desktopBadge = el('notifBadge');
+  const mobileBadge  = el('mNotifBadge');
+  if (count > 0) {
+    desktopBtn.classList.add('has-unread');
+    mobileBtn.classList.add('has-unread');
+    desktopBadge.textContent = count;
+    mobileBadge.textContent = count;
+  } else {
+    desktopBtn.classList.remove('has-unread');
+    mobileBtn.classList.remove('has-unread');
+  }
+  el('notifMarkAll').disabled = (count === 0);
+}
+
+function renderNotifications() {
+  const list = el('notifList');
+  if (!NOTIFICATIONS.length) {
+    list.innerHTML = `
+      <div class="notif-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+          <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+        </svg>
+        No notifications yet.
+      </div>`;
+    return;
+  }
+  // Group by time bucket, preserving the original chronological order.
+  const sorted = [...NOTIFICATIONS].sort((a, b) => b.ts - a.ts);
+  const groups = {};
+  const groupOrder = [];
+  for (const n of sorted) {
+    const g = notifGroup(n.ts);
+    if (!groups[g]) { groups[g] = []; groupOrder.push(g); }
+    groups[g].push(n);
+  }
+  let html = '';
+  for (const g of groupOrder) {
+    html += `<div class="notif-group-label">${g}</div>`;
+    for (const n of groups[g]) {
+      const iconSvg = NOTIF_ICONS[n.type] || NOTIF_ICONS.system;
+      html += `
+        <div class="notif-item ${n.read ? '' : 'unread'}" data-notif-id="${n.id}">
+          <div class="notif-icon ${n.type}">
+            <svg viewBox="0 0 24 24">${iconSvg}</svg>
+          </div>
+          <div class="notif-body">
+            <div class="notif-title">${n.title}</div>
+            <div class="notif-text">${n.text}</div>
+            <div class="notif-time">${notifFormatTime(n.ts)}</div>
+          </div>
+        </div>`;
+    }
+  }
+  list.innerHTML = html;
+
+  // Click an item → mark just that one as read
+  list.querySelectorAll('.notif-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const id = item.dataset.notifId;
+      const n = NOTIFICATIONS.find(x => x.id === id);
+      if (n && !n.read) {
+        n.read = true;
+        item.classList.remove('unread');
+        refreshNotifBadge();
+      }
+    });
+  });
+}
+
+function openNotifPanel() {
+  el('notifPanel').classList.add('open');
+  el('notifBackdrop').classList.add('open');
+}
+function closeNotifPanel() {
+  el('notifPanel').classList.remove('open');
+  el('notifBackdrop').classList.remove('open');
+}
+function toggleNotifPanel() {
+  if (el('notifPanel').classList.contains('open')) closeNotifPanel();
+  else openNotifPanel();
+}
+
+el('openNotifs').addEventListener('click', (e) => { e.stopPropagation(); toggleNotifPanel(); });
+el('mNotifsOpen').addEventListener('click', (e) => { e.stopPropagation(); toggleNotifPanel(); });
+el('notifBackdrop').addEventListener('click', closeNotifPanel);
+
+el('notifMarkAll').addEventListener('click', () => {
+  NOTIFICATIONS.forEach(n => n.read = true);
+  renderNotifications();
+  refreshNotifBadge();
+});
+
+el('notifSettingsLink').addEventListener('click', () => {
+  closeNotifPanel();
+  openSettings();
+});
+
+// Initial render
+renderNotifications();
+refreshNotifBadge();
 
 // Filter chip handlers
 document.querySelectorAll('#finderOverlay .finder-chips').forEach(group => {
@@ -3898,6 +6732,11 @@ document.querySelectorAll('#finderOverlay .finder-chips').forEach(group => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && el('finderOverlay').classList.contains('open')) closeFinder();
   if (e.key === 'Escape' && el('brokeredOverlay').classList.contains('open')) closeBrokered();
+  if (e.key === 'Escape' && el('mDrawerOverlay').classList.contains('open')) closeMobileDrawer();
+  if (e.key === 'Escape' && el('pwaPreviewOverlay').classList.contains('open')) closePwaPreview();
+  if (e.key === 'Escape' && el('myRatesOverlay').classList.contains('open')) closeMyRates();
+  if (e.key === 'Escape' && el('notifPanel').classList.contains('open')) closeNotifPanel();
+  if (e.key === 'Escape' && isMobile() && state.sidebarOpen) setSidebarOpen(false);
 });
 
 /* =====================================================================
@@ -3916,10 +6755,17 @@ window.addEventListener('resize', postResize);
    Init
    ===================================================================== */
 loadSettings();
-setSidebarOpen(state.sidebarOpen);
+// Mobile-first: if no location is selected on mobile, open the location picker immediately.
+// Otherwise, mobile starts with the picker closed regardless of saved desktop state.
+const initialSidebarOpen = isMobile()
+  ? !state.selectedState
+  : state.sidebarOpen;
+setSidebarOpen(initialSidebarOpen);
 syncSettingsInputs();
 updateLensIndicator();
 applyDefaultLocation();
+updateStateScopeUI();
+updateMyRatesBtnState();
 renderSidebar();
 renderMain();
 </script>
