@@ -2216,6 +2216,44 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* Include My Rates toggle — sits on the right side of the picker head */
+  .competitors-myrates-toggle {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    color: var(--gray-700);
+    cursor: pointer;
+    user-select: none;
+  }
+  .competitors-myrates-toggle input[type="checkbox"] {
+    width: 14px; height: 14px;
+    accent-color: var(--navy);
+    cursor: pointer;
+  }
+  .competitors-myrates-empty {
+    margin: -2px 0 10px;
+    padding: 7px 10px;
+    font-size: 12px;
+    color: var(--gray-700);
+    background: #fffbeb;
+    border: 1px solid #f5d99a;
+    border-radius: var(--radius-sm);
+  }
+  .competitors-myrates-empty[hidden] { display: none; }
+  .link-btn {
+    background: none;
+    border: none;
+    color: var(--blue);
+    font-family: var(--font);
+    font-size: inherit;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+  }
+  .link-btn:hover { color: var(--navy); }
+
   .competitors-chips {
     display: flex;
     flex-wrap: wrap;
@@ -2412,6 +2450,35 @@
     color: var(--gray-700);
     font-weight: 600;
     background: #f8fafc;
+  }
+  /* My Rates column — pale navy tint distinguishes the column;
+     header label rendered in gold to make it scannable */
+  .competitors-table .myrates-cell {
+    color: var(--navy);
+    font-weight: 600;
+    background: rgba(0, 45, 114, 0.06);
+  }
+  .competitors-table .myrates-cell.empty {
+    color: var(--gray-400);
+    font-weight: 400;
+    background: rgba(0, 45, 114, 0.06);
+  }
+  .competitors-table thead th.comp-th-you {
+    background: var(--navy);
+  }
+  .competitors-table thead th.comp-th-you .comp-th-name {
+    color: var(--gold);
+  }
+  .competitors-table thead th.comp-th-you .you-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    background: var(--gold);
+    color: var(--navy);
+    border-radius: 8px;
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
   }
   .competitors-table .rate-best {
     color: var(--navy);
@@ -4272,7 +4339,7 @@
           Preview as an app
         </button>
       </nav>
-      <div class="m-drawer-footer">v1.69</div>
+      <div class="m-drawer-footer">v1.75</div>
     </aside>
   </div>
 
@@ -4553,7 +4620,16 @@
             <div class="competitors-picker-head">
               <span class="competitors-picker-label">Watching</span>
               <span class="competitors-picker-count" id="competitorsCount">0 of 5</span>
+              <label class="competitors-myrates-toggle">
+                <input type="checkbox" id="competitorsIncludeMyRates" />
+                <span>Include My Rates</span>
+              </label>
             </div>
+            <p class="competitors-myrates-empty" id="competitorsMyRatesEmpty" hidden>
+              You haven't entered your rates yet —
+              <button class="link-btn" id="competitorsOpenMyRates" type="button">open My Rates</button>
+              to add them.
+            </p>
             <div class="competitors-chips" id="competitorsChips"></div>
             <div class="competitors-search-wrap" id="competitorsSearchWrap">
               <input type="text" class="competitors-search" id="competitorsSearch"
@@ -4571,7 +4647,7 @@
 
   <footer class="widget-footer">
     <span>Source: Sample data for prototype only · Not production rates</span>
-    <span>v1.69</span>
+    <span>v1.75</span>
   </footer>
 
   <!-- ===== Mobile Bottom Nav (≤840px only) ===== -->
@@ -5693,7 +5769,10 @@ const state = {
   filterBelowMarket: false,
   // Selected competitors for the Competitor Rates tab — array of institution
   // names (max 5). Persisted to localStorage.
-  competitors: []
+  competitors: [],
+  // Whether to also include the user's own rates as a column in the
+  // Competitor Rates comparison table. Persisted.
+  competitorsIncludeMyRates: false
 };
 
 /* =====================================================================
@@ -5745,6 +5824,9 @@ function loadSettings() {
         .filter(n => typeof n === 'string' && pool.has(n))
         .slice(0, COMPETITORS_MAX);
     }
+    if (typeof s.competitorsIncludeMyRates === 'boolean') {
+      state.competitorsIncludeMyRates = s.competitorsIncludeMyRates;
+    }
   } catch (e) { /* ignore */ }
 }
 
@@ -5762,7 +5844,8 @@ function saveSettings() {
       },
       myRates: state.myRates,
       attention: state.attention,
-      competitors: state.competitors
+      competitors: state.competitors,
+      competitorsIncludeMyRates: state.competitorsIncludeMyRates
     }));
   } catch (e) { /* ignore */ }
 }
@@ -7870,6 +7953,13 @@ function generateCompetitorRates(name) {
 function renderCompetitors() {
   renderCompetitorChips();
   renderCompetitorSearchState();
+  // Sync the My Rates toggle checkbox + empty-state warning
+  const cb = el('competitorsIncludeMyRates');
+  if (cb) cb.checked = state.competitorsIncludeMyRates;
+  const emptyMsg = el('competitorsMyRatesEmpty');
+  if (emptyMsg) {
+    emptyMsg.hidden = !(state.competitorsIncludeMyRates && !hasAnyMyRates());
+  }
   renderCompetitorTable();
 }
 
@@ -7964,11 +8054,13 @@ function renderCompetitorTable() {
     rates: generateCompetitorRates(name)
   }));
   const marketRows = (state.data && state.data.rows) || null;
+  const includeMyRates = state.competitorsIncludeMyRates;
 
   // Build header
   let html = `<table class="competitors-table"><thead><tr>
     <th>Product</th>
     ${marketRows ? `<th><span class="comp-th-name">Market Avg</span><span class="comp-th-meta">${state.selectedState || ''}</span></th>` : ''}
+    ${includeMyRates ? `<th class="comp-th-you"><span class="comp-th-name">My Rates</span><span class="comp-th-meta">${ACCOUNT_DATA.organization.name}</span></th>` : ''}
     ${ratesByCompetitor.map(c => {
       const pool = COMPETITORS_POOL.find(p => p.name === c.name);
       return `<th><span class="comp-th-name">${c.name}</span><span class="comp-th-meta">${pool ? (pool.type === 'cu' ? 'CU · ' : 'BANK · ') + pool.meta : ''}</span></th>`;
@@ -7977,25 +8069,26 @@ function renderCompetitorTable() {
 
   // Body — grouped by category
   for (const group of PRODUCT_GROUPS) {
-    const colspan = 1 + (marketRows ? 1 : 0) + state.competitors.length;
+    const colspan = 1 + (marketRows ? 1 : 0) + (includeMyRates ? 1 : 0) + state.competitors.length;
     html += `<tr class="group-header"><td colspan="${colspan}">${group.label}</td></tr>`;
     for (const p of group.products) {
       const mktRow = marketRows ? marketRows.find(r => r.productKey === p.key) : null;
       const compRates = ratesByCompetitor.map(c => c.rates[p.key]);
-      const allRates = compRates.slice(); // for best/lowest identification
-      const maxRate = Math.max(...allRates);
-      const minRate = Math.min(...allRates);
+      const myRate = includeMyRates ? getMyRate(p.key) : null;
 
       html += `<tr><td>${p.label}</td>`;
       if (mktRow) {
         html += `<td class="market-avg-cell">${mktRow.avg.toFixed(2)}%</td>`;
       }
+      if (includeMyRates) {
+        if (myRate !== null && myRate !== undefined) {
+          html += `<td class="myrates-cell">${myRate.toFixed(2)}%</td>`;
+        } else {
+          html += `<td class="myrates-cell empty">—</td>`;
+        }
+      }
       compRates.forEach(r => {
-        // Highlight best (highest) only when there's a clear winner > 5bps gap
-        const isBest = (r === maxRate) && (maxRate - minRate > 0.05);
-        const isLow  = (r === minRate) && (maxRate - minRate > 0.05);
-        const cls = isBest ? 'rate-best' : (isLow ? 'rate-low' : '');
-        html += `<td class="${cls}">${r.toFixed(2)}%</td>`;
+        html += `<td>${r.toFixed(2)}%</td>`;
       });
       html += `</tr>`;
     }
@@ -8036,6 +8129,17 @@ document.addEventListener('click', e => {
   if (!el('competitorsSearchWrap').contains(e.target)) {
     el('competitorsResults').hidden = true;
   }
+});
+
+// Wire the Include My Rates toggle — re-renders the table with/without the column
+el('competitorsIncludeMyRates').addEventListener('change', e => {
+  state.competitorsIncludeMyRates = e.target.checked;
+  saveSettings();
+  renderCompetitors();
+});
+// "open My Rates" link in the empty-state message
+el('competitorsOpenMyRates').addEventListener('click', () => {
+  openMyRates();
 });
 
 /* =====================================================================
