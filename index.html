@@ -183,25 +183,40 @@
   }
 
   .container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0;
+    display: block;
+    position: relative;
     min-height: 720px;
-    transition: grid-template-columns .2s ease;
-  }
-  .container.sidebar-open {
-    grid-template-columns: 300px 1fr;
   }
 
-  /* ---------- Sidebar ---------- */
+  /* ---------- Sidebar (fly-out overlay) ---------- */
   .sidebar {
-    display: none;
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 300px;
     background: var(--gray-50);
     border-right: 1px solid var(--gray-200);
+    display: flex;
     flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform .2s ease;
+    z-index: 50;
+    box-shadow: 2px 0 18px rgba(0,45,114,0.10);
   }
   .container.sidebar-open .sidebar {
-    display: flex;
+    transform: translateX(0);
+  }
+  .sidebar-scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,20,50,0.16);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .2s ease;
+    z-index: 40;
+  }
+  .container.sidebar-open .sidebar-scrim {
+    opacity: 1;
+    visibility: visible;
   }
 
   .geo-tabs {
@@ -4153,6 +4168,7 @@
       display: flex;
       position: fixed;
       inset: 0;
+      transform: none;
       z-index: 250;
       background: var(--white);
       border: none;
@@ -4339,7 +4355,7 @@
           Preview as an app
         </button>
       </nav>
-      <div class="m-drawer-footer">v1.75</div>
+      <div class="m-drawer-footer">v1.76</div>
     </aside>
   </div>
 
@@ -4413,6 +4429,7 @@
   <div class="container">
 
     <!-- ===== Sidebar (desktop) / Location picker overlay (mobile) ===== -->
+    <div class="sidebar-scrim" id="sidebarScrim"></div>
     <aside class="sidebar">
       <button class="sidebar-close-x" id="sidebarCloseX" aria-label="Close locations">×</button>
       <div class="geo-tabs" role="tablist">
@@ -4647,7 +4664,7 @@
 
   <footer class="widget-footer">
     <span>Source: Sample data for prototype only · Not production rates</span>
-    <span>v1.75</span>
+    <span>v1.76</span>
   </footer>
 
   <!-- ===== Mobile Bottom Nav (≤840px only) ===== -->
@@ -5892,46 +5909,17 @@ function renderSidebar(filterText="") {
 
     const item = document.createElement('div');
     item.className = 'state-item';
-    if (state.expandedStates.has(name)) item.classList.add('expanded');
 
     const row = document.createElement('button');
     row.className = 'state-row';
     if (state.selectedState === name) row.classList.add('selected');
-    if (state.expandedStates.has(name)) row.classList.add('expanded');
 
     row.innerHTML = `
-      <svg class="caret" viewBox="0 0 16 16" fill="none">
-        <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
       <span class="state-name">${name}</span>
       <span class="state-count">${abbr}</span>
     `;
     row.addEventListener('click', () => onLocationClick(name));
     item.appendChild(row);
-
-    // Sublist
-    const sub = document.createElement('div');
-    sub.className = 'state-sublist';
-    const data = state.expandedStates.has(name) ? generateLocationData(name, state.geo) : null;
-    if (data) {
-      for (const group of PRODUCT_GROUPS) {
-        const gh = document.createElement('div');
-        gh.className = 'sub-group';
-        gh.textContent = group.label;
-        sub.appendChild(gh);
-
-        for (const p of group.products) {
-          const r = data.rows.find(r => r.productKey === p.key);
-          const si = document.createElement('div');
-          si.className = 'sub-item';
-          if (state.selectedState === name && state.selectedProduct === p.key) si.classList.add('selected');
-          si.innerHTML = `<span>${p.label}</span><span class="rate">${r ? r.avg.toFixed(2)+'%' : '—'}</span>`;
-          si.addEventListener('click', (e) => { e.stopPropagation(); onProductClick(name, p.key); });
-          sub.appendChild(si);
-        }
-      }
-    }
-    item.appendChild(sub);
     list.appendChild(item);
   });
 }
@@ -6597,10 +6585,6 @@ function renderCOF() {
    Event handlers
    ===================================================================== */
 function onLocationClick(name) {
-  // Toggle expand
-  if (state.expandedStates.has(name)) state.expandedStates.delete(name);
-  else state.expandedStates.add(name);
-
   // Select this location and clear product filter when switching
   if (state.selectedState !== name) {
     state.selectedState = name;
@@ -6616,8 +6600,8 @@ function onLocationClick(name) {
 
   renderSidebar(el('stateSearch').value);
   renderMain();
-  // On mobile, close the bottom sheet after a pick so the user sees the rates immediately
-  if (isMobile()) setSidebarOpen(false);
+  // Fly-out closes after a pick so the user sees the rates immediately
+  setSidebarOpen(false);
 }
 
 function onProductClick(locationName, productKey) {
@@ -7153,6 +7137,7 @@ function shouldKeepScrollLock() {
 }
 el('sidebarToggle').addEventListener('click', toggleSidebar);
 el('sidebarCloseX').addEventListener('click', () => setSidebarOpen(false));
+el('sidebarScrim').addEventListener('click', () => setSidebarOpen(false));
 
 /* ===================================================================
    Mobile chrome wiring — top bar, drawer, location chip, bottom nav
