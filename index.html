@@ -2187,7 +2187,250 @@
     100% { transform: scale(1); }
   }
 
-  /* ---------- Account button + modal ---------- */
+  /* ---------- Competitor Rates ---------- */
+  .competitors-section { padding: 18px 20px; }
+
+  .competitors-picker {
+    margin-top: 14px;
+    padding: 14px 16px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+  }
+  .competitors-picker-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .competitors-picker-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .competitors-picker-count {
+    font-size: 12px;
+    color: var(--gray-500);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .competitors-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .competitors-chips:empty { margin-bottom: 0; }
+  .competitor-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 6px 5px 10px;
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: 14px;
+    font-size: 12px;
+    color: var(--gray-900);
+  }
+  .competitor-chip .chip-type {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-right: 2px;
+  }
+  .competitor-chip .chip-type.cu { color: #4a7c8f; }
+  .competitor-chip .chip-type.bank { color: var(--navy); }
+  .chip-remove {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--gray-200);
+    color: var(--gray-700);
+    border: none;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background .12s ease, color .12s ease;
+  }
+  .chip-remove:hover { background: #c44d3d; color: var(--white); }
+
+  .competitors-search-wrap { position: relative; }
+  .competitors-search {
+    width: 100%;
+    padding: 8px 12px;
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--gray-900);
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    transition: border-color .12s ease, box-shadow .12s ease;
+  }
+  .competitors-search:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-soft);
+  }
+  .competitors-search:disabled {
+    background: var(--gray-100);
+    color: var(--gray-500);
+    cursor: not-allowed;
+  }
+
+  .competitors-results {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0; right: 0;
+    max-height: 260px;
+    overflow-y: auto;
+    background: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 6px 18px rgba(0,45,114,0.10);
+    z-index: 5;
+  }
+  .competitors-results[hidden] { display: none; }
+  .competitor-result {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    transition: background .08s ease;
+  }
+  .competitor-result:last-child { border-bottom: none; }
+  .competitor-result:hover { background: var(--gray-50); }
+  .competitor-result.selected {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .competitor-result.selected:hover { background: transparent; }
+  .competitor-result-name {
+    font-size: 13px;
+    color: var(--gray-900);
+  }
+  .competitor-result-meta {
+    font-size: 11px;
+    color: var(--gray-500);
+    font-weight: 500;
+  }
+  .competitors-empty-result {
+    padding: 12px;
+    font-size: 12.5px;
+    color: var(--gray-500);
+    text-align: center;
+  }
+
+  /* The side-by-side rate table */
+  .competitors-table-wrap {
+    margin-top: 18px;
+    overflow-x: auto;
+  }
+  .competitors-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--gray-500);
+    font-size: 13px;
+    background: var(--gray-50);
+    border: 1px dashed var(--gray-300);
+    border-radius: var(--radius);
+    margin-top: 18px;
+  }
+  .competitors-empty strong { color: var(--gray-700); }
+  .competitors-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    min-width: 600px;
+  }
+  .competitors-table thead th {
+    position: sticky;
+    top: 0;
+    background: var(--navy);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 9px 10px;
+    text-align: right;
+    z-index: 2;
+    border-right: 1px solid rgba(255,255,255,0.10);
+  }
+  .competitors-table thead th:first-child {
+    text-align: left;
+    left: 0;
+    z-index: 3;
+  }
+  .competitors-table thead th .comp-th-name {
+    display: block;
+    font-weight: 600;
+    color: var(--white);
+  }
+  .competitors-table thead th .comp-th-meta {
+    display: block;
+    font-size: 9.5px;
+    color: rgba(255,255,255,0.65);
+    font-weight: 500;
+    margin-top: 1px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .competitors-table tbody td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--gray-200);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--gray-900);
+  }
+  .competitors-table tbody td:first-child {
+    text-align: left;
+    color: var(--gray-700);
+    font-weight: 500;
+    background: var(--white);
+    position: sticky;
+    left: 0;
+    border-right: 1px solid var(--gray-200);
+  }
+  .competitors-table tbody tr.group-header td {
+    background: var(--gray-50);
+    color: var(--gray-700);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .competitors-table .market-avg-cell {
+    color: var(--gray-700);
+    font-weight: 600;
+    background: #f8fafc;
+  }
+  .competitors-table .rate-best {
+    color: var(--navy);
+    font-weight: 700;
+    background: rgba(255,191,63,0.18);
+  }
+  .competitors-table .rate-low {
+    color: var(--gray-500);
+  }
+
+  /* Mobile tweaks */
+  @media (max-width: 840px) {
+    .competitors-section { padding: 12px; }
+    .competitors-picker { padding: 12px; }
+    .competitors-table { min-width: 480px; font-size: 11.5px; }
+    .competitors-table thead th { padding: 7px 8px; font-size: 10px; }
+    .competitors-table tbody td { padding: 6px 8px; }
+  }
+
   .account-btn {
     background: transparent;
     border: 1px solid var(--gray-300);
@@ -4029,7 +4272,7 @@
           Preview as an app
         </button>
       </nav>
-      <div class="m-drawer-footer">v1.68</div>
+      <div class="m-drawer-footer">v1.69</div>
     </aside>
   </div>
 
@@ -4194,6 +4437,15 @@
           <svg class="tab-icon" viewBox="0 0 16 16"><polyline points="2,12 5,9 8,11 11,5 14,7"/><line x1="2" y1="14" x2="14" y2="14"/></svg>
           Cost of Funds
         </button>
+        <button class="content-tab" data-panel="competitors" role="tab" aria-selected="false">
+          <svg class="tab-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5.5" cy="6" r="2"/>
+            <circle cx="10.5" cy="6" r="2"/>
+            <path d="M2 13c0-1.7 1.6-3 3.5-3s3.5 1.3 3.5 3"/>
+            <path d="M7 13c0-1.7 1.6-3 3.5-3s3.5 1.3 3.5 3"/>
+          </svg>
+          Competitor Rates
+        </button>
       </div>
 
       <div class="tab-panel active" id="panel-table">
@@ -4288,13 +4540,38 @@
           <div class="cof-summary" id="cofSummary"></div>
         </section>
       </div>
+      <div class="tab-panel" id="panel-competitors">
+        <section class="chart-section competitors-section">
+          <div class="chart-header">
+            <div>
+              <h3>Competitor Rates</h3>
+              <div class="chart-sub">Pick up to 5 banks or credit unions to watch. Their rates appear side-by-side with the regional market average so you can see where each one is pricing.</div>
+            </div>
+          </div>
+
+          <div class="competitors-picker">
+            <div class="competitors-picker-head">
+              <span class="competitors-picker-label">Watching</span>
+              <span class="competitors-picker-count" id="competitorsCount">0 of 5</span>
+            </div>
+            <div class="competitors-chips" id="competitorsChips"></div>
+            <div class="competitors-search-wrap" id="competitorsSearchWrap">
+              <input type="text" class="competitors-search" id="competitorsSearch"
+                placeholder="Add a bank or credit union…" autocomplete="off" />
+              <div class="competitors-results" id="competitorsResults" hidden></div>
+            </div>
+          </div>
+
+          <div class="competitors-table-wrap" id="competitorsTableWrap"></div>
+        </section>
+      </div>
     </main>
 
   </div>
 
   <footer class="widget-footer">
     <span>Source: Sample data for prototype only · Not production rates</span>
-    <span>v1.68</span>
+    <span>v1.69</span>
   </footer>
 
   <!-- ===== Mobile Bottom Nav (≤840px only) ===== -->
@@ -4314,6 +4591,15 @@
     <button class="m-nav-tab" data-m-panel="cof" aria-label="Cost of Funds">
       <svg viewBox="0 0 24 24"><polyline points="3,17 8,11 13,14 21,5"/><polyline points="15,5 21,5 21,11"/></svg>
       <span>COF</span>
+    </button>
+    <button class="m-nav-tab" data-m-panel="competitors" aria-label="Competitor Rates">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="8" r="3"/>
+        <circle cx="16" cy="8" r="3"/>
+        <path d="M3 19c0-2.5 2.7-4.5 6-4.5s6 2 6 4.5"/>
+        <path d="M12 19c0-2.5 2.7-4.5 6-4.5s3 1 3 1"/>
+      </svg>
+      <span>Comp</span>
     </button>
   </nav>
 
@@ -5404,7 +5690,10 @@ const state = {
   // Session-only filters — when true, the rates table filters to flagged rows.
   // Not persisted; each load shows the full picture first.
   filterAboveMarket: false,
-  filterBelowMarket: false
+  filterBelowMarket: false,
+  // Selected competitors for the Competitor Rates tab — array of institution
+  // names (max 5). Persisted to localStorage.
+  competitors: []
 };
 
 /* =====================================================================
@@ -5449,6 +5738,13 @@ function loadSettings() {
       if (typeof s.attention.highlightAbove === 'boolean') state.attention.highlightAbove = s.attention.highlightAbove;
       if (typeof s.attention.highlightBelow === 'boolean') state.attention.highlightBelow = s.attention.highlightBelow;
     }
+    if (Array.isArray(s.competitors)) {
+      // Filter to known competitors only (in case the pool has changed between versions)
+      const pool = new Set(COMPETITORS_POOL.map(c => c.name));
+      state.competitors = s.competitors
+        .filter(n => typeof n === 'string' && pool.has(n))
+        .slice(0, COMPETITORS_MAX);
+    }
   } catch (e) { /* ignore */ }
 }
 
@@ -5465,7 +5761,8 @@ function saveSettings() {
         county: Array.from(state.visibleLocations.county)
       },
       myRates: state.myRates,
-      attention: state.attention
+      attention: state.attention,
+      competitors: state.competitors
     }));
   } catch (e) { /* ignore */ }
 }
@@ -5606,6 +5903,7 @@ function renderMain() {
   renderHeatmap();
   renderConstruction();
   renderCOF();
+  renderCompetitors();
   if (typeof updateMobileLocChip === 'function') updateMobileLocChip();
   postResize();
 }
@@ -7518,6 +7816,229 @@ window.addEventListener('load', postResize);
 window.addEventListener('resize', postResize);
 
 /* =====================================================================
+   Competitor Rates — pick up to 5 banks/CUs to watch side-by-side
+
+   Each competitor has its own deterministic rate generator (seeded on the
+   institution name), so the demo numbers are stable across refreshes but
+   different per institution. State.competitors is persisted to localStorage.
+   ===================================================================== */
+const COMPETITORS_POOL = [
+  // Florida-based banks
+  { name: 'The Bank of Tampa',           type: 'bank', meta: 'Tampa, FL' },
+  { name: 'Seacoast Bank',               type: 'bank', meta: 'Stuart, FL' },
+  { name: 'Centennial Bank',             type: 'bank', meta: 'Conway, AR (FL ops)' },
+  { name: 'Bay First National Bank',     type: 'bank', meta: 'St. Petersburg, FL' },
+  { name: 'Sunrise Banks',               type: 'bank', meta: 'St. Paul, MN' },
+  { name: 'Heritage Bank of Florida',    type: 'bank', meta: 'Lutz, FL' },
+  { name: 'Florida Capital Bank',        type: 'bank', meta: 'Jacksonville, FL' },
+  { name: 'Mercantile Bank',             type: 'bank', meta: 'Grand Rapids, MI' },
+  { name: 'Pinellas Trust',              type: 'bank', meta: 'Clearwater, FL' },
+  { name: 'Peninsula Bank',              type: 'bank', meta: 'Englewood, FL' },
+  { name: 'Bayshore Community Bank',     type: 'bank', meta: 'Tampa, FL' },
+  { name: 'Republic Bank',               type: 'bank', meta: 'Louisville, KY' },
+  { name: 'Suncoast Bank',               type: 'bank', meta: 'Sarasota, FL' },
+  { name: 'Mainstreet Community Bank',   type: 'bank', meta: 'DeLand, FL' },
+  // Florida-based credit unions
+  { name: 'Suncoast Credit Union',       type: 'cu',   meta: 'Tampa, FL' },
+  { name: 'VyStar Credit Union',         type: 'cu',   meta: 'Jacksonville, FL' },
+  { name: 'GTE Financial',               type: 'cu',   meta: 'Tampa, FL' },
+  { name: 'Achieva Credit Union',        type: 'cu',   meta: 'Dunedin, FL' },
+  { name: 'MIDFLORIDA Credit Union',     type: 'cu',   meta: 'Lakeland, FL' },
+  { name: 'Grow Financial',              type: 'cu',   meta: 'Tampa, FL' },
+  { name: 'USF Federal Credit Union',    type: 'cu',   meta: 'Tampa, FL' },
+  { name: 'Tampa Bay Federal CU',        type: 'cu',   meta: 'Tampa, FL' },
+  { name: 'Space Coast Credit Union',    type: 'cu',   meta: 'Melbourne, FL' },
+  { name: 'Tropical Financial CU',       type: 'cu',   meta: 'Miramar, FL' },
+  { name: 'PSCU',                        type: 'cu',   meta: 'St. Petersburg, FL' }
+];
+
+const COMPETITORS_MAX = 5;
+
+// Per-competitor rate generator. Returns { [productKey]: rate% } for all 37
+// products. Seeded on institution name so it's deterministic.
+function generateCompetitorRates(name) {
+  const rng = mulberry32(hashStr('competitor:' + name));
+  const bias = (rng() - 0.5) * 0.40;         // institution-wide rate bias
+  const out = {};
+  for (const p of ALL_PRODUCTS) {
+    const noise = (rng() - 0.5) * 0.20;
+    out[p.key] = Math.max(0.02, p.base + bias + noise);
+  }
+  return out;
+}
+
+function renderCompetitors() {
+  renderCompetitorChips();
+  renderCompetitorSearchState();
+  renderCompetitorTable();
+}
+
+function renderCompetitorChips() {
+  const wrap = el('competitorsChips');
+  el('competitorsCount').textContent = `${state.competitors.length} of ${COMPETITORS_MAX}`;
+  if (state.competitors.length === 0) {
+    wrap.innerHTML = '';
+    return;
+  }
+  wrap.innerHTML = state.competitors.map(name => {
+    const c = COMPETITORS_POOL.find(c => c.name === name);
+    const typeLabel = c && c.type === 'cu' ? 'CU' : 'BANK';
+    const typeClass = c && c.type === 'cu' ? 'cu' : 'bank';
+    return `
+      <span class="competitor-chip" data-name="${name.replace(/"/g, '&quot;')}">
+        <span class="chip-type ${typeClass}">${typeLabel}</span>
+        ${name}
+        <button class="chip-remove" type="button" aria-label="Remove ${name}">×</button>
+      </span>
+    `;
+  }).join('');
+  wrap.querySelectorAll('.chip-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = btn.closest('.competitor-chip').dataset.name;
+      removeCompetitor(name);
+    });
+  });
+}
+
+function renderCompetitorSearchState() {
+  const input = el('competitorsSearch');
+  const atMax = state.competitors.length >= COMPETITORS_MAX;
+  input.disabled = atMax;
+  input.placeholder = atMax
+    ? `${COMPETITORS_MAX} of ${COMPETITORS_MAX} selected — remove one to add another`
+    : 'Add a bank or credit union…';
+  if (atMax) {
+    input.value = '';
+    el('competitorsResults').hidden = true;
+  }
+}
+
+function renderCompetitorSearchResults(query) {
+  const results = el('competitorsResults');
+  const q = query.trim().toLowerCase();
+  if (q.length === 0) {
+    results.hidden = true;
+    return;
+  }
+  const matches = COMPETITORS_POOL.filter(c =>
+    c.name.toLowerCase().includes(q) || c.meta.toLowerCase().includes(q)
+  ).slice(0, 12);
+  if (matches.length === 0) {
+    results.innerHTML = '<div class="competitors-empty-result">No matches.</div>';
+    results.hidden = false;
+    return;
+  }
+  const selected = new Set(state.competitors);
+  results.innerHTML = matches.map(c => {
+    const isSel = selected.has(c.name);
+    return `
+      <div class="competitor-result ${isSel ? 'selected' : ''}" data-name="${c.name.replace(/"/g, '&quot;')}">
+        <div>
+          <div class="competitor-result-name">${c.name}</div>
+          <div class="competitor-result-meta">${c.type === 'cu' ? 'Credit Union' : 'Bank'} · ${c.meta}</div>
+        </div>
+        <div class="competitor-result-meta">${isSel ? 'Added' : '+'}</div>
+      </div>
+    `;
+  }).join('');
+  results.querySelectorAll('.competitor-result').forEach(r => {
+    if (r.classList.contains('selected')) return;
+    r.addEventListener('click', () => addCompetitor(r.dataset.name));
+  });
+  results.hidden = false;
+}
+
+function renderCompetitorTable() {
+  const wrap = el('competitorsTableWrap');
+  if (state.competitors.length === 0) {
+    wrap.innerHTML = `
+      <div class="competitors-empty">
+        <strong>No competitors selected yet.</strong><br/>
+        Add up to ${COMPETITORS_MAX} banks or credit unions above to see their rates side-by-side.
+      </div>`;
+    return;
+  }
+
+  const ratesByCompetitor = state.competitors.map(name => ({
+    name,
+    rates: generateCompetitorRates(name)
+  }));
+  const marketRows = (state.data && state.data.rows) || null;
+
+  // Build header
+  let html = `<table class="competitors-table"><thead><tr>
+    <th>Product</th>
+    ${marketRows ? `<th><span class="comp-th-name">Market Avg</span><span class="comp-th-meta">${state.selectedState || ''}</span></th>` : ''}
+    ${ratesByCompetitor.map(c => {
+      const pool = COMPETITORS_POOL.find(p => p.name === c.name);
+      return `<th><span class="comp-th-name">${c.name}</span><span class="comp-th-meta">${pool ? (pool.type === 'cu' ? 'CU · ' : 'BANK · ') + pool.meta : ''}</span></th>`;
+    }).join('')}
+  </tr></thead><tbody>`;
+
+  // Body — grouped by category
+  for (const group of PRODUCT_GROUPS) {
+    const colspan = 1 + (marketRows ? 1 : 0) + state.competitors.length;
+    html += `<tr class="group-header"><td colspan="${colspan}">${group.label}</td></tr>`;
+    for (const p of group.products) {
+      const mktRow = marketRows ? marketRows.find(r => r.productKey === p.key) : null;
+      const compRates = ratesByCompetitor.map(c => c.rates[p.key]);
+      const allRates = compRates.slice(); // for best/lowest identification
+      const maxRate = Math.max(...allRates);
+      const minRate = Math.min(...allRates);
+
+      html += `<tr><td>${p.label}</td>`;
+      if (mktRow) {
+        html += `<td class="market-avg-cell">${mktRow.avg.toFixed(2)}%</td>`;
+      }
+      compRates.forEach(r => {
+        // Highlight best (highest) only when there's a clear winner > 5bps gap
+        const isBest = (r === maxRate) && (maxRate - minRate > 0.05);
+        const isLow  = (r === minRate) && (maxRate - minRate > 0.05);
+        const cls = isBest ? 'rate-best' : (isLow ? 'rate-low' : '');
+        html += `<td class="${cls}">${r.toFixed(2)}%</td>`;
+      });
+      html += `</tr>`;
+    }
+  }
+  html += `</tbody></table>`;
+  wrap.innerHTML = html;
+}
+
+function addCompetitor(name) {
+  if (state.competitors.includes(name)) return;
+  if (state.competitors.length >= COMPETITORS_MAX) return;
+  if (!COMPETITORS_POOL.some(c => c.name === name)) return;
+  state.competitors.push(name);
+  saveSettings();
+  // Clear the search input
+  el('competitorsSearch').value = '';
+  el('competitorsResults').hidden = true;
+  renderCompetitors();
+}
+
+function removeCompetitor(name) {
+  const i = state.competitors.indexOf(name);
+  if (i === -1) return;
+  state.competitors.splice(i, 1);
+  saveSettings();
+  renderCompetitors();
+}
+
+// Wire the search input
+el('competitorsSearch').addEventListener('input', e => {
+  renderCompetitorSearchResults(e.target.value);
+});
+el('competitorsSearch').addEventListener('focus', e => {
+  if (e.target.value.trim()) renderCompetitorSearchResults(e.target.value);
+});
+// Close results when clicking outside
+document.addEventListener('click', e => {
+  if (!el('competitorsSearchWrap').contains(e.target)) {
+    el('competitorsResults').hidden = true;
+  }
+});
+
+/* =====================================================================
    Account — Team & Subscription (display-only)
 
    Data shape mirrors Stripe API objects (Customer, Subscription, PaymentMethod)
@@ -7872,6 +8393,7 @@ updateStateScopeUI();
 updateMyRatesBtnState();
 renderSidebar();
 renderMain();
+renderCompetitors();
 </script>
 
 <!-- Ionicons web component (for logo icon) -->
