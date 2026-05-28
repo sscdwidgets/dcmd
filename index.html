@@ -3494,6 +3494,52 @@
   }
   .yourrate-cell.empty { color: var(--gray-400); font-weight: 400; }
 
+  /* Inline-editable rate cell — used in Rates Table "Your Rate" and
+     Competitor Rates "My Rates" columns. Renders as a transparent
+     input that looks like a normal cell value until interacted with. */
+  .inline-rate-input {
+    width: 100%;
+    padding: 2px 4px;
+    margin: 0;
+    border: 1px solid transparent;
+    background: transparent;
+    font-family: var(--font);
+    font-size: inherit;
+    font-weight: inherit;
+    font-variant-numeric: tabular-nums;
+    color: inherit;
+    text-align: right;
+    border-radius: 3px;
+    cursor: text;
+    -moz-appearance: textfield;
+  }
+  .inline-rate-input::-webkit-outer-spin-button,
+  .inline-rate-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .inline-rate-input::placeholder { color: var(--gray-400); }
+  .inline-rate-input:hover {
+    background: rgba(255,191,63,0.10);
+    border-color: rgba(255,191,63,0.40);
+  }
+  .inline-rate-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(255,191,63,0.30);
+  }
+
+  /* "This column is editable" affordance in column headers */
+  .th-edit-icon {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    margin-left: 5px;
+    vertical-align: -1px;
+    opacity: 0.65;
+  }
+
   .position-cell {
     white-space: nowrap;
     line-height: 1;
@@ -4355,7 +4401,7 @@
           Preview as an app
         </button>
       </nav>
-      <div class="m-drawer-footer">v1.76</div>
+      <div class="m-drawer-footer">v1.78</div>
     </aside>
   </div>
 
@@ -4547,7 +4593,7 @@
             <thead>
               <tr>
                 <th class="sortable" data-sort="product">Product <span class="sort-icon">↕</span></th>
-                <th class="myrates-col num"><span class="th-long">Your Rate</span><span class="th-short">Yours</span></th>
+                <th class="myrates-col num" title="Click any cell to edit your rate"><span class="th-long">Your Rate <svg class="th-edit-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2l3 3-8 8H3v-3l8-8z"/></svg></span><span class="th-short">Yours</span></th>
                 <th class="myrates-col"><span class="th-long">Position</span><span class="th-short">Pos</span></th>
                 <th class="sortable num" data-sort="avg"><span class="th-long">Avg Rate</span><span class="th-short">Avg</span> <span class="sort-icon">↕</span></th>
                 <th class="sortable num" data-sort="high"><span class="th-long">High Rate</span><span class="th-short">High</span> <span class="sort-icon">↕</span></th>
@@ -4664,7 +4710,7 @@
 
   <footer class="widget-footer">
     <span>Source: Sample data for prototype only · Not production rates</span>
-    <span>v1.76</span>
+    <span>v1.78</span>
   </footer>
 
   <!-- ===== Mobile Bottom Nav (≤840px only) ===== -->
@@ -5656,6 +5702,42 @@ function hasAnyMyRates() {
   }
   return false;
 }
+
+/* Inline rate editing — Rates Table "Your Rate" + Competitor Rates "My Rates"
+   cells render as <input class="inline-rate-input" data-mr-product="...">.
+   A single delegated change handler routes edits to state.myRates and
+   re-renders the affected views.
+   - Empty input → removes the product's rate
+   - Out-of-range or non-numeric → ignored
+   - Persists to localStorage */
+function setMyRateInline(productKey, rawValue) {
+  if (!productKey) return;
+  const trimmed = String(rawValue || '').trim();
+  if (trimmed === '') {
+    delete state.myRates[productKey];
+  } else {
+    const v = parseFloat(trimmed);
+    if (isNaN(v) || v < 0 || v > 20) return;
+    state.myRates[productKey] = v;
+  }
+  saveSettings();
+  // Update the rates table (your rate, position cell, attention class) and the
+  // competitor rates table (my rates column).
+  if (state.data) renderTable();
+  renderCompetitors();
+}
+document.addEventListener('change', (e) => {
+  const t = e.target;
+  if (t && t.classList && t.classList.contains('inline-rate-input')) {
+    setMyRateInline(t.dataset.mrProduct, t.value);
+  }
+});
+// Escape key cancels the edit by blurring (preserves previously-saved value)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && e.target.classList && e.target.classList.contains('inline-rate-input')) {
+    e.target.blur();
+  }
+});
 /* Estimate percentile from the row's avg / high / low.
    Below avg: linear from low (0) to avg (50). Above avg: avg (50) to high (100).
    Clamped 0..100. */
@@ -5988,7 +6070,10 @@ function buildRateRow(r) {
   const myr = getMyRate(r.productKey);
   let yourRateCell, posCell;
   if (myr !== null) {
-    yourRateCell = `<td class="myrates-col rate-cell yourrate-cell">${myr.toFixed(2)}%</td>`;
+    yourRateCell = `<td class="myrates-col rate-cell yourrate-cell">
+      <input type="number" class="inline-rate-input" data-mr-product="${r.productKey}"
+        value="${myr.toFixed(2)}" step="0.01" min="0" max="20" aria-label="Your rate for ${r.productKey}" />
+    </td>`;
     const pct = Math.max(0, Math.min(100, ((myr - r.low) / (r.high - r.low)) * 100));
     const bps = Math.round((myr - r.avg) * 100);
     const absBps = Math.abs(bps);
@@ -6000,15 +6085,16 @@ function buildRateRow(r) {
       <span class="pos-text ${posClass}">${text}</span>
     </td>`;
     // Flag the row when your rate is meaningfully off-market (in either direction).
-    // Each direction is gated by its own toggle in state.attention so the user
-    // can enable / disable independently.
     if (state.attention.highlightAbove && bps > ABOVE_MARKET_THRESHOLD_BPS) {
       tr.classList.add('above-market');
     } else if (state.attention.highlightBelow && bps < -BELOW_MARKET_THRESHOLD_BPS) {
       tr.classList.add('below-market');
     }
   } else {
-    yourRateCell = `<td class="myrates-col yourrate-cell empty">—</td>`;
+    yourRateCell = `<td class="myrates-col yourrate-cell empty">
+      <input type="number" class="inline-rate-input" data-mr-product="${r.productKey}"
+        placeholder="—" step="0.01" min="0" max="20" aria-label="Enter your rate for ${r.productKey}" />
+    </td>`;
     posCell      = `<td class="myrates-col"><span class="pos-cell-empty">—</span></td>`;
   }
 
@@ -8045,7 +8131,7 @@ function renderCompetitorTable() {
   let html = `<table class="competitors-table"><thead><tr>
     <th>Product</th>
     ${marketRows ? `<th><span class="comp-th-name">Market Avg</span><span class="comp-th-meta">${state.selectedState || ''}</span></th>` : ''}
-    ${includeMyRates ? `<th class="comp-th-you"><span class="comp-th-name">My Rates</span><span class="comp-th-meta">${ACCOUNT_DATA.organization.name}</span></th>` : ''}
+    ${includeMyRates ? `<th class="comp-th-you" title="Click any cell to edit your rate"><span class="comp-th-name">My Rates <svg class="th-edit-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2l3 3-8 8H3v-3l8-8z"/></svg></span><span class="comp-th-meta">${ACCOUNT_DATA.organization.name}</span></th>` : ''}
     ${ratesByCompetitor.map(c => {
       const pool = COMPETITORS_POOL.find(p => p.name === c.name);
       return `<th><span class="comp-th-name">${c.name}</span><span class="comp-th-meta">${pool ? (pool.type === 'cu' ? 'CU · ' : 'BANK · ') + pool.meta : ''}</span></th>`;
@@ -8067,9 +8153,13 @@ function renderCompetitorTable() {
       }
       if (includeMyRates) {
         if (myRate !== null && myRate !== undefined) {
-          html += `<td class="myrates-cell">${myRate.toFixed(2)}%</td>`;
+          html += `<td class="myrates-cell"><input type="number" class="inline-rate-input"
+            data-mr-product="${p.key}" value="${myRate.toFixed(2)}" step="0.01" min="0" max="20"
+            aria-label="Your rate for ${p.label}" /></td>`;
         } else {
-          html += `<td class="myrates-cell empty">—</td>`;
+          html += `<td class="myrates-cell empty"><input type="number" class="inline-rate-input"
+            data-mr-product="${p.key}" placeholder="—" step="0.01" min="0" max="20"
+            aria-label="Enter your rate for ${p.label}" /></td>`;
         }
       }
       compRates.forEach(r => {
