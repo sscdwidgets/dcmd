@@ -3531,15 +3531,31 @@
     box-shadow: 0 0 0 3px rgba(255,191,63,0.30);
   }
 
-  /* "This column is editable" affordance in column headers */
-  .th-edit-icon {
-    display: inline-block;
-    width: 11px;
-    height: 11px;
+  /* Edit / save toggle in My Rates column headers */
+  .myrates-edit-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
     margin-left: 5px;
-    vertical-align: -1px;
+    vertical-align: -2px;
+    border-radius: 4px;
+    color: inherit;
     opacity: 0.65;
+    transition: opacity .12s ease, background .12s ease, color .12s ease;
   }
+  .myrates-edit-toggle:hover { opacity: 1; }
+  .myrates-edit-toggle svg { width: 12px; height: 12px; display: block; }
+  .myrates-edit-toggle.editing {
+    opacity: 1;
+    background: var(--gold);
+    color: var(--navy);
+    padding: 3px 6px;
+  }
+  .myrates-toggle-slot { display: inline; }
 
   .position-cell {
     white-space: nowrap;
@@ -4402,7 +4418,7 @@
           Preview as an app
         </button>
       </nav>
-      <div class="m-drawer-footer">v1.79</div>
+      <div class="m-drawer-footer">v1.81</div>
     </aside>
   </div>
 
@@ -4594,7 +4610,7 @@
             <thead>
               <tr>
                 <th class="sortable" data-sort="product">Product <span class="sort-icon">↕</span></th>
-                <th class="myrates-col num" title="Click any cell to edit your rate"><span class="th-long">Your Rate <svg class="th-edit-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2l3 3-8 8H3v-3l8-8z"/></svg></span><span class="th-short">Yours</span></th>
+                <th class="myrates-col num"><span class="th-long">Your Rate <span class="myrates-toggle-slot" id="ratesYourRateToggle"></span></span><span class="th-short">Yours</span></th>
                 <th class="myrates-col"><span class="th-long">Position</span><span class="th-short">Pos</span></th>
                 <th class="sortable num" data-sort="avg"><span class="th-long">Avg Rate</span><span class="th-short">Avg</span> <span class="sort-icon">↕</span></th>
                 <th class="sortable num" data-sort="high"><span class="th-long">High Rate</span><span class="th-short">High</span> <span class="sort-icon">↕</span></th>
@@ -4711,7 +4727,7 @@
 
   <footer class="widget-footer">
     <span>Source: Sample data for prototype only · Not production rates</span>
-    <span>v1.79</span>
+    <span>v1.81</span>
   </footer>
 
   <!-- ===== Mobile Bottom Nav (≤840px only) ===== -->
@@ -5693,6 +5709,49 @@ function sortRows(rows, column, direction) {
    columns. These helpers are tolerant — every row may or may not have a
    personal rate. The key is just productKey now (no tier dimension). */
 function myRateKey(productKey) { return productKey; }
+/* Inline rate editing — Rates Table "Your Rate" + Competitor Rates "My Rates"
+   cells. Editing is gated behind an edit-mode toggle (the pencil in the column
+   header). In read-only mode cells show static text; in edit mode they become
+   <input class="inline-rate-input"> elements. A delegated change handler routes
+   edits to state.myRates.
+   - Empty input → removes the product's rate
+   - Out-of-range or non-numeric → ignored
+   - Persists to localStorage */
+
+// Header toggle button — pencil when locked, checkmark when editing
+function myRatesToggleHTML() {
+  const editing = state.myRatesEditMode;
+  const icon = editing
+    ? `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,8.5 6.5,12 13,4.5"/></svg>`
+    : `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2l3 3-8 8H3v-3l8-8z"/></svg>`;
+  const cls = editing ? 'myrates-edit-toggle editing' : 'myrates-edit-toggle';
+  const label = editing ? 'Save your rates' : 'Edit your rates';
+  return `<button type="button" class="${cls}" data-myrates-edit aria-label="${label}" title="${label}">${icon}</button>`;
+}
+
+// Cell inner content — static text when locked, an input when editing
+function renderMyRateCellInner(productKey, rate, label) {
+  const has = (rate !== null && rate !== undefined);
+  if (state.myRatesEditMode) {
+    const valAttr = has ? `value="${rate.toFixed(2)}"` : 'placeholder="—"';
+    return `<input type="number" class="inline-rate-input" data-mr-product="${productKey}" ${valAttr} step="0.01" min="0" max="20" aria-label="${label || 'Your rate'}" />`;
+  }
+  return has ? `${rate.toFixed(2)}%` : '—';
+}
+
+function toggleMyRatesEdit() {
+  state.myRatesEditMode = !state.myRatesEditMode;
+  if (state.data) renderTable();
+  renderCompetitors();
+  // Entering edit mode: focus the first editable field for fast entry
+  if (state.myRatesEditMode) {
+    setTimeout(() => {
+      const first = document.querySelector('.tab-panel.active .inline-rate-input');
+      if (first) first.focus();
+    }, 0);
+  }
+}
+
 function getMyRate(productKey) {
   const v = state.myRates[productKey];
   return (typeof v === 'number' && !isNaN(v)) ? v : null;
@@ -5704,13 +5763,6 @@ function hasAnyMyRates() {
   return false;
 }
 
-/* Inline rate editing — Rates Table "Your Rate" + Competitor Rates "My Rates"
-   cells render as <input class="inline-rate-input" data-mr-product="...">.
-   A single delegated change handler routes edits to state.myRates and
-   re-renders the affected views.
-   - Empty input → removes the product's rate
-   - Out-of-range or non-numeric → ignored
-   - Persists to localStorage */
 function setMyRateInline(productKey, rawValue) {
   if (!productKey) return;
   const trimmed = String(rawValue || '').trim();
@@ -5722,10 +5774,9 @@ function setMyRateInline(productKey, rawValue) {
     state.myRates[productKey] = v;
   }
   saveSettings();
-  // Update the rates table (your rate, position cell, attention class) and the
-  // competitor rates table (my rates column).
-  if (state.data) renderTable();
-  renderCompetitors();
+  // Note: we intentionally do NOT re-render here while in edit mode, so the
+  // user can tab through fields without the inputs being torn down mid-entry.
+  // The position cells / competitor column refresh when edit mode is closed.
 }
 document.addEventListener('change', (e) => {
   const t = e.target;
@@ -5733,10 +5784,16 @@ document.addEventListener('change', (e) => {
     setMyRateInline(t.dataset.mrProduct, t.value);
   }
 });
-// Escape key cancels the edit by blurring (preserves previously-saved value)
+// Escape cancels the in-progress edit by blurring (keeps saved value)
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && e.target.classList && e.target.classList.contains('inline-rate-input')) {
     e.target.blur();
+  }
+});
+// Pencil / save toggle in either column header
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-myrates-edit]')) {
+    toggleMyRatesEdit();
   }
 });
 /* Estimate percentile from the row's avg / high / low.
@@ -5872,7 +5929,10 @@ const state = {
   competitors: [],
   // Whether to also include the user's own rates as a column in the
   // Competitor Rates comparison table. Persisted.
-  competitorsIncludeMyRates: false
+  competitorsIncludeMyRates: false,
+  // Whether My Rates cells are in edit mode (inputs) vs read-only display.
+  // Session-only — never persisted, so a refresh always starts locked.
+  myRatesEditMode: false
 };
 
 /* =====================================================================
@@ -6071,10 +6131,7 @@ function buildRateRow(r) {
   const myr = getMyRate(r.productKey);
   let yourRateCell, posCell;
   if (myr !== null) {
-    yourRateCell = `<td class="myrates-col rate-cell yourrate-cell">
-      <input type="number" class="inline-rate-input" data-mr-product="${r.productKey}"
-        value="${myr.toFixed(2)}" step="0.01" min="0" max="20" aria-label="Your rate for ${r.productKey}" />
-    </td>`;
+    yourRateCell = `<td class="myrates-col rate-cell yourrate-cell">${renderMyRateCellInner(r.productKey, myr, 'Your rate')}</td>`;
     const pct = Math.max(0, Math.min(100, ((myr - r.low) / (r.high - r.low)) * 100));
     const bps = Math.round((myr - r.avg) * 100);
     const absBps = Math.abs(bps);
@@ -6092,10 +6149,7 @@ function buildRateRow(r) {
       tr.classList.add('below-market');
     }
   } else {
-    yourRateCell = `<td class="myrates-col yourrate-cell empty">
-      <input type="number" class="inline-rate-input" data-mr-product="${r.productKey}"
-        placeholder="—" step="0.01" min="0" max="20" aria-label="Enter your rate for ${r.productKey}" />
-    </td>`;
+    yourRateCell = `<td class="myrates-col yourrate-cell empty">${renderMyRateCellInner(r.productKey, null, 'Enter your rate')}</td>`;
     posCell      = `<td class="myrates-col"><span class="pos-cell-empty">—</span></td>`;
   }
 
@@ -6191,6 +6245,9 @@ function renderTable() {
   const myRatesActive = hasAnyMyRates();
   if (table) table.classList.toggle('has-myrates', myRatesActive);
   const colCount = myRatesActive ? 9 : 7;
+  // Keep the Your Rate header's edit/save toggle in sync with edit mode
+  const toggleSlot = el('ratesYourRateToggle');
+  if (toggleSlot) toggleSlot.innerHTML = myRatesToggleHTML();
 
   // Toggle the load animation only when the underlying location actually changed
   const animateNew = state.selectedState !== _lastRenderedLocation;
@@ -8128,11 +8185,11 @@ function renderCompetitorTable() {
   const marketRows = (state.data && state.data.rows) || null;
   const includeMyRates = state.competitorsIncludeMyRates;
 
-  // Build header
+  // Build header — My Rates (when included) sits first, right after Product
   let html = `<table class="competitors-table"><thead><tr>
     <th>Product</th>
+    ${includeMyRates ? `<th class="comp-th-you"><span class="comp-th-name">My Rates ${myRatesToggleHTML()}</span><span class="comp-th-meta">${ACCOUNT_DATA.organization.name}</span></th>` : ''}
     ${marketRows ? `<th><span class="comp-th-name">Market Avg</span><span class="comp-th-meta">${state.selectedState || ''}</span></th>` : ''}
-    ${includeMyRates ? `<th class="comp-th-you" title="Click any cell to edit your rate"><span class="comp-th-name">My Rates <svg class="th-edit-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2l3 3-8 8H3v-3l8-8z"/></svg></span><span class="comp-th-meta">${ACCOUNT_DATA.organization.name}</span></th>` : ''}
     ${ratesByCompetitor.map(c => {
       const pool = COMPETITORS_POOL.find(p => p.name === c.name);
       return `<th><span class="comp-th-name">${c.name}</span><span class="comp-th-meta">${pool ? (pool.type === 'cu' ? 'CU · ' : 'BANK · ') + pool.meta : ''}</span></th>`;
@@ -8149,19 +8206,12 @@ function renderCompetitorTable() {
       const myRate = includeMyRates ? getMyRate(p.key) : null;
 
       html += `<tr><td>${p.label}</td>`;
+      if (includeMyRates) {
+        const cls = (myRate !== null && myRate !== undefined) ? 'myrates-cell' : 'myrates-cell empty';
+        html += `<td class="${cls}">${renderMyRateCellInner(p.key, (myRate !== null && myRate !== undefined) ? myRate : null, 'Your rate for ' + p.label)}</td>`;
+      }
       if (mktRow) {
         html += `<td class="market-avg-cell">${mktRow.avg.toFixed(2)}%</td>`;
-      }
-      if (includeMyRates) {
-        if (myRate !== null && myRate !== undefined) {
-          html += `<td class="myrates-cell"><input type="number" class="inline-rate-input"
-            data-mr-product="${p.key}" value="${myRate.toFixed(2)}" step="0.01" min="0" max="20"
-            aria-label="Your rate for ${p.label}" /></td>`;
-        } else {
-          html += `<td class="myrates-cell empty"><input type="number" class="inline-rate-input"
-            data-mr-product="${p.key}" placeholder="—" step="0.01" min="0" max="20"
-            aria-label="Enter your rate for ${p.label}" /></td>`;
-        }
       }
       compRates.forEach(r => {
         html += `<td>${r.toFixed(2)}%</td>`;
